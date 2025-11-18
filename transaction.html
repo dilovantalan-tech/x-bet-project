@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Bet Transactions - Iraqi Dinar Gaming</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
+            authDomain: "x-bet-prod-jd.firebaseapp.com",
+            projectId: "x-bet-prod-jd",
+            storageBucket: "x-bet-prod-jd.firebasestorage.app",
+            messagingSenderId: "499334334535",
+            appId: "1:499334334535:web:bebc1bf817e24d9e3c4962",
+            measurementId: "G-PTV4XMYQ6P"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Simple password-based admin access (easier for your team)
+        const ADMIN_PASSWORD = "xbet2024"; // Change this password
+
+        // Auth State Listener
+        auth.onAuthStateChanged(async (user) => {
+            const authSection = document.getElementById('auth-section');
+            const transactionContent = document.getElementById('transaction-content');
+            const adminLoginSection = document.getElementById('admin-login-section');
+            
+            if (user) {
+                // Check if user is admin via password
+                const isAdmin = localStorage.getItem('admin_access') === 'true';
+                
+                if (isAdmin) {
+                    // Admin is signed in and verified
+                    authSection.innerHTML = `
+                        <div class="user-profile">
+                            ${user.photoURL ? `<img src="${user.photoURL}" class="avatar">` : ''}
+                            <span>👑 ${user.displayName || user.email}</span>
+                            <div class="balance">Transaction Manager</div>
+                            <button onclick="logout()" class="btn-logout">Logout</button>
+                        </div>
+                    `;
+                    
+                    transactionContent.style.display = 'block';
+                    adminLoginSection.style.display = 'none';
+                    loadTransactionData();
+                    
+                } else {
+                    // User needs to enter admin password
+                    authSection.innerHTML = `
+                        <div class="user-profile">
+                            ${user.photoURL ? `<img src="${user.photoURL}" class="avatar">` : ''}
+                            <span>${user.displayName || user.email}</span>
+                            <div class="balance">Enter Admin Password</div>
+                            <button onclick="logout()" class="btn-logout">Logout</button>
+                        </div>
+                    `;
+                    
+                    adminLoginSection.style.display = 'block';
+                    transactionContent.style.display = 'none';
+                }
+                
+            } else {
+                // No user signed in
+                authSection.innerHTML = `
+                    <div class="auth-container">
+                        <h1>X-Bet Transactions 🔄</h1>
+                        <p>Admin Transaction Portal</p>
+                        <div class="login-options">
+                            <button onclick="signInWithGitHub()" class="btn btn-github">🚀 Continue with GitHub</button>
+                            <button onclick="signInWithGoogle()" class="btn btn-google">📧 Continue with Google</button>
+                            <div class="divider"><span>or</span></div>
+                            <div class="email-login">
+                                <input type="email" id="login-email" placeholder="Admin Email">
+                                <input type="password" id="login-password" placeholder="Password">
+                                <button onclick="signInWithEmail()" class="btn btn-email">Admin Login</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                transactionContent.style.display = 'none';
+                adminLoginSection.style.display = 'none';
+            }
+        });
+
+        // Admin Password Verification
+        function verifyAdminAccess() {
+            const password = document.getElementById('admin-password').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                localStorage.setItem('admin_access', 'true');
+                location.reload(); // Refresh to show transaction panel
+            } else {
+                alert('❌ Incorrect admin password!');
+            }
+        }
+
+        // Auth Functions
+        function signInWithGitHub() {
+            const provider = new firebase.auth.GithubAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                alert('Login Error: ' + error.message);
+            });
+        }
+
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                alert('Login Error: ' + error.message);
+            });
+        }
+
+        function signInWithEmail() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+            
+            auth.signInWithEmailAndPassword(email, password).catch(error => {
+                alert('Login Error: ' + error.message);
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_access');
+            auth.signOut();
+        }
+
+        // Firestore Functions
+        async function getUserData(userId) {
+            const doc = await db.collection('users').doc(userId).get();
+            return doc.exists ? doc.data() : null;
+        }
+
+        async function updateBalance(userId, newBalance) {
+            await db.collection('users').doc(userId).update({
+                balance: newBalance,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        async function addTransaction(fromUser, toUser, amount, type, notes = '') {
+            await db.collection('transactions').add({
+                fromUser: fromUser,
+                toUser: toUser,
+                amount: amount,
+                type: type,
+                notes: notes,
+                adminName: auth.currentUser.displayName || auth.currentUser.email,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        async function findUserByEmail(email) {
+            // This is a simplified search - in production you'd need better user search
+            const snapshot = await db.collection('users').where('email', '==', email).get();
+            if (!snapshot.empty) {
+                const doc = snapshot.docs[0];
+                return {
+                    id: doc.id,
+                    ...doc.data()
+                };
+            }
+            return null;
+        }
+
+        async function findUserById(userId) {
+            const userData = await getUserData(userId);
+            if (userData) {
+                return {
+                    id: userId,
+                    ...userData
+                };
+            }
+            return null;
+        }
+
+        // Transaction Functions
+        async function loadTransactionData() {
+            // Load recent transactions
+            loadRecentTransactions();
+        }
+
+        async function loadRecentTransactions() {
+            const snapshot = await db.collection('transactions')
+                .orderBy('timestamp', 'desc')
+                .limit(10)
+                .get();
+            
+            const transactionsList = document.getElementById('recent-transactions');
+            if (snapshot.empty) {
+                transactionsList.innerHTML = '<p>No transactions yet</p>';
+                return;
+            }
+            
+            transactionsList.innerHTML = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <strong>${data.type.toUpperCase()}</strong>
+                            <small>From: ${data.fromUser}</small>
+                            <small>To: ${data.toUser}</small>
+                            ${data.notes ? `<small>Notes: ${data.notes}</small>` : ''}
+                            <small>By: ${data.adminName}</small>
+                            <small>${data.timestamp?.toDate().toLocaleString()}</small>
+                        </div>
+                        <div class="transaction-amount ${data.amount > 0 ? 'positive' : 'negative'}">
+                            ${data.amount > 0 ? '+' : ''}${data.amount} د.ع
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Main Transaction Functions
+        async function processTransaction() {
+            const userIdentifier = document.getElementById('user-identifier').value.trim();
+            const amount = parseInt(document.getElementById('transaction-amount').value);
+            const notes = document.getElementById('transaction-notes').value;
+            const transactionType = document.getElementById('transaction-type').value;
+            
+            if (!userIdentifier || !amount) {
+                alert('Please enter both user identifier and amount');
+                return;
+            }
+            
+            if (amount < 1) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            // Find user by email or ID
+            let user;
+            if (userIdentifier.includes('@')) {
+                user = await findUserByEmail(userIdentifier);
+            } else {
+                user = await findUserById(userIdentifier);
+            }
+            
+            if (!user) {
+                alert('❌ User not found! Please check the email or user ID');
+                return;
+            }
+            
+            const currentBalance = user.balance || 0;
+            let newBalance;
+            
+            if (transactionType === 'add') {
+                newBalance = currentBalance + amount;
+            } else if (transactionType === 'subtract') {
+                if (currentBalance < amount) {
+                    alert('❌ User has insufficient balance!');
+                    return;
+                }
+                newBalance = currentBalance - amount;
+            } else {
+                newBalance = amount; // Set specific amount
+            }
+            
+            // Confirm transaction
+            const confirmMessage = `Confirm: ${transactionType.toUpperCase()} ${amount} د.ع to ${user.displayName || user.email}?
+Current Balance: ${currentBalance} د.ع
+New Balance: ${newBalance} د.ع`;
+            
+            if (!confirm(confirmMessage)) return;
+            
+            // Process transaction
+            await updateBalance(user.id, newBalance);
+            await addTransaction(auth.currentUser.uid, user.id, 
+                transactionType === 'subtract' ? -amount : amount, 
+                transactionType, notes);
+            
+            // Show success
+            document.getElementById('transaction-result').innerHTML = `
+                <div class="success-message">
+                    ✅ Transaction Successful!
+                    <br>User: ${user.displayName || user.email}
+                    <br>Amount: ${amount} د.ع
+                    <br>New Balance: ${newBalance} د.ع
+                </div>
+            `;
+            
+            // Clear form
+            document.getElementById('user-identifier').value = '';
+            document.getElementById('transaction-amount').value = '';
+            document.getElementById('transaction-notes').value = '';
+            
+            // Reload recent transactions
+            loadRecentTransactions();
+        }
+
+        // Quick action functions
+        function setZeroBalance() {
+            const userIdentifier = document.getElementById('user-identifier').value.trim();
+            if (!userIdentifier) {
+                alert('Please enter user email or ID first');
+                return;
+            }
+            
+            document.getElementById('transaction-amount').value = '0';
+            document.getElementById('transaction-type').value = 'set';
+            document.getElementById('transaction-notes').value = 'Reset balance to zero';
+        }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 20px; color: #333; }
+        
+        /* Auth Styles */
+        .auth-container { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); max-width: 400px; margin: 50px auto; }
+        .auth-container h1 { color: #333; margin-bottom: 10px; font-size: 2.5em; }
+        .auth-container p { color: #666; margin-bottom: 30px; font-size: 1.1em; }
+        
+        /* Multi-Login Styles */
+        .login-options { display: flex; flex-direction: column; gap: 15px; }
+        
+        .btn { padding: 14px 28px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .btn-github { background: #24292e; color: white; }
+        .btn-github:hover { background: #000; transform: translateY(-2px); }
+        .btn-google { background: #db4437; color: white; }
+        .btn-google:hover { background: #c23321; transform: translateY(-2px); }
+        .btn-email { background: #667eea; color: white; width: 100%; }
+        .btn-email:hover { background: #5a6fd8; }
+        
+        .email-login { display: flex; flex-direction: column; gap: 12px; }
+        .email-login input { padding: 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .email-login input:focus { border-color: #667eea; outline: none; }
+        
+        .divider { text-align: center; position: relative; margin: 20px 0; }
+        .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #ddd; }
+        .divider span { background: white; padding: 0 15px; color: #666; }
+        
+        /* User Profile */
+        .user-profile { display: flex; align-items: center; gap: 15px; background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); margin-bottom: 20px; flex-wrap: wrap; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 3px solid #667eea; }
+        .balance { font-weight: bold; color: #27ae60; margin-left: auto; }
+        .btn-logout { background: #e74c3c; color: white; padding: 8px 16px; font-size: 14px; }
+        .btn-logout:hover { background: #c0392b; }
+        
+        /* Admin Password Section */
+        .admin-login-section { background: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); text-align: center; }
+        .admin-login-section h2 { color: #2c3e50; margin-bottom: 20px; }
+        .password-input { display: flex; gap: 10px; justify-content: center; align-items: center; }
+        .password-input input { padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; width: 200px; }
+        .btn-verify { background: #27ae60; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn-verify:hover { background: #219652; }
+        
+        /* Transaction Content */
+        .transaction-content { display: none; }
+        .transaction-header { background: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .transaction-header h1 { color: #2c3e50; margin-bottom: 10px; }
+        .transaction-header p { color: #7f8c8d; }
+        
+        /* Transaction Form */
+        .transaction-form { background: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3498db; outline: none; }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; align-items: end; }
+        .btn-process { background: #3498db; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; }
+        .btn-process:hover { background: #2980b9; }
+        .btn-zero { background: #e67e22; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn-zero:hover { background: #d35400; }
+        
+        /* Transaction Result */
+        .transaction-result { margin-top: 20px; }
+        .success-message { background: #d4edda; color: #155724; padding: 15px; border-radius: 6px; border: 1px solid #c3e6cb; text-align: center; }
+        
+        /* Recent Transactions */
+        .recent-transactions { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .recent-transactions h2 { color: #2c3e50; margin-bottom: 20px; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        
+        .transactions-list { display: grid; gap: 10px; }
+        .transaction-item { display: flex; justify-content: space-between; align-items: start; padding: 15px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #3498db; }
+        .transaction-info { flex: 1; }
+        .transaction-info strong { display: block; color: #2c3e50; margin-bottom: 5px; }
+        .transaction-info small { display: block; color: #7f8c8d; margin-bottom: 2px; font-size: 12px; }
+        .transaction-amount { font-weight: bold; font-size: 1.2em; }
+        .transaction-amount.positive { color: #27ae60; }
+        .transaction-amount.negative { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div id="auth-section"></div>
+        </header>
+        
+        <!-- Admin Password Section -->
+        <section id="admin-login-section" style="display: none;">
+            <div class="admin-login-section">
+                <h2>🔐 Admin Verification Required</h2>
+                <p>Please enter the admin password to access transaction tools</p>
+                <div class="password-input">
+                    <input type="password" id="admin-password" placeholder="Enter admin password">
+                    <button onclick="verifyAdminAccess()" class="btn-verify">Verify & Continue</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Main Transaction Content -->
+        <main id="transaction-content" class="transaction-content">
+            <div class="transaction-header">
+                <h1>🔄 X-Bet Transaction Portal</h1>
+                <p>Manage user balances and process transactions</p>
+            </div>
+            
+            <div class="transaction-form">
+                <h2>💳 Process Transaction</h2>
+                <div class="form-group">
+                    <label for="user-identifier">User Email or User ID:</label>
+                    <input type="text" id="user-identifier" placeholder="Enter user email or ID">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="transaction-amount">Amount (د.ع):</label>
+                        <input type="number" id="transaction-amount" placeholder="Enter amount" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transaction-type">Transaction Type:</label>
+                        <select id="transaction-type">
+                            <option value="add">Add Coins</option>
+                            <option value="subtract">Subtract Coins</option>
+                            <option value="set">Set Balance</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="setZeroBalance()" class="btn-zero">Set to Zero</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="transaction-notes">Notes (Optional):</label>
+                    <textarea id="transaction-notes" placeholder="Transaction notes" rows="2"></textarea>
+                </div>
+                
+                <button onclick="processTransaction()" class="btn-process">✅ Process Transaction</button>
+                
+                <div id="transaction-result" class="transaction-result"></div>
+            </div>
+            
+            <div class="recent-transactions">
+                <h2>📋 Recent Transactions</h2>
+                <div class="transactions-list" id="recent-transactions">
+                    <p>Loading transactions...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
