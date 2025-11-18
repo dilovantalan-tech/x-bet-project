@@ -1,26 +1,311 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Users can read/write their own data
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Bet - Iraqi Dinar Gaming</title>
     
-    // Anyone can read games
-    match /games/{gameId} {
-      allow read: if true;
-      allow write: if false;
-    }
-    
-    // Users can create predictions
-    match /predictions/{predictionId} {
-      allow read, create: if request.auth != null;
-      allow update, delete: if false;
-    }
-    
-    // Transactions are readable by user
-    match /transactions/{transactionId} {
-      allow read, create: if request.auth != null;
-    }
-  }
-}
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getAuth, 
+            signInWithPopup, 
+            GithubAuthProvider, 
+            GoogleAuthProvider,
+            signOut, 
+            onAuthStateChanged,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
+            authDomain: "x-bet-prod-jd.firebaseapp.com",
+            projectId: "x-bet-prod-jd",
+            storageBucket: "x-bet-prod-jd.firebasestorage.app",
+            messagingSenderId: "499334334535",
+            appId: "1:499334334535:web:bebc1bf817e24d9e3c4962"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const githubProvider = new GithubAuthProvider();
+        const googleProvider = new GoogleAuthProvider();
+
+        // Global functions
+        window.auth = auth;
+        window.db = db;
+        window.signInWithGitHub = () => signInWithPopup(auth, githubProvider);
+        window.signInWithGoogle = () => signInWithPopup(auth, googleProvider);
+        window.logout = () => signOut(auth);
+        
+        // Email/Password functions
+        window.signInWithEmail = async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                if (error.code === 'auth/user-not-found') {
+                    try {
+                        await createUserWithEmailAndPassword(auth, email, password);
+                    } catch (createError) {
+                        alert('Error creating account: ' + createError.message);
+                    }
+                } else {
+                    alert('Error: ' + error.message);
+                }
+            }
+        };
+
+        window.showRegister = () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                alert('Please enter email and password to register');
+                return;
+            }
+            
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(() => alert('Account created successfully!'))
+                .catch(error => alert('Error: ' + error.message));
+        };
+        
+        // User management
+        window.getUserData = async (userId) => {
+            const userDoc = await getDoc(doc(db, "users", userId));
+            return userDoc.exists() ? userDoc.data() : null;
+        };
+
+        window.createUser = async (userId, userData) => {
+            await setDoc(doc(db, "users", userId), {
+                ...userData,
+                balance: 1000,
+                createdAt: new Date()
+            });
+        };
+
+        window.updateBalance = async (userId, newBalance) => {
+            await updateDoc(doc(db, "users", userId), {
+                balance: newBalance
+            });
+        };
+
+        window.addTransaction = async (userId, type, amount, game = null) => {
+            await addDoc(collection(db, "transactions"), {
+                userId: userId,
+                type: type,
+                amount: amount,
+                game: game,
+                timestamp: new Date()
+            });
+        };
+
+        // Auth state listener
+        onAuthStateChanged(auth, async (user) => {
+            const authSection = document.getElementById('auth-section');
+            const mainContent = document.getElementById('main-content');
+            
+            if (user) {
+                let userData = await getUserData(user.uid);
+                if (!userData) {
+                    await createUser(user.uid, {
+                        displayName: user.displayName || user.email,
+                        email: user.email,
+                        photoURL: user.photoURL || '/default-avatar.png'
+                    });
+                    userData = await getUserData(user.uid);
+                }
+                
+                authSection.innerHTML = `
+                    <div class="user-profile">
+                        ${user.photoURL ? `<img src="${user.photoURL}" class="avatar">` : ''}
+                        <span>${user.displayName || user.email}</span>
+                        <div class="balance">Balance: <span id="live-balance">${userData.balance}</span> د.ع</div>
+                        <button onclick="logout()" class="btn-logout">Logout</button>
+                    </div>
+                `;
+                
+                mainContent.classList.remove('hidden');
+                renderGames();
+                setupRealTimeBalance(user.uid);
+                
+            } else {
+                authSection.innerHTML = `
+                    <div class="auth-container">
+                        <h1>X-Bet 🎯</h1>
+                        <p>Iraqi Dinar Gaming Platform</p>
+                        
+                        <div class="login-options">
+                            <button onclick="signInWithGitHub()" class="btn btn-github">
+                                <span>🚀 Continue with GitHub</span>
+                            </button>
+                            
+                            <button onclick="signInWithGoogle()" class="btn btn-google">
+                                <span>📧 Continue with Google</span>
+                            </button>
+                            
+                            <div class="divider">
+                                <span>or</span>
+                            </div>
+                            
+                            <div class="email-login">
+                                <input type="email" id="login-email" placeholder="Email address">
+                                <input type="password" id="login-password" placeholder="Password">
+                                <button onclick="signInWithEmail()" class="btn btn-email">Sign In</button>
+                                <button onclick="showRegister()" class="btn btn-register">Create Account</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                mainContent.classList.add('hidden');
+            }
+        });
+
+        // Real-time balance updates
+        function setupRealTimeBalance(userId) {
+            onSnapshot(doc(db, "users", userId), (doc) => {
+                const userData = doc.data();
+                const balanceElement = document.getElementById('live-balance');
+                if (balanceElement && userData) {
+                    balanceElement.textContent = userData.balance;
+                }
+            });
+        }
+
+        // Game functions
+        window.renderGames = async () => {
+            const gamesContainer = document.getElementById('games-container');
+            
+            const games = [
+                { id: 'bs7bLJLPZkT0eDePrUAhF', title: 'Coin Flip', description: 'Bet on Heads or Tails - Double your money!', minBet: 50, maxBet: 500, multiplier: 2.0 },
+                { id: 'k8okZVsLD61SXkPgJc40', title: 'Number Guess', description: 'Guess a number between 1-10 - Win 5x!', minBet: 100, maxBet: 1000, multiplier: 5.0 },
+                { id: 'm9ES1PSrY1N2SSNeKZZY', title: 'Dice Roll', description: 'Bet on dice outcome - Win 3x!', minBet: 200, maxBet: 2000, multiplier: 3.0 }
+            ];
+            
+            gamesContainer.innerHTML = `
+                <h2>🎮 Available Games</h2>
+                <div class="games-grid">
+                    ${games.map(game => `
+                        <div class="game-card">
+                            <h3>${game.title}</h3>
+                            <p>${game.description}</p>
+                            <p>💰 Win: ${game.multiplier}x your bet</p>
+                            <p>🎯 Bet Range: ${game.minBet} - ${game.maxBet} د.ع</p>
+                            <div class="bet-controls">
+                                <input type="number" id="bet-amount-${game.id}" placeholder="Bet amount" min="${game.minBet}" max="${game.maxBet}">
+                                <button class="btn-bet" onclick="placeBet('${game.id}', ${game.multiplier})">Place Bet</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        };
+
+        window.placeBet = async (gameId, multiplier) => {
+            const user = auth.currentUser;
+            if (!user) return alert('Please login first');
+            
+            const betInput = document.getElementById(`bet-amount-${gameId}`);
+            const betAmount = parseInt(betInput.value);
+            
+            if (!betAmount || betAmount < 50) {
+                alert('Please enter a valid bet amount (min 50 د.ع)');
+                return;
+            }
+            
+            const userData = await getUserData(user.uid);
+            if (userData.balance < betAmount) {
+                alert('Insufficient balance!');
+                return;
+            }
+            
+            // Process bet (50% win chance for demo)
+            const win = Math.random() > 0.5;
+            const winAmount = win ? Math.floor(betAmount * multiplier) : 0;
+            const newBalance = win ? userData.balance + winAmount : userData.balance - betAmount;
+            
+            await updateBalance(user.uid, newBalance);
+            await addTransaction(user.uid, win ? 'win' : 'loss', win ? winAmount : -betAmount, gameId);
+            
+            alert(win ? `🎉 You won ${winAmount} د.ع!` : `😞 You lost ${betAmount} د.ع. Try again!`);
+            betInput.value = '';
+        };
+
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #333; }
+        
+        /* Auth Styles */
+        .auth-container { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); max-width: 400px; margin: 100px auto; }
+        .auth-container h1 { color: #333; margin-bottom: 10px; font-size: 2.5em; }
+        .auth-container p { color: #666; margin-bottom: 30px; font-size: 1.1em; }
+        
+        /* Multi-Login Styles */
+        .login-options { display: flex; flex-direction: column; gap: 15px; }
+        
+        .btn { padding: 14px 28px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-github { background: #24292e; color: white; }
+        .btn-github:hover { background: #000; transform: translateY(-2px); }
+        .btn-google { background: #db4437; color: white; }
+        .btn-google:hover { background: #c23321; transform: translateY(-2px); }
+        .btn-email { background: #667eea; color: white; width: 100%; }
+        .btn-email:hover { background: #5a6fd8; }
+        .btn-register { background: #27ae60; color: white; width: 100%; }
+        .btn-register:hover { background: #219652; }
+        
+        .email-login { display: flex; flex-direction: column; gap: 12px; }
+        .email-login input { padding: 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .email-login input:focus { border-color: #667eea; outline: none; }
+        
+        .divider { text-align: center; position: relative; margin: 20px 0; }
+        .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #ddd; }
+        .divider span { background: white; padding: 0 15px; color: #666; }
+        
+        /* User Profile */
+        .user-profile { display: flex; align-items: center; gap: 15px; background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); margin-bottom: 20px; flex-wrap: wrap; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 3px solid #667eea; }
+        .balance { font-weight: bold; color: #27ae60; margin-left: auto; }
+        .btn-logout { background: #e74c3c; color: white; padding: 8px 16px; font-size: 14px; }
+        .btn-logout:hover { background: #c0392b; }
+        
+        /* Games */
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-top: 20px; }
+        .game-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .game-card h3 { color: #333; margin-bottom: 15px; font-size: 1.4em; }
+        .game-card p { color: #666; margin-bottom: 10px; }
+        
+        .bet-controls { display: flex; gap: 10px; margin-top: 15px; }
+        .bet-controls input { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; }
+        .btn-bet { background: #e67e22; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn-bet:hover { background: #d35400; }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div id="auth-section"></div>
+        </header>
+        
+        <main id="main-content" class="hidden">
+            <div class="dashboard">
+                <div id="games-container"></div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
