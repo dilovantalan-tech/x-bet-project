@@ -4,15 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-Bet - Zero Cost Gamma Platform</title>
-    <link rel="stylesheet" href="./frontend/public/styles.css">
-    <script type="module" src="./frontend/src/main.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .auth-container h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .auth-container p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-github {
+            background: #24292e;
+            color: white;
+        }
+
+        .btn-github:hover {
+            background: #000;
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <header>
-            <div id="auth-section"></div>
-        </header>
-        <main id="main-content" style="display:none;"></main>
+    <div class="auth-container">
+        <h1>X-Bet 🎯</h1>
+        <p>Zero Cost Gamma Platform</p>
+        <button class="btn btn-github" onclick="alert('GitHub Auth Coming Soon!')">
+            🚀 Sign in with GitHub
+        </button>
     </div>
+
+    <script>
+        console.log("X-Bet App Loaded Successfully!");
+    </script>
 </body>
 </html>
