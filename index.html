@@ -243,6 +243,34 @@
             alert(win ? `🎉 You won ${winAmount} د.ع!` : `😞 You lost ${betAmount} د.ع. Try again!`);
             betInput.value = '';
         }
+
+        // Admin Functions
+        function adminAddCoins() {
+            const userId = document.getElementById('admin-user-id').value;
+            const amount = parseInt(document.getElementById('admin-amount').value);
+            
+            if (!userId || !amount) {
+                alert('Please enter both User ID and Amount');
+                return;
+            }
+            
+            getUserData(userId).then(userData => {
+                if (!userData) {
+                    alert('User not found!');
+                    return;
+                }
+                
+                const newBalance = userData.balance + amount;
+                updateBalance(userId, newBalance);
+                addTransaction(userId, 'admin_add', amount, 'admin');
+                
+                alert(`✅ Added ${amount} د.ع to user ${userId}`);
+                document.getElementById('admin-user-id').value = '';
+                document.getElementById('admin-amount').value = '';
+            }).catch(error => {
+                alert('Error: ' + error.message);
+            });
+        }
     </script>
 
     <style>
@@ -292,6 +320,50 @@
         .bet-controls input { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; }
         .btn-bet { background: #e67e22; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
         .btn-bet:hover { background: #d35400; }
+        
+        /* Admin Panel */
+        .admin-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .admin-panel h3 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .admin-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .admin-form input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        .btn-admin {
+            background: #9b59b6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-admin:hover {
+            background: #8e44ad;
+        }
     </style>
 </head>
 <body>
@@ -303,6 +375,16 @@
         <main id="main-content" style="display: none;">
             <div class="dashboard">
                 <div id="games-container"></div>
+                
+                <!-- Admin Panel -->
+                <div class="admin-panel">
+                    <h3>👑 Admin Controls</h3>
+                    <div class="admin-form">
+                        <input type="text" id="admin-user-id" placeholder="User ID">
+                        <input type="number" id="admin-amount" placeholder="Amount د.ع">
+                        <button onclick="adminAddCoins()" class="btn-admin">Add Coins</button>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
