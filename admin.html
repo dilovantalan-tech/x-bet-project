@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Bet Admin - Iraqi Dinar Gaming</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
+            authDomain: "x-bet-prod-jd.firebaseapp.com",
+            projectId: "x-bet-prod-jd",
+            storageBucket: "x-bet-prod-jd.firebasestorage.app",
+            messagingSenderId: "499334334535",
+            appId: "1:499334334535:web:bebc1bf817e24d9e3c4962",
+            measurementId: "G-PTV4XMYQ6P"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Admin users (you can add more)
+        const ADMIN_USERS = [
+            "YOUR_MAIN_ADMIN_USER_ID_HERE", // Add your main admin user ID
+            "SUB_ADMIN_1_USER_ID_HERE"      // Add sub-admin user IDs
+        ];
+
+        // Check if user is admin
+        function isAdmin(user) {
+            return ADMIN_USERS.includes(user.uid);
+        }
+
+        // Auth State Listener
+        auth.onAuthStateChanged(async (user) => {
+            const authSection = document.getElementById('auth-section');
+            const adminContent = document.getElementById('admin-content');
+            
+            if (user && isAdmin(user)) {
+                // Admin is signed in
+                authSection.innerHTML = `
+                    <div class="user-profile">
+                        ${user.photoURL ? `<img src="${user.photoURL}" class="avatar">` : ''}
+                        <span>👑 ${user.displayName || user.email} (ADMIN)</span>
+                        <div class="balance">Admin Panel</div>
+                        <button onclick="logout()" class="btn-logout">Logout</button>
+                    </div>
+                `;
+                
+                adminContent.style.display = 'block';
+                loadAdminData();
+                
+            } else if (user) {
+                // Regular user trying to access admin panel
+                authSection.innerHTML = `
+                    <div class="auth-container">
+                        <h1>🚫 Access Denied</h1>
+                        <p>This area is for administrators only.</p>
+                        <button onclick="logout()" class="btn btn-logout">Return to Main App</button>
+                    </div>
+                `;
+                adminContent.style.display = 'none';
+            } else {
+                // No user signed in
+                authSection.innerHTML = `
+                    <div class="auth-container">
+                        <h1>X-Bet Admin 👑</h1>
+                        <p>Administrator Login</p>
+                        <div class="login-options">
+                            <button onclick="signInWithGitHub()" class="btn btn-github">🚀 Continue with GitHub</button>
+                            <button onclick="signInWithGoogle()" class="btn btn-google">📧 Continue with Google</button>
+                            <div class="divider"><span>or</span></div>
+                            <div class="email-login">
+                                <input type="email" id="login-email" placeholder="Admin Email">
+                                <input type="password" id="login-password" placeholder="Password">
+                                <button onclick="signInWithEmail()" class="btn btn-email">Admin Login</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                adminContent.style.display = 'none';
+            }
+        });
+
+        // Auth Functions
+        function signInWithGitHub() {
+            const provider = new firebase.auth.GithubAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                alert('Login Error: ' + error.message);
+            });
+        }
+
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                alert('Login Error: ' + error.message);
+            });
+        }
+
+        function signInWithEmail() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+            
+            auth.signInWithEmailAndPassword(email, password).catch(error => {
+                alert('Login Error: ' + error.message);
+            });
+        }
+
+        function logout() {
+            auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        // Firestore Functions
+        async function getUserData(userId) {
+            const doc = await db.collection('users').doc(userId).get();
+            return doc.exists ? doc.data() : null;
+        }
+
+        async function updateBalance(userId, newBalance) {
+            await db.collection('users').doc(userId).update({
+                balance: newBalance,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        async function addTransaction(fromUser, toUser, amount, type) {
+            await db.collection('transactions').add({
+                fromUser: fromUser,
+                toUser: toUser,
+                amount: amount,
+                type: type,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        async function getAllUsers() {
+            const snapshot = await db.collection('users').get();
+            return snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        }
+
+        // Admin Functions
+        async function loadAdminData() {
+            const users = await getAllUsers();
+            displayUsers(users);
+            displaySystemStats(users);
+        }
+
+        function displayUsers(users) {
+            const usersList = document.getElementById('users-list');
+            usersList.innerHTML = users.map(user => `
+                <div class="user-card">
+                    <div class="user-info">
+                        <strong>${user.displayName || user.email}</strong>
+                        <small>ID: ${user.id}</small>
+                        <small>Balance: ${user.balance || 0} د.ع</small>
+                        <small>Joined: ${user.createdAt ? new Date(user.createdAt.toDate()).toLocaleDateString() : 'N/A'}</small>
+                    </div>
+                    <div class="user-actions">
+                        <input type="number" id="amount-${user.id}" placeholder="Amount د.ع" min="1">
+                        <button onclick="addCoinsToUser('${user.id}')" class="btn-add">Add Coins</button>
+                        <button onclick="setZeroBalance('${user.id}')" class="btn-reset">Set Zero</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displaySystemStats(users) {
+            const stats = document.getElementById('system-stats');
+            const totalUsers = users.length;
+            const totalBalance = users.reduce((sum, user) => sum + (user.balance || 0), 0);
+            const zeroBalanceUsers = users.filter(user => !user.balance || user.balance === 0).length;
+            
+            stats.innerHTML = `
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <div class="stat-number">${totalUsers}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total IQD in System</h3>
+                    <div class="stat-number">${totalBalance.toLocaleString()} د.ع</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Zero Balance Users</h3>
+                    <div class="stat-number">${zeroBalanceUsers}</div>
+                </div>
+            `;
+        }
+
+        async function addCoinsToUser(userId) {
+            const amountInput = document.getElementById(`amount-${userId}`);
+            const amount = parseInt(amountInput.value);
+            
+            if (!amount || amount < 1) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            const userData = await getUserData(userId);
+            const currentBalance = userData?.balance || 0;
+            const newBalance = currentBalance + amount;
+            
+            await updateBalance(userId, newBalance);
+            await addTransaction(auth.currentUser.uid, userId, amount, 'admin_add');
+            
+            alert(`✅ Added ${amount} د.ع to user. New balance: ${newBalance} د.ع`);
+            amountInput.value = '';
+            loadAdminData(); // Refresh data
+        }
+
+        async function setZeroBalance(userId) {
+            if (!confirm('Are you sure you want to set this user balance to zero?')) return;
+            
+            await updateBalance(userId, 0);
+            await addTransaction(auth.currentUser.uid, userId, 0, 'admin_reset');
+            
+            alert('✅ User balance set to zero');
+            loadAdminData(); // Refresh data
+        }
+
+        // Initialize main admin with 1 billion IQD
+        async function initializeMainAdmin() {
+            const user = auth.currentUser;
+            if (!user || !isAdmin(user)) return;
+            
+            const userData = await getUserData(user.uid);
+            if (!userData || userData.balance < 1000000000) {
+                await updateBalance(user.uid, 1000000000);
+                await addTransaction('system', user.uid, 1000000000, 'admin_initial');
+                alert('🎉 Main Admin initialized with 1,000,000,000 د.ع');
+                loadAdminData();
+            }
+        }
+
+        // Quick actions
+        function setAllUsersZero() {
+            if (!confirm('Set ALL users balance to ZERO? This cannot be undone!')) return;
+            
+            getAllUsers().then(users => {
+                users.forEach(user => {
+                    if (!ADMIN_USERS.includes(user.id)) { // Don't reset admin balances
+                        updateBalance(user.id, 0);
+                    }
+                });
+                alert('✅ All non-admin user balances set to zero');
+                loadAdminData();
+            });
+        }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; padding: 20px; color: #333; }
+        
+        /* Auth Styles */
+        .auth-container { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); max-width: 400px; margin: 100px auto; }
+        .auth-container h1 { color: #333; margin-bottom: 10px; font-size: 2.5em; }
+        .auth-container p { color: #666; margin-bottom: 30px; font-size: 1.1em; }
+        
+        /* Multi-Login Styles */
+        .login-options { display: flex; flex-direction: column; gap: 15px; }
+        
+        .btn { padding: 14px 28px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .btn-github { background: #24292e; color: white; }
+        .btn-github:hover { background: #000; transform: translateY(-2px); }
+        .btn-google { background: #db4437; color: white; }
+        .btn-google:hover { background: #c23321; transform: translateY(-2px); }
+        .btn-email { background: #667eea; color: white; width: 100%; }
+        .btn-email:hover { background: #5a6fd8; }
+        
+        .email-login { display: flex; flex-direction: column; gap: 12px; }
+        .email-login input { padding: 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .email-login input:focus { border-color: #667eea; outline: none; }
+        
+        .divider { text-align: center; position: relative; margin: 20px 0; }
+        .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #ddd; }
+        .divider span { background: white; padding: 0 15px; color: #666; }
+        
+        /* User Profile */
+        .user-profile { display: flex; align-items: center; gap: 15px; background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); margin-bottom: 20px; flex-wrap: wrap; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 3px solid #667eea; }
+        .balance { font-weight: bold; color: #27ae60; margin-left: auto; }
+        .btn-logout { background: #e74c3c; color: white; padding: 8px 16px; font-size: 14px; }
+        .btn-logout:hover { background: #c0392b; }
+        
+        /* Admin Content */
+        .admin-content { display: none; }
+        .admin-header { background: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .admin-header h1 { color: #2c3e50; margin-bottom: 10px; }
+        .admin-header p { color: #7f8c8d; margin-bottom: 20px; }
+        
+        /* System Stats */
+        .system-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .stat-card h3 { color: #7f8c8d; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; }
+        .stat-number { font-size: 2em; font-weight: bold; color: #2c3e50; }
+        
+        /* Users List */
+        .users-section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .users-section h2 { color: #2c3e50; margin-bottom: 20px; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        
+        .users-list { display: grid; gap: 15px; }
+        .user-card { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; }
+        .user-info { flex: 1; }
+        .user-info strong { display: block; color: #2c3e50; margin-bottom: 5px; }
+        .user-info small { display: block; color: #7f8c8d; margin-bottom: 2px; }
+        
+        .user-actions { display: flex; gap: 10px; align-items: center; }
+        .user-actions input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 120px; }
+        .btn-add { background: #27ae60; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-add:hover { background: #219652; }
+        .btn-reset { background: #e74c3c; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-reset:hover { background: #c0392b; }
+        
+        /* Quick Actions */
+        .quick-actions { margin-top: 20px; }
+        .btn-danger { background: #e74c3c; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-danger:hover { background: #c0392b; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div id="auth-section"></div>
+        </header>
+        
+        <main id="admin-content" class="admin-content">
+            <div class="admin-header">
+                <h1>👑 X-Bet Admin Dashboard</h1>
+                <p>Manage users, balances, and system operations</p>
+                <button onclick="initializeMainAdmin()" class="btn">Initialize Main Admin (1B د.ع)</button>
+            </div>
+            
+            <div class="system-stats" id="system-stats">
+                <!-- Stats will be loaded here -->
+            </div>
+            
+            <div class="users-section">
+                <h2>👥 User Management</h2>
+                <div class="quick-actions">
+                    <button onclick="setAllUsersZero()" class="btn-danger">Set ALL Users to Zero Balance</button>
+                </div>
+                <div class="users-list" id="users-list">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
