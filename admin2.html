@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin 2 - X-Bet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fdbb2d;
+        }
+        
+        .admin-section {
+            margin-top: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .admin-section h2 {
+            margin-bottom: 20px;
+            color: #fdbb2d;
+        }
+        
+        .balance-card {
+            background: rgba(0,0,0,0.5);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+        
+        .balance-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .balance-card .value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff4444;
+        }
+        
+        .btn {
+            background: #fdbb2d;
+            color: #1a2a6c;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            background: #ffcc44;
+            transform: translateY(-2px);
+        }
+        
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-style: italic;
+        }
+        
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">X-BET ADMIN 2</div>
+            <nav>
+                <a href="admin-manager.html" class="btn">Request Balance Transfer</a>
+                <a href="admin.html" class="btn">Main Admin</a>
+            </nav>
+        </header>
+        
+        <div class="admin-section">
+            <h2>Admin 2 Dashboard</h2>
+            
+            <div class="balance-card">
+                <h3>Current Balance</h3>
+                <div class="value">$0.00</div>
+            </div>
+            
+            <p>This admin account has zero balance. Request a transfer from the Admin Manager.</p>
+            
+            <div class="note">
+                <p>Note: This is the second new admin account with zero initial balance.</p>
+            </div>
+            
+            <a href="admin-manager.html" class="btn">Go to Admin Manager</a>
+        </div>
+        
+        <footer>
+            <p>&copy; 2023 X-Bet Admin Panel. Admin 2 Account.</p>
+        </footer>
+    </div>
+</body>
+</html>
