@@ -24,4 +24,147 @@
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
         .logo { font-size: 28px; font-weight: bold; color: #fdbb2d; }
         
-        .admin-section { margin-top: 
+        .admin-section { margin-top: 30px; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 25px; text-align: center; }
+        .admin-section h2 { margin-bottom: 20px; color: #fdbb2d; }
+        
+        .balance-card { background: rgba(0,0,0,0.5); padding: 30px; border-radius: 10px; max-width: 400px; margin: 0 auto 30px; }
+        .balance-card h3 { font-size: 18px; margin-bottom: 15px; color: #ccc; }
+        .balance-card .value { font-size: 36px; font-weight: bold; color: #ff4444; }
+        
+        .btn { background: #fdbb2d; color: #1a2a6c; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s; display: inline-block; text-decoration: none; margin: 10px; }
+        .btn-disabled { background: #666; color: #ccc; cursor: not-allowed; }
+        
+        .note { margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; font-style: italic; }
+        
+        footer { margin-top: 50px; text-align: center; padding: 20px; border-top: 1px solid rgba(255,255,255,0.2); color: #ccc; }
+        
+        .admin-info { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        
+        .permissions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .perm-card { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; text-align: center; }
+        .perm-allowed { border-left: 4px solid #27ae60; }
+        .perm-denied { border-left: 4px solid #e74c3c; }
+    </style>
+</head>
+<body>
+    <div id="login-section">
+        <div class="login-container">
+            <h2>Admin 2 Login</h2>
+            <input type="text" id="username" class="login-input" placeholder="Username" value="admin2">
+            <input type="password" id="password" class="login-input" placeholder="Password">
+            <button onclick="login()" class="login-btn">Login</button>
+            <div style="margin-top: 20px; color: #fdbb2d; font-size: 14px;">
+                <strong>Username:</strong> admin2<br>
+                <strong>Password:</strong> admin2pass
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-content" style="display: none;">
+        <div class="container">
+            <header>
+                <div class="logo">X-BET ADMIN 2</div>
+                <nav>
+                    <a href="admin.html" class="btn">Super Admin</a>
+                    <button onclick="logout()" class="btn" style="background: #e74c3c;">Logout</button>
+                </nav>
+            </header>
+            
+            <div class="admin-info">
+                <h3>🔐 Admin 2 - Limited Access</h3>
+                <p>View-only access. Cannot make transactions. Contact Super Admin for fund transfers.</p>
+            </div>
+            
+            <div class="permissions">
+                <div class="perm-card perm-allowed">
+                    <h4>✅ View Balance</h4>
+                    <p>Can see current balance</p>
+                </div>
+                <div class="perm-card perm-denied">
+                    <h4>❌ Send Money</h4>
+                    <p>Cannot transfer funds</p>
+                </div>
+                <div class="perm-card perm-denied">
+                    <h4>❌ User Transactions</h4>
+                    <p>Cannot send to users</p>
+                </div>
+                <div class="perm-card perm-allowed">
+                    <h4>✅ View Reports</h4>
+                    <p>Can see system status</p>
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <h2>Admin 2 Dashboard</h2>
+                
+                <div class="balance-card">
+                    <h3>Current Balance</h3>
+                    <div class="value" id="current-balance">0 IQD</div>
+                </div>
+                
+                <p>This admin account has view-only access. Request transfers from Super Admin.</p>
+                
+                <div class="note">
+                    <p>⚠️ Limited Permissions: You can only view your balance. All transactions must be processed by Super Admin.</p>
+                </div>
+                
+                <button class="btn btn-disabled" disabled>🚫 Send Money (Disabled)</button>
+                <button class="btn btn-disabled" disabled>🚫 Transfer Funds (Disabled)</button>
+                <button class="btn" onclick="requestFunds()">📞 Request Funds from Super Admin</button>
+                
+            </div>
+            
+            <footer>
+                <p>&copy; 2023 X-Bet Admin Panel. Admin 2 Account. Limited Access</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Admin 2 Credentials
+        const ADMIN2 = {
+            username: "admin2",
+            password: "admin2pass"
+        };
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === ADMIN2.username && password === ADMIN2.password) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                localStorage.setItem('admin2_loggedin', 'true');
+                loadBalance();
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+
+        function loadBalance() {
+            const balances = JSON.parse(localStorage.getItem('admin_balances')) || { admin2: 0 };
+            document.getElementById('current-balance').textContent = formatMoney(balances.admin2 || 0) + ' IQD';
+        }
+
+        function formatMoney(amount) {
+            return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function requestFunds() {
+            alert('Fund Request Sent to Super Admin!\n\nPlease contact Super Admin directly for fund transfers.');
+        }
+
+        function logout() {
+            localStorage.removeItem('admin2_loggedin');
+            location.reload();
+        }
+
+        // Check if already logged in
+        if (localStorage.getItem('admin2_loggedin') === 'true') {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+            loadBalance();
+        }
+    </script>
+</body>
+</html>
