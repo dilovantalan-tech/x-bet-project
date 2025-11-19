@@ -11,8 +11,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #333; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #333; }
         
         /* Navigation */
         nav { background: rgba(255,255,255,0.1); padding: 15px 0; margin-bottom: 20px; border-radius: 10px; }
@@ -49,16 +49,16 @@
         .btn-logout { background: #e74c3c; color: white; padding: 8px 16px; font-size: 14px; border: none; border-radius: 5px; cursor: pointer; }
         .btn-logout:hover { background: #c0392b; }
         
-        /* Games */
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-top: 20px; }
-        .game-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-        .game-card h3 { color: #333; margin-bottom: 15px; font-size: 1.4em; }
-        .game-card p { color: #666; margin-bottom: 10px; }
+        /* Ads & Announcements */
+        .ads-section { background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; }
+        .announcement { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; border-radius: 8px; margin: 10px 0; }
         
-        .bet-controls { display: flex; gap: 10px; margin-top: 15px; }
-        .bet-controls input { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; }
-        .btn-bet { background: #e67e22; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .btn-bet:hover { background: #d35400; }
+        /* Quick Games Preview */
+        .games-preview { background: white; padding: 25px; border-radius: 12px; margin: 20px 0; }
+        .games-preview h2 { color: #333; margin-bottom: 15px; text-align: center; }
+        .preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .preview-game { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; }
+        .preview-game h4 { color: #333; margin-bottom: 10px; }
         
         /* User Profile Section */
         .user-profile-section {
@@ -189,6 +189,38 @@
         .auth-toggle button:hover {
             color: #5a6fd8;
         }
+
+        /* Play Now Button */
+        .play-now-btn {
+            background: #e67e22;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            width: 200px;
+        }
+
+        .play-now-btn:hover {
+            background: #d35400;
+            transform: translateY(-2px);
+        }
+
+        .error-message { 
+            background: #e74c3c; 
+            color: white; 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin: 10px 0; 
+            display: none; 
+        }
     </style>
 </head>
 <body>
@@ -196,11 +228,23 @@
     <nav>
         <div class="nav-container">
             <a href="index.html">Home</a>
-            <a href="games.html">Games</a>
-            <a href="signup.html">Quick Sign Up</a>
-            <a href="admin.html">Admin</a>
+            <a href="games.html">Play Games</a>
+            <a href="login.html">Login</a>
+            <a href="signup.html">Sign Up</a>
         </div>
     </nav>
+
+    <!-- Ads & Announcements Section -->
+    <div class="ads-section">
+        <h3>🎯 Special Offers</h3>
+        <div class="announcement">
+            <strong>🔥 New Game Added!</strong> Try our exciting Number Race with 5x multipliers!
+        </div>
+        <div class="announcement">
+            <strong>💰 Welcome Bonus!</strong> New users get special starting bonuses!
+        </div>
+        <p>Advertisement Space - Contact for ads</p>
+    </div>
 
     <div id="app">
         <header>
@@ -208,54 +252,70 @@
         </header>
         
         <main id="main-content" style="display: none;">
-            <div class="dashboard">
-                <div id="games-container"></div>
-                
-                <!-- Zero Balance Warning -->
-                <div id="zero-balance-warning" class="warning-message">
-                    <h3>💰 Zero Balance Detected</h3>
-                    <p>You need IQD coins to play games. Please contact an admin to purchase coins.</p>
-                    <p><strong>Your User ID: <span id="warning-user-id"></span></strong></p>
-                    <p>Share this ID with admin to get coins</p>
-                    <button onclick="copyUserId()" class="btn-copy">Copy My User ID</button>
+            <!-- Quick Games Preview -->
+            <div class="games-preview">
+                <h2>🎮 Quick Play</h2>
+                <div class="preview-grid">
+                    <div class="preview-game">
+                        <h4>Coin Flip</h4>
+                        <p>Double your money!</p>
+                    </div>
+                    <div class="preview-game">
+                        <h4>Number Guess</h4>
+                        <p>Win 5x your bet!</p>
+                    </div>
+                    <div class="preview-game">
+                        <h4>Dice Roll</h4>
+                        <p>3x multiplier!</p>
+                    </div>
                 </div>
-                
-                <!-- User Profile Section -->
-                <div class="user-profile-section">
-                    <h2>👤 Your Profile</h2>
-                    <div class="profile-card">
-                        <div class="profile-info">
-                            <div class="profile-field">
-                                <label>User ID:</label>
-                                <span id="user-id-display" class="user-id"></span>
-                                <button onclick="copyUserId()" class="btn-copy">Copy ID</button>
-                            </div>
-                            <div class="profile-field">
-                                <label>Display Name:</label>
-                                <span id="user-name-display"></span>
-                            </div>
-                            <div class="profile-field">
-                                <label>Email:</label>
-                                <span id="user-email-display"></span>
-                            </div>
-                            <div class="profile-field">
-                                <label>Member Since:</label>
-                                <span id="user-join-date"></span>
-                            </div>
+                <a href="games.html" class="play-now-btn">🎯 Play All Games</a>
+            </div>
+            
+            <!-- Zero Balance Warning -->
+            <div id="zero-balance-warning" class="warning-message">
+                <h3>💰 Zero Balance Detected</h3>
+                <p>You need IQD coins to play games. Please contact an admin to purchase coins.</p>
+                <p><strong>Your User ID: <span id="warning-user-id"></span></strong></p>
+                <p>Share this ID with admin to get coins</p>
+                <button onclick="copyUserId()" class="btn-copy">Copy My User ID</button>
+            </div>
+            
+            <!-- User Profile Section -->
+            <div class="user-profile-section">
+                <h2>👤 Your Profile</h2>
+                <div class="profile-card">
+                    <div class="profile-info">
+                        <div class="profile-field">
+                            <label>User ID:</label>
+                            <span id="user-id-display" class="user-id"></span>
+                            <button onclick="copyUserId()" class="btn-copy">Copy ID</button>
                         </div>
-                        <div class="profile-stats">
-                            <div class="stat">
-                                <h3>Total Bets</h3>
-                                <p id="total-bets">0</p>
-                            </div>
-                            <div class="stat">
-                                <h3>Games Played</h3>
-                                <p id="games-played">0</p>
-                            </div>
-                            <div class="stat">
-                                <h3>Win Rate</h3>
-                                <p id="win-rate">0%</p>
-                            </div>
+                        <div class="profile-field">
+                            <label>Display Name:</label>
+                            <span id="user-name-display"></span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Email:</label>
+                            <span id="user-email-display"></span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Member Since:</label>
+                            <span id="user-join-date"></span>
+                        </div>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <h3>Total Bets</h3>
+                            <p id="total-bets">0</p>
+                        </div>
+                        <div class="stat">
+                            <h3>Games Played</h3>
+                            <p id="games-played">0</p>
+                        </div>
+                        <div class="stat">
+                            <h3>Win Rate</h3>
+                            <p id="win-rate">0%</p>
                         </div>
                     </div>
                 </div>
@@ -313,7 +373,6 @@
                 `;
                 
                 mainContent.style.display = 'block';
-                renderGames();
                 setupRealTimeBalance(user.uid);
                 displayUserProfile(user, userData);
                 
@@ -323,6 +382,8 @@
                     <div class="auth-container">
                         <h1>X-Bet 🎯</h1>
                         <p>Iraqi Dinar Gaming Platform</p>
+                        
+                        <div class="error-message" id="auth-error" style="display: none;"></div>
                         
                         <div class="login-options">
                             <button onclick="signInWithGoogle()" class="btn btn-google">
@@ -340,7 +401,7 @@
                                     <input type="password" id="register-password" placeholder="Password (min 6 chars)" required>
                                     <button onclick="registerWithName()" class="btn btn-simple">Create Account</button>
                                 ` : `
-                                    <input type="text" id="login-name" placeholder="Your Name" required>
+                                    <input type="text" id="login-name" placeholder="Your Username" required>
                                     <input type="password" id="login-password" placeholder="Your Password" required>
                                     <button onclick="loginWithName()" class="btn btn-simple">Sign In</button>
                                 `}
@@ -359,6 +420,21 @@
             }
         });
 
+        function showAuthError(message) {
+            const errorElement = document.getElementById('auth-error');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function hideAuthError() {
+            const errorElement = document.getElementById('auth-error');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }
+
         // Toggle between login and register
         function toggleAuthMode() {
             isRegisterMode = !isRegisterMode;
@@ -366,11 +442,10 @@
             auth.onAuthStateChanged((user) => {});
         }
 
-        // Simple Name-Based Authentication
-        function generateEmailFromName(firstName, lastName) {
-            const cleanFirstName = firstName.toLowerCase().replace(/\s+/g, '');
-            const cleanLastName = lastName.toLowerCase().replace(/\s+/g, '');
-            return `${cleanFirstName}.${cleanLastName}@xbet.local`;
+        // Simple Name-Based Authentication - FIXED VERSION
+        function generateEmailFromName(name) {
+            const cleanName = name.toLowerCase().replace(/\s+/g, '');
+            return `${cleanName}@xbet.local`;
         }
 
         function registerWithName() {
@@ -379,17 +454,19 @@
             const password = document.getElementById('register-password').value;
             
             if (!firstName || !lastName || !password) {
-                alert('Please fill all fields');
+                showAuthError('Please fill all fields');
                 return;
             }
             
             if (password.length < 6) {
-                alert('Password must be at least 6 characters');
+                showAuthError('Password must be at least 6 characters');
                 return;
             }
             
-            const email = generateEmailFromName(firstName, lastName);
-            const displayName = `${firstName} ${lastName}`;
+            hideAuthError();
+            const name = `${firstName} ${lastName}`;
+            const email = generateEmailFromName(name);
+            const displayName = name;
             
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
@@ -399,14 +476,15 @@
                     });
                 })
                 .then(() => {
-                    alert(`Account created successfully!\nWelcome ${displayName}`);
+                    // Auto login after creation
+                    return auth.signInWithEmailAndPassword(email, password);
                 })
                 .catch(error => {
+                    console.error('Registration error:', error);
                     if (error.code === 'auth/email-already-in-use') {
-                        // Auto login if account exists
-                        loginWithName();
+                        showAuthError('Account already exists. Please sign in instead.');
                     } else {
-                        alert('Error creating account: ' + error.message);
+                        showAuthError('Error: ' + error.message);
                     }
                 });
         }
@@ -416,23 +494,27 @@
             const password = document.getElementById('login-password').value;
             
             if (!name || !password) {
-                alert('Please enter both name and password');
+                showAuthError('Please enter both username and password');
                 return;
             }
             
-            // Try to generate email from name
-            const nameParts = name.split(' ');
-            const firstName = nameParts[0] || 'User';
-            const lastName = nameParts.slice(1).join(' ') || 'Account';
-            const email = generateEmailFromName(firstName, lastName);
+            hideAuthError();
+            const email = generateEmailFromName(name);
             
             auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    // Login successful
+                })
                 .catch(error => {
+                    console.error('Login error:', error);
                     if (error.code === 'auth/user-not-found') {
-                        alert('Account not found. Please create an account first.');
-                        toggleAuthMode();
+                        showAuthError('Account not found. Please create an account first.');
+                    } else if (error.code === 'auth/wrong-password') {
+                        showAuthError('Wrong password. Please try again.');
+                    } else if (error.code === 'auth/invalid-credential') {
+                        showAuthError('Invalid login credentials. Please check your username and password.');
                     } else {
-                        alert('Sign-in Error: ' + error.message);
+                        showAuthError('Login Error: ' + error.message);
                     }
                 });
         }
@@ -441,7 +523,7 @@
         function signInWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).catch(error => {
-                alert('Google Sign-in Error: ' + error.message);
+                showAuthError('Google Sign-in Error: ' + error.message);
             });
         }
 
@@ -464,26 +546,6 @@
                 gamesPlayed: 0,
                 wins: 0,
                 losses: 0
-            });
-        }
-
-        async function updateBalance(userId, newBalance) {
-            await db.collection('users').doc(userId).update({
-                balance: newBalance
-            });
-        }
-
-        async function updateUserStats(userId, stats) {
-            await db.collection('users').doc(userId).update(stats);
-        }
-
-        async function addTransaction(userId, type, amount, game = null) {
-            await db.collection('transactions').add({
-                userId: userId,
-                type: type,
-                amount: amount,
-                game: game,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
         }
 
@@ -539,86 +601,16 @@
             });
         }
 
-        // Games
-        function renderGames() {
-            const gamesContainer = document.getElementById('games-container');
-            
-            const games = [
-                { id: 'bs7bLJLPZkT0eDePrUAhF', title: 'Coin Flip', description: 'Bet on Heads or Tails - Double your money!', minBet: 50, maxBet: 500, multiplier: 2.0 },
-                { id: 'k8okZVsLD61SXkPgJc40', title: 'Number Guess', description: 'Guess a number between 1-10 - Win 5x!', minBet: 100, maxBet: 1000, multiplier: 5.0 },
-                { id: 'm9ES1PSrY1N2SSNeKZZY', title: 'Dice Roll', description: 'Bet on dice outcome - Win 3x!', minBet: 200, maxBet: 2000, multiplier: 3.0 }
-            ];
-            
-            gamesContainer.innerHTML = `
-                <h2>🎮 Available Games</h2>
-                <div class="games-grid">
-                    ${games.map(game => `
-                        <div class="game-card">
-                            <h3>${game.title}</h3>
-                            <p>${game.description}</p>
-                            <p>💰 Win: ${game.multiplier}x your bet</p>
-                            <p>🎯 Bet Range: ${game.minBet} - ${game.maxBet} د.ع</p>
-                            <div class="bet-controls">
-                                <input type="number" id="bet-amount-${game.id}" placeholder="Bet amount" min="${game.minBet}" max="${game.maxBet}">
-                                <button class="btn-bet" onclick="placeBet('${game.id}', ${game.multiplier})">Place Bet</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        async function placeBet(gameId, multiplier) {
-            const user = auth.currentUser;
-            if (!user) return alert('Please login first');
-            
-            const userData = await getUserData(user.uid);
-            
-            // Check if user has zero balance
-            if (userData.balance === 0) {
-                alert('❌ Zero Balance!\n\nYou need IQD coins to play. Please contact admin with your User ID to purchase coins.');
-                copyUserId(); // Auto-copy user ID for them
-                return;
+        // Enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (isRegisterMode) {
+                    registerWithName();
+                } else {
+                    loginWithName();
+                }
             }
-            
-            const betInput = document.getElementById(`bet-amount-${gameId}`);
-            const betAmount = parseInt(betInput.value);
-            
-            if (!betAmount || betAmount < 50) {
-                alert('Please enter a valid bet amount (min 50 د.ع)');
-                return;
-            }
-            
-            if (userData.balance < betAmount) {
-                alert('Insufficient balance!');
-                return;
-            }
-            
-            // Process bet (50% win chance for demo)
-            const win = Math.random() > 0.5;
-            const winAmount = win ? Math.floor(betAmount * multiplier) : 0;
-            const newBalance = win ? userData.balance + winAmount : userData.balance - betAmount;
-            
-            // Update balance and stats
-            await updateBalance(user.uid, newBalance);
-            
-            const statsUpdate = {
-                totalBets: (userData.totalBets || 0) + 1,
-                gamesPlayed: (userData.gamesPlayed || 0) + 1
-            };
-            
-            if (win) {
-                statsUpdate.wins = (userData.wins || 0) + 1;
-            } else {
-                statsUpdate.losses = (userData.losses || 0) + 1;
-            }
-            
-            await updateUserStats(user.uid, statsUpdate);
-            await addTransaction(user.uid, win ? 'win' : 'loss', win ? winAmount : -betAmount, gameId);
-            
-            alert(win ? `🎉 You won ${winAmount} د.ع!` : `😞 You lost ${betAmount} د.ع. Try again!`);
-            betInput.value = '';
-        }
+        });
     </script>
 </body>
 </html>
