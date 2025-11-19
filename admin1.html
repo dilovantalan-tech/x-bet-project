@@ -32,12 +32,18 @@
         .balance-card .value { font-size: 36px; font-weight: bold; color: #ff4444; }
         
         .btn { background: #fdbb2d; color: #1a2a6c; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s; display: inline-block; text-decoration: none; margin: 10px; }
+        .btn-disabled { background: #666; color: #ccc; cursor: not-allowed; }
         
         .note { margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; font-style: italic; }
         
         footer { margin-top: 50px; text-align: center; padding: 20px; border-top: 1px solid rgba(255,255,255,0.2); color: #ccc; }
         
         .admin-info { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        
+        .permissions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .perm-card { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; text-align: center; }
+        .perm-allowed { border-left: 4px solid #27ae60; }
+        .perm-denied { border-left: 4px solid #e74c3c; }
     </style>
 </head>
 <body>
@@ -59,14 +65,33 @@
             <header>
                 <div class="logo">X-BET ADMIN 1</div>
                 <nav>
-                    <a href="admin-manager.html" class="btn">Request Balance Transfer</a>
                     <a href="admin.html" class="btn">Super Admin</a>
+                    <button onclick="logout()" class="btn" style="background: #e74c3c;">Logout</button>
                 </nav>
             </header>
             
             <div class="admin-info">
-                <h3>🔐 Admin 1 Access</h3>
-                <p>Limited access - Can view dashboard but cannot transfer funds without Super Admin approval</p>
+                <h3>🔐 Admin 1 - Limited Access</h3>
+                <p>View-only access. Cannot make transactions. Contact Super Admin for fund transfers.</p>
+            </div>
+            
+            <div class="permissions">
+                <div class="perm-card perm-allowed">
+                    <h4>✅ View Balance</h4>
+                    <p>Can see current balance</p>
+                </div>
+                <div class="perm-card perm-denied">
+                    <h4>❌ Send Money</h4>
+                    <p>Cannot transfer funds</p>
+                </div>
+                <div class="perm-card perm-denied">
+                    <h4>❌ User Transactions</h4>
+                    <p>Cannot send to users</p>
+                </div>
+                <div class="perm-card perm-allowed">
+                    <h4>✅ View Reports</h4>
+                    <p>Can see system status</p>
+                </div>
             </div>
             
             <div class="admin-section">
@@ -74,21 +99,23 @@
                 
                 <div class="balance-card">
                     <h3>Current Balance</h3>
-                    <div class="value">$0.00</div>
+                    <div class="value" id="current-balance">0 IQD</div>
                 </div>
                 
-                <p>This admin account has zero balance. Request a transfer from the Super Admin.</p>
+                <p>This admin account has view-only access. Request transfers from Super Admin.</p>
                 
                 <div class="note">
-                    <p>Note: This is Admin 1 account with zero initial balance. Contact Super Admin for funds.</p>
+                    <p>⚠️ Limited Permissions: You can only view your balance. All transactions must be processed by Super Admin.</p>
                 </div>
                 
-                <a href="admin-manager.html" class="btn">Request Funds from Super Admin</a>
-                <button onclick="logout()" class="btn" style="background: #e74c3c;">Logout</button>
+                <button class="btn btn-disabled" disabled>🚫 Send Money (Disabled)</button>
+                <button class="btn btn-disabled" disabled>🚫 Transfer Funds (Disabled)</button>
+                <button class="btn" onclick="requestFunds()">📞 Request Funds from Super Admin</button>
+                
             </div>
             
             <footer>
-                <p>&copy; 2023 X-Bet Admin Panel. Admin 1 Account. Logged in as: Admin1</p>
+                <p>&copy; 2023 X-Bet Admin Panel. Admin 1 Account. Limited Access</p>
             </footer>
         </div>
     </div>
@@ -108,9 +135,23 @@
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 localStorage.setItem('admin1_loggedin', 'true');
+                loadBalance();
             } else {
                 alert('Invalid credentials!');
             }
+        }
+
+        function loadBalance() {
+            const balances = JSON.parse(localStorage.getItem('admin_balances')) || { admin1: 0 };
+            document.getElementById('current-balance').textContent = formatMoney(balances.admin1 || 0) + ' IQD';
+        }
+
+        function formatMoney(amount) {
+            return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function requestFunds() {
+            alert('Fund Request Sent to Super Admin!\n\nPlease contact Super Admin directly for fund transfers.');
         }
 
         function logout() {
@@ -122,6 +163,7 @@
         if (localStorage.getItem('admin1_loggedin') === 'true') {
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
+            loadBalance();
         }
     </script>
 </body>
