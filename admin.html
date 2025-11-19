@@ -51,12 +51,15 @@
         th { background: rgba(0,0,0,0.7); color: #fdbb2d; }
         
         .balance-transfer { margin-top: 30px; }
-        .transfer-form { display: flex; gap: 10px; margin-top: 15px; }
-        .transfer-form input, .transfer-form select { padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9); }
+        .transfer-form { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .transfer-form input, .transfer-form select { padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9); flex: 1; min-width: 150px; }
         
         footer { margin-top: 50px; text-align: center; padding: 20px; border-top: 1px solid rgba(255,255,255,0.2); color: #ccc; }
         
         .admin-info { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        
+        .transaction-history { margin-top: 30px; }
+        .transaction-item { background: rgba(0,0,0,0.5); padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #fdbb2d; }
     </style>
 </head>
 <body>
@@ -89,97 +92,90 @@
             </header>
             
             <div class="admin-info">
-                <h3>🔐 Super Admin Access</h3>
-                <p>Full system access - Can manage all users, games, and transfer funds to any admin</p>
+                <h3>🔐 Super Admin Access - Full Transaction Control</h3>
+                <p>All money stored here: 14,000,000,000 IQD | Can transfer between all accounts (Admin↔Admin, Admin↔User, User↔Admin)</p>
             </div>
             
             <div class="admin-section">
-                <h2>Super Admin Dashboard</h2>
+                <h2>💰 Super Admin Dashboard</h2>
                 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <h3>Total Users</h3>
+                        <h3>Total System Balance</h3>
+                        <div class="value" id="total-balance">14,000,000,000 IQD</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Admin 1 Balance</h3>
+                        <div class="value" id="admin1-balance">0 IQD</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Admin 2 Balance</h3>
+                        <div class="value" id="admin2-balance">0 IQD</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Users</h3>
                         <div class="value">1,247</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Active Bets</h3>
-                        <div class="value">86</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Total Balance</h3>
-                        <div class="value">$24,580</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Today's Profit</h3>
-                        <div class="value">$1,250</div>
                     </div>
                 </div>
                 
                 <div class="admin-actions">
                     <div class="action-card">
-                        <h3>User Management</h3>
+                        <h3>💸 Make Transaction</h3>
+                        <p>Transfer funds between all accounts (Admins & Users)</p>
+                        <button class="btn" onclick="showTransactionModal()">Start Transaction</button>
+                    </div>
+                    <div class="action-card">
+                        <h3>👥 User Management</h3>
                         <p>Manage all users, their balances and activities.</p>
-                        <a href="#" class="btn">Manage Users</a>
+                        <button class="btn" onclick="showUserManagement()">Manage Users</button>
                     </div>
                     <div class="action-card">
-                        <h3>Game Management</h3>
-                        <p>Add, edit or remove games from the platform.</p>
-                        <a href="#" class="btn">Manage Games</a>
-                    </div>
-                    <div class="action-card">
-                        <h3>Balance Transfer</h3>
-                        <p>Transfer balance between admin accounts.</p>
-                        <a href="#" class="btn" onclick="showTransferModal()">Transfer Balance</a>
+                        <h3>📊 System Report</h3>
+                        <p>View complete transaction history and system stats.</p>
+                        <button class="btn" onclick="showSystemReport()">View Report</button>
                     </div>
                 </div>
                 
-                <div class="balance-transfer">
-                    <h3>Quick Admin Balance Transfer</h3>
-                    <div class="transfer-form">
-                        <select id="from-admin">
-                            <option value="super">From: Super Admin</option>
-                            <option value="admin1">From: Admin 1</option>
-                            <option value="admin2">From: Admin 2</option>
-                        </select>
-                        <select id="to-admin">
-                            <option value="admin1">To: Admin 1</option>
-                            <option value="admin2">To: Admin 2</option>
-                            <option value="super">To: Super Admin</option>
-                        </select>
-                        <input type="number" id="transfer-amount" placeholder="Amount">
-                        <button class="btn" onclick="processTransfer()">Transfer</button>
+                <div class="transaction-history">
+                    <h3>📋 Recent Transactions</h3>
+                    <div id="transactions-list">
+                        <!-- Transactions will appear here -->
                     </div>
                 </div>
                 
                 <div class="user-list">
-                    <h3>Recent Users</h3>
+                    <h3>👥 User Balances</h3>
                     <table>
                         <thead>
                             <tr>
+                                <th>User ID</th>
                                 <th>Username</th>
                                 <th>Balance</th>
                                 <th>Last Activity</th>
-                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="users-table">
                             <tr>
+                                <td>U1001</td>
                                 <td>john_doe</td>
-                                <td>$150</td>
+                                <td>150 IQD</td>
                                 <td>2 hours ago</td>
-                                <td>Active</td>
+                                <td><button class="btn" onclick="sendToUser('U1001')">Send Money</button></td>
                             </tr>
                             <tr>
+                                <td>U1002</td>
                                 <td>sarah_m</td>
-                                <td>$75</td>
+                                <td>75 IQD</td>
                                 <td>5 hours ago</td>
-                                <td>Active</td>
+                                <td><button class="btn" onclick="sendToUser('U1002')">Send Money</button></td>
                             </tr>
                             <tr>
+                                <td>U1003</td>
                                 <td>mike_t</td>
-                                <td>$320</td>
+                                <td>320 IQD</td>
                                 <td>1 day ago</td>
-                                <td>Active</td>
+                                <td><button class="btn" onclick="sendToUser('U1003')">Send Money</button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -187,7 +183,7 @@
             </div>
             
             <footer>
-                <p>&copy; 2023 X-Bet Super Admin Panel. Logged in as: <span id="current-user">Super Admin</span></p>
+                <p>&copy; 2023 X-Bet Super Admin Panel. Total System: <span id="system-total">14,000,000,000 IQD</span></p>
             </footer>
         </div>
     </div>
@@ -199,6 +195,20 @@
             password: "super123"
         };
 
+        // Initialize balances
+        let balances = JSON.parse(localStorage.getItem('admin_balances')) || {
+            super: 14000000000,
+            admin1: 0,
+            admin2: 0,
+            users: {
+                'U1001': 150,
+                'U1002': 75,
+                'U1003': 320
+            }
+        };
+
+        let transactions = JSON.parse(localStorage.getItem('admin_transactions')) || [];
+
         function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -207,39 +217,278 @@
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 localStorage.setItem('superadmin_loggedin', 'true');
+                loadDashboard();
             } else {
                 alert('Invalid credentials!');
             }
         }
 
-        function showTransferModal() {
-            alert('Super Admin Transfer: You can transfer funds between all admin accounts');
+        function loadDashboard() {
+            updateBalancesDisplay();
+            updateTransactionsList();
         }
 
-        function processTransfer() {
-            const fromAdmin = document.getElementById('from-admin').value;
-            const toAdmin = document.getElementById('to-admin').value;
-            const amount = document.getElementById('transfer-amount').value;
+        function updateBalancesDisplay() {
+            document.getElementById('total-balance').textContent = formatMoney(balances.super) + ' IQD';
+            document.getElementById('admin1-balance').textContent = formatMoney(balances.admin1) + ' IQD';
+            document.getElementById('admin2-balance').textContent = formatMoney(balances.admin2) + ' IQD';
+            document.getElementById('system-total').textContent = formatMoney(balances.super) + ' IQD';
+        }
+
+        function formatMoney(amount) {
+            return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function showTransactionModal() {
+            const modal = `
+                <div id="transaction-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:1000;">
+                    <div style="background:white; padding:30px; border-radius:10px; width:500px; color:black; max-height:90vh; overflow-y:auto;">
+                        <h3 style="color: #1a2a6c; margin-bottom:20px;">💸 Make Transaction</h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label style="display:block; margin-bottom:5px; font-weight:bold;">From Account:</label>
+                                <select id="tx-from" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;" onchange="updateToOptions()">
+                                    <option value="super">Super Admin (${formatMoney(balances.super)} IQD)</option>
+                                    <option value="admin1">Admin 1 (${formatMoney(balances.admin1)} IQD)</option>
+                                    <option value="admin2">Admin 2 (${formatMoney(balances.admin2)} IQD)</option>
+                                    <option value="user">User Account</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label style="display:block; margin-bottom:5px; font-weight:bold;">To Account:</label>
+                                <select id="tx-to" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;">
+                                    <option value="super">Super Admin</option>
+                                    <option value="admin1">Admin 1</option>
+                                    <option value="admin2">Admin 2</option>
+                                    <option value="user">User Account</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="user-id-section" style="margin-bottom:15px; display:none;">
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">User ID:</label>
+                            <input type="text" id="tx-userid" placeholder="Enter User ID (e.g., U1001)" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;">
+                            <div style="font-size:12px; color:#666; margin-top:5px;">Available: U1001, U1002, U1003 or add new</div>
+                        </div>
+                        
+                        <div style="margin-bottom:20px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">Amount (IQD):</label>
+                            <input type="number" id="tx-amount" placeholder="Enter amount in IQD" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;">
+                        </div>
+
+                        <div style="background:#f8f9fa; padding:15px; border-radius:5px; margin-bottom:20px;">
+                            <h4 style="margin-bottom:10px; color:#333;">Available Balances:</h4>
+                            <div>Super Admin: ${formatMoney(balances.super)} IQD</div>
+                            <div>Admin 1: ${formatMoney(balances.admin1)} IQD</div>
+                            <div>Admin 2: ${formatMoney(balances.admin2)} IQD</div>
+                        </div>
+                        
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="processTransaction()" style="flex:1; padding:12px; background:#27ae60; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">💸 Send Money</button>
+                            <button onclick="closeModal()" style="flex:1; padding:12px; background:#e74c3c; color:white; border:none; border-radius:5px; cursor:pointer;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modal);
+        }
+
+        function updateToOptions() {
+            const from = document.getElementById('tx-from').value;
+            const toSelect = document.getElementById('tx-to');
+            const userSection = document.getElementById('user-id-section');
             
+            userSection.style.display = (from === 'user' || toSelect.value === 'user') ? 'block' : 'none';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('transaction-modal');
+            if (modal) modal.remove();
+        }
+
+        function processTransaction() {
+            const from = document.getElementById('tx-from').value;
+            const to = document.getElementById('tx-to').value;
+            const userId = document.getElementById('tx-userid').value;
+            const amount = parseInt(document.getElementById('tx-amount').value);
+
             if (!amount || amount <= 0) {
                 alert('Please enter a valid amount');
                 return;
             }
-            
-            if (fromAdmin === toAdmin) {
+
+            if (from === to) {
                 alert('Cannot transfer to the same account');
                 return;
             }
+
+            // Validate user transactions
+            if ((from === 'user' || to === 'user') && !userId) {
+                alert('Please enter User ID for user transactions');
+                return;
+            }
+
+            // Check balances
+            if (from !== 'user') {
+                if (balances[from] < amount) {
+                    alert('Insufficient balance in source account');
+                    return;
+                }
+            } else {
+                if (!balances.users[userId] || balances.users[userId] < amount) {
+                    alert('User not found or insufficient balance');
+                    return;
+                }
+            }
+
+            // Process transaction
+            if (from !== 'user') {
+                balances[from] -= amount;
+            } else {
+                balances.users[userId] -= amount;
+            }
+
+            if (to !== 'user') {
+                balances[to] += amount;
+            } else {
+                if (!balances.users[userId]) balances.users[userId] = 0;
+                balances.users[userId] += amount;
+            }
+
+            // Record transaction
+            const transaction = {
+                id: Date.now(),
+                from: from,
+                to: to,
+                userId: userId,
+                amount: amount,
+                date: new Date().toLocaleString(),
+                status: 'completed'
+            };
+            transactions.unshift(transaction);
             
-            alert(`Transfer successful!\n$${amount} transferred from ${fromAdmin} to ${toAdmin}`);
-            document.getElementById('transfer-amount').value = '';
+            // Save to localStorage
+            localStorage.setItem('admin_balances', JSON.stringify(balances));
+            localStorage.setItem('admin_transactions', JSON.stringify(transactions));
+            
+            alert(`✅ Transaction Successful!\n${amount} IQD transferred from ${from} to ${to}${userId ? ' (User: ' + userId + ')' : ''}`);
+            
+            closeModal();
+            loadDashboard();
+        }
+
+        function updateTransactionsList() {
+            const container = document.getElementById('transactions-list');
+            const recentTransactions = transactions.slice(0, 10);
+            
+            if (recentTransactions.length === 0) {
+                container.innerHTML = '<div class="transaction-item">No transactions yet</div>';
+                return;
+            }
+            
+            container.innerHTML = recentTransactions.map(tx => `
+                <div class="transaction-item">
+                    <strong>${tx.amount} IQD</strong> from ${tx.from} to ${tx.to} 
+                    ${tx.userId ? `(User: ${tx.userId})` : ''}
+                    <div style="font-size:12px; color:#ccc;">${tx.date}</div>
+                </div>
+            `).join('');
+        }
+
+        function sendToUser(userId) {
+            const modal = `
+                <div id="send-user-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:1000;">
+                    <div style="background:white; padding:30px; border-radius:10px; width:400px; color:black;">
+                        <h3 style="color: #1a2a6c; margin-bottom:20px;">Send to User ${userId}</h3>
+                        <p>Current balance: ${balances.users[userId] || 0} IQD</p>
+                        <input type="number" id="send-amount" placeholder="Amount in IQD" style="width:100%; padding:10px; margin:15px 0; border-radius:5px; border:1px solid #ddd;">
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="completeSendToUser('${userId}')" style="flex:1; padding:12px; background:#27ae60; color:white; border:none; border-radius:5px; cursor:pointer;">Send</button>
+                            <button onclick="closeSendModal()" style="flex:1; padding:12px; background:#e74c3c; color:white; border:none; border-radius:5px; cursor:pointer;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modal);
+        }
+
+        function closeSendModal() {
+            const modal = document.getElementById('send-user-modal');
+            if (modal) modal.remove();
+        }
+
+        function completeSendToUser(userId) {
+            const amount = parseInt(document.getElementById('send-amount').value);
+            
+            if (!amount || amount <= 0) {
+                alert('Please enter valid amount');
+                return;
+            }
+
+            if (balances.super < amount) {
+                alert('Insufficient balance in Super Admin account');
+                return;
+            }
+
+            // Process send to user
+            balances.super -= amount;
+            if (!balances.users[userId]) balances.users[userId] = 0;
+            balances.users[userId] += amount;
+
+            // Record transaction
+            const transaction = {
+                id: Date.now(),
+                from: 'super',
+                to: 'user',
+                userId: userId,
+                amount: amount,
+                date: new Date().toLocaleString(),
+                status: 'completed'
+            };
+            transactions.unshift(transaction);
+            
+            localStorage.setItem('admin_balances', JSON.stringify(balances));
+            localStorage.setItem('admin_transactions', JSON.stringify(transactions));
+            
+            alert(`✅ Sent ${amount} IQD to user ${userId}`);
+            closeSendModal();
+            loadDashboard();
+        }
+
+        function showUserManagement() {
+            alert('User Management System - Coming Soon');
+        }
+
+        function showSystemReport() {
+            let report = `📊 SYSTEM REPORT\n\n`;
+            report += `Total Super Admin: ${formatMoney(balances.super)} IQD\n`;
+            report += `Admin 1 Balance: ${formatMoney(balances.admin1)} IQD\n`;
+            report += `Admin 2 Balance: ${formatMoney(balances.admin2)} IQD\n`;
+            report += `Total Transactions: ${transactions.length}\n\n`;
+            report += `Recent Transactions:\n`;
+            
+            transactions.slice(0, 5).forEach(tx => {
+                report += `${tx.date} - ${tx.amount} IQD (${tx.from} → ${tx.to})\n`;
+            });
+            
+            alert(report);
         }
 
         // Check if already logged in
         if (localStorage.getItem('superadmin_loggedin') === 'true') {
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
+            loadDashboard();
         }
+
+        // Update to select change events
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'tx-from' || e.target.id === 'tx-to') {
+                updateToOptions();
+            }
+        });
     </script>
 </body>
 </html>
