@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-BET - Welcome</title>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -79,7 +74,7 @@
         .signup-btn {
             background: white;
             color: #1a2a6c;
-            border: 2px solid #1a2a6c !important;
+            border: 2px solid #1a2a6c;
         }
 
         .google-btn {
@@ -102,21 +97,6 @@
             text-align: center;
             color: white;
             margin-top: 2rem;
-        }
-
-        .welcome-message {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .logout-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid white;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 1rem;
         }
 
         .social-links {
@@ -145,22 +125,32 @@
             opacity: 0.7;
             font-size: 0.9rem;
         }
+
+        .debug-info {
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            max-width: 400px;
+        }
     </style>
 </head>
 <body>
     <div class="logo">X-BET</div>
     <div class="tagline">Play Smart • Win Big • Zero Cost Gaming</div>
 
-    <!-- Authentication Container (Visible when not logged in) -->
+    <!-- Authentication Container -->
     <div id="authContainer" class="auth-container">
         <h2>Welcome to X-BET</h2>
         <p style="margin: 1rem 0; color: #666;">Please login or sign up to continue</p>
         
         <div class="auth-buttons">
-            <button class="auth-btn login-btn" onclick="window.location.href='login.html'">
+            <button class="auth-btn login-btn" onclick="goToLogin()">
                 Login with Email
             </button>
-            <button class="auth-btn signup-btn" onclick="window.location.href='signup.html'">
+            <button class="auth-btn signup-btn" onclick="goToSignup()">
                 Create New Account
             </button>
             <button class="auth-btn google-btn" onclick="loginWithGoogle()">
@@ -175,26 +165,41 @@
         </div>
     </div>
 
-    <!-- User Info (Visible when logged in) -->
+    <!-- User Info -->
     <div id="userInfo" class="user-info">
         <div class="welcome-message" id="welcomeMessage">Welcome back!</div>
         <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
+    <!-- Debug Info -->
+    <div class="debug-info" id="debugInfo">
+        <strong>Status:</strong> <span id="statusMessage">Loading...</span>
+    </div>
+
     <!-- Social Media & Copyright -->
     <div class="social-links">
-        <a href="#" class="social-icon">📘</a> <!-- Facebook -->
-        <a href="#" class="social-icon">📷</a> <!-- Instagram -->
-        <a href="#" class="social-icon">🐦</a> <!-- Twitter -->
-        <a href="#" class="social-icon">💬</a> <!-- Telegram -->
+        <a href="#" class="social-icon">📘</a>
+        <a href="#" class="social-icon">📷</a>
+        <a href="#" class="social-icon">🐦</a>
+        <a href="#" class="social-icon">💬</a>
     </div>
 
     <div class="copyright">
         &copy; 2024 Crazy X Bet. All rights reserved.
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    
     <script>
-        // Firebase configuration - USE YOUR ACTUAL CONFIG
+        // Update status
+        function updateStatus(message) {
+            document.getElementById('statusMessage').textContent = message;
+            console.log('Status:', message);
+        }
+
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
             authDomain: "x-bet-prod-jd.firebaseapp.com",
@@ -205,50 +210,66 @@
             measurementId: "G-PTV4XMYQ6P"
         };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+        updateStatus('Initializing Firebase...');
 
-        // Monitor auth state
-        auth.onAuthStateChanged((user) => {
-            const authContainer = document.getElementById('authContainer');
-            const userInfo = document.getElementById('userInfo');
-            const welcomeMessage = document.getElementById('welcomeMessage');
+        try {
+            // Initialize Firebase
+            const app = firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            
+            updateStatus('Firebase initialized successfully');
 
-            if (user) {
-                // User is signed in
-                authContainer.style.display = 'none';
-                userInfo.style.display = 'block';
-                welcomeMessage.textContent = `Welcome, ${user.email}!`;
-                
-                // Redirect to dashboard after login
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            } else {
-                // User is signed out
-                authContainer.style.display = 'block';
-                userInfo.style.display = 'none';
-            }
-        });
+            // Monitor auth state
+            auth.onAuthStateChanged((user) => {
+                const authContainer = document.getElementById('authContainer');
+                const userInfo = document.getElementById('userInfo');
+                const welcomeMessage = document.getElementById('welcomeMessage');
 
-        // Google Login
-        function loginWithGoogle() {
-            // For now, show message - we'll implement this later
-            alert('Google login will be available soon! Please use email login for now.');
-        }
-
-        // Logout function
-        function logout() {
-            auth.signOut().then(() => {
-                console.log('User signed out');
-            }).catch((error) => {
-                console.error('Sign out error:', error);
+                if (user) {
+                    updateStatus(`User logged in: ${user.email}`);
+                    authContainer.style.display = 'none';
+                    userInfo.style.display = 'block';
+                    welcomeMessage.textContent = `Welcome, ${user.email}!`;
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
+                } else {
+                    updateStatus('No user logged in');
+                    authContainer.style.display = 'block';
+                    userInfo.style.display = 'none';
+                }
             });
+
+        } catch (error) {
+            updateStatus(`Firebase error: ${error.message}`);
+            console.error('Firebase initialization error:', error);
         }
 
-        // Check if Firebase initialized properly
-        console.log('Firebase initialized for project:', firebaseConfig.projectId);
+        // Navigation functions
+        function goToLogin() {
+            window.location.href = 'login.html';
+        }
+
+        function goToSignup() {
+            window.location.href = 'signup.html';
+        }
+
+        function loginWithGoogle() {
+            alert('Google login coming soon! Use email login for now.');
+        }
+
+        function logout() {
+            if (auth) {
+                auth.signOut();
+            }
+        }
+
+        // Check if page loaded successfully
+        window.addEventListener('load', function() {
+            updateStatus('Page loaded successfully');
+        });
     </script>
 </body>
 </html>
