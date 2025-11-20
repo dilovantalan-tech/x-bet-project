@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET - Login</title>
+    <title>X-BET - Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -13,411 +13,268 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
+        /* Navigation */
         nav {
-            width: 100%;
             background: rgba(0, 0, 0, 0.8);
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            backdrop-filter: blur(10px);
         }
 
-        .nav-left {
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav-links {
             display: flex;
             gap: 2rem;
-            align-items: center;
         }
 
-        .nav-left a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .nav-right {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .nav-right a {
+        .nav-links a {
             color: white;
             text-decoration: none;
             padding: 0.5rem 1rem;
-            border: 1px solid white;
             border-radius: 5px;
+            transition: background 0.3s ease;
         }
 
-        .logo {
-            font-size: 3rem;
-            font-weight: bold;
-            color: white;
-            text-align: center;
-            margin: 2rem 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
         }
 
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 2rem;
-        }
-
-        .login-title {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #333;
-            font-size: 1.5rem;
-        }
-
-        .error-message {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 0.75rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            text-align: center;
-            display: none;
-        }
-
-        .success-message {
-            background: #efe;
-            border: 1px solid #cfc;
-            color: #363;
-            padding: 0.75rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            text-align: center;
-            display: none;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #555;
-            font-weight: bold;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 1rem;
-        }
-
-        .login-btn:hover {
-            opacity: 0.9;
-        }
-
-        .login-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .divider {
-            text-align: center;
-            margin: 1.5rem 0;
-            color: #666;
-            position: relative;
-        }
-
-        .divider::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #ddd;
-        }
-
-        .divider span {
-            background: white;
-            padding: 0 1rem;
-        }
-
-        .google-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: white;
-            color: #333;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
+        .user-section {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            gap: 1rem;
         }
 
-        .google-btn:hover {
-            background: #f5f5f5;
-        }
-
-        .signup-link {
-            text-align: center;
-            margin-top: 1rem;
-            color: #666;
-        }
-
-        .signup-link a {
-            color: #1a2a6c;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .debug-info {
-            background: #f5f5f5;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            color: #666;
-            display: none;
-        }
-
-        .debug-toggle {
-            background: #666;
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
             color: white;
-            border: none;
-            padding: 0.25rem 0.5rem;
-            border-radius: 3px;
+            border: 1px solid white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 0.7rem;
-            margin-top: 0.5rem;
+        }
+
+        /* Main Content */
+        .dashboard-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .balance-amount {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .action-card {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0,0,0,0.8);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .social-icon {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .social-icon:hover {
+            opacity: 1;
+        }
+
+        .copyright {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav>
-        <div class="nav-left">
-            <a href="index.html">Home</a>
+        <div class="nav-logo">X-BET</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Home</a>
             <a href="games.html">Games</a>
-            <a href="login.html">Login</a>
+            <a href="bits.html">Bits</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="about.html">About Us</a>
         </div>
-        <div class="nav-right">
-            <a href="signup.html">Sign Up</a>
+        <div class="user-section">
+            <span id="userEmail">user@example.com</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </nav>
 
-    <div class="logo">X-BET</div>
-
-    <div class="login-container">
-        <h2 class="login-title">Login to your account</h2>
-        
-        <div id="errorMessage" class="error-message">
-            Invalid login credentials. Please check your username and password.
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <div class="welcome-section">
+            <h1 class="welcome-title">🎮 Welcome to Your X-BET Dashboard! 🎮</h1>
+            <p>Ready to play and win? Choose your game and start earning today!</p>
         </div>
 
-        <div id="successMessage" class="success-message">
-            Login successful! Redirecting...
+        <div class="balance-card">
+            <h3>Your Balance</h3>
+            <div class="balance-amount">$0.00</div>
+            <p>Start playing to increase your balance!</p>
         </div>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username or Email</label>
-                <input type="text" id="username" name="username" required placeholder="Enter your username or email">
+        <div class="quick-actions">
+            <div class="action-card" onclick="window.location.href='games.html'">
+                <div class="action-icon">🎯</div>
+                <h3>Play Games</h3>
+                <p>Explore our exciting game collection</p>
             </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            <div class="action-card" onclick="window.location.href='bits.html'">
+                <div class="action-icon">💰</div>
+                <h3>Earn Bits</h3>
+                <p>Discover ways to earn more</p>
             </div>
-
-            <button type="submit" class="login-btn" id="loginButton">
-                Sign In
-            </button>
-        </form>
-
-        <div class="divider">
-            <span>or</span>
-        </div>
-
-        <button class="google-btn" onclick="loginWithGoogle()">
-            <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-            </svg>
-            Continue with Google
-        </button>
-
-        <div class="signup-link">
-            Don't have an account? <a href="signup.html">Create one here</a>
-        </div>
-
-        <div class="debug-info" id="debugInfo">
-            <strong>Debug Information:</strong>
-            <div id="debugContent"></div>
-            <button class="debug-toggle" onclick="toggleDebug()">Hide Debug</button>
+            <div class="action-card">
+                <div class="action-icon">🏆</div>
+                <h3>Tournaments</h3>
+                <p>Compete for big prizes</p>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">🎁</div>
+                <h3>Daily Rewards</h3>
+                <p>Claim your daily bonus</p>
+            </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Footer -->
+    <footer>
+        <div class="social-links">
+            <a href="#" class="social-icon">📘</a>
+            <a href="#" class="social-icon">📷</a>
+            <a href="#" class="social-icon">🐦</a>
+            <a href="#" class="social-icon">💬</a>
+        </div>
+        <div class="copyright">
+            &copy; 2024 Crazy X Bet. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     
     <script>
-        // Firebase configuration - REPLACE WITH YOUR ACTUAL CONFIG FROM FIREBASE CONSOLE
+        // Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC2Mep9Oc0l3t5Qq2qX9Q2wX9Q2wX9Q2wX9Q",
+            apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
             authDomain: "x-bet-prod-jd.firebaseapp.com",
             projectId: "x-bet-prod-jd",
-            storageBucket: "x-bet-prod-jd.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef123456"
+            storageBucket: "x-bet-prod-jd.firebasestorage.app",
+            messagingSenderId: "499334334535",
+            appId: "1:499334334535:web:bebc1bf817e24d9e3c4962",
+            measurementId: "G-PTV4XMYQ6P"
         };
 
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Debug logging
-        console.log("🚀 Firebase initialized:", app);
-        console.log("🔑 Auth object:", auth);
-        console.log("📋 Project ID:", firebaseConfig.projectId);
-
-        // Show debug info by default
-        document.getElementById('debugInfo').style.display = 'block';
-        updateDebugInfo('Firebase initialized. Ready for testing.');
-
-        // Update debug information
-        function updateDebugInfo(message) {
-            const debugContent = document.getElementById('debugContent');
-            const timestamp = new Date().toLocaleTimeString();
-            debugContent.innerHTML += `<div>[${timestamp}] ${message}</div>`;
-            debugContent.scrollTop = debugContent.scrollHeight;
-        }
-
-        // Toggle debug visibility
-        function toggleDebug() {
-            const debugInfo = document.getElementById('debugInfo');
-            const button = document.querySelector('.debug-toggle');
-            if (debugInfo.style.display === 'none') {
-                debugInfo.style.display = 'block';
-                button.textContent = 'Hide Debug';
-            } else {
-                debugInfo.style.display = 'none';
-                button.textContent = 'Show Debug';
-            }
-        }
-
-        // Monitor auth state changes
+        // Check authentication
         auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log("✅ User signed in:", user.uid, user.email);
-                updateDebugInfo(`User signed in: ${user.email} (${user.uid})`);
-                
-                // Show success message
-                document.getElementById('successMessage').style.display = 'block';
-                document.getElementById('errorMessage').style.display = 'none';
-                
-                // Redirect after successful login
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 2000);
+            if (!user) {
+                // Redirect to login if not authenticated
+                window.location.href = 'index.html';
             } else {
-                console.log("❌ No user signed in");
-                updateDebugInfo('No user signed in');
+                // Update user email
+                document.getElementById('userEmail').textContent = user.email;
             }
         });
 
-        // Login form handler
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const loginButton = document.getElementById('loginButton');
-            
-            updateDebugInfo(`Attempting login for: ${username}`);
-            
-            // Show loading state
-            loginButton.disabled = true;
-            loginButton.textContent = 'Signing In...';
-            document.getElementById('errorMessage').style.display = 'none';
-            
-            try {
-                // For Firebase, we use email for authentication
-                // If username is provided instead of email, you might need to handle that
-                const userCredential = await auth.signInWithEmailAndPassword(username, password);
-                const user = userCredential.user;
-                
-                console.log("✅ Login successful:", user);
-                updateDebugInfo(`Login successful! User ID: ${user.uid}`);
-                
-            } catch (error) {
-                console.error("❌ Login error:", error);
-                
-                // Show error message
-                document.getElementById('errorMessage').style.display = 'block';
-                document.getElementById('errorMessage').textContent = `Login failed: ${error.message}`;
-                
-                updateDebugInfo(`Login failed: ${error.code} - ${error.message}`);
-                
-                // Reset button
-                loginButton.disabled = false;
-                loginButton.textContent = 'Sign In';
-            }
-        });
-
-        // Google login function
-        function loginWithGoogle() {
-            updateDebugInfo('Google login initiated');
-            // You can implement Google login here later
-            alert('Google login will be implemented in the next version');
+        // Logout function
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
         }
-
-        // Test functions for browser console
-        window.testLogin = function(email, password) {
-            return auth.signInWithEmailAndPassword(email, password);
-        };
-
-        window.getCurrentUser = function() {
-            const user = auth.currentUser;
-            console.log("Current user:", user);
-            updateDebugInfo(`Current user check: ${user ? user.email : 'None'}`);
-            return user;
-        };
-
-        window.signOut = function() {
-            return auth.signOut();
-        };
-
-        // Initial debug info
-        updateDebugInfo('Page loaded successfully');
-        updateDebugInfo(`Firebase project: ${firebaseConfig.projectId}`);
     </script>
 </body>
 </html>
