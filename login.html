@@ -9,105 +9,126 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
 
-        .logo {
-            font-size: 3rem;
-            font-weight: bold;
-            color: white;
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 400px;
             text-align: center;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #ccc;
             margin-bottom: 2rem;
         }
 
-        .login-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .login-title {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #333;
-        }
-
-        .error-message {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 0.75rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            text-align: center;
-            display: none;
-        }
-
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
         }
 
         .form-group label {
             display: block;
+            color: #ffd700;
             margin-bottom: 0.5rem;
-            color: #555;
+            font-weight: bold;
         }
 
         .form-group input {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
             font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffd700;
         }
 
         .login-btn {
             width: 100%;
-            padding: 0.75rem;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
-            color: white;
+            padding: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #ffd700);
+            color: black;
             border: none;
-            border-radius: 5px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
             cursor: pointer;
+            transition: transform 0.3s ease;
             margin-bottom: 1rem;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.05);
         }
 
         .login-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .links {
+            margin-top: 1.5rem;
+        }
+
+        .links a {
+            color: #ffd700;
+            text-decoration: none;
+            margin: 0 0.5rem;
         }
 
         .back-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: #666;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
+            background: transparent;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
             cursor: pointer;
+            margin-top: 1rem;
         }
     </style>
 </head>
 <body>
-    <div class="logo">X-BET</div>
-
     <div class="login-container">
-        <h2 class="login-title">Login to your account</h2>
+        <div class="logo">X-BET</div>
+        <div class="subtitle">Login to Your Account</div>
         
         <div id="errorMessage" class="error-message"></div>
 
@@ -127,13 +148,10 @@
             </button>
         </form>
 
-        <p style="text-align: center; margin: 1rem 0; color: #666;">
-            Don't have an account? <a href="signup.html" style="color: #1a2a6c;">Sign up here</a>
-        </p>
-
-        <button class="back-btn" onclick="window.location.href='index.html'">
-            Back to Home
-        </button>
+        <div class="links">
+            <a href="signup.html">Create Account</a> • 
+            <a href="index.html">Back to Home</a>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -173,7 +191,6 @@
             
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                // Redirect happens automatically via auth state listener
             } catch (error) {
                 errorMessage.style.display = 'block';
                 errorMessage.textContent = `Login failed: ${error.message}`;
