@@ -18,23 +18,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             padding: 20px;
-        }
-
-        nav {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .nav-left a {
-            color: white;
-            text-decoration: none;
-            margin-right: 1rem;
         }
 
         .logo {
@@ -46,7 +31,7 @@
         }
 
         .login-container {
-            background: rgba(255, 255, 255, 0.95);
+            background: white;
             padding: 2rem;
             border-radius: 10px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -115,25 +100,16 @@
             border-radius: 5px;
             font-size: 1rem;
             cursor: pointer;
-            margin-top: 1rem;
         }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="nav-left">
-            <a href="index.html">← Back to Home</a>
-        </div>
-    </nav>
-
     <div class="logo">X-BET</div>
 
     <div class="login-container">
         <h2 class="login-title">Login to your account</h2>
         
-        <div id="errorMessage" class="error-message">
-            Invalid login credentials
-        </div>
+        <div id="errorMessage" class="error-message"></div>
 
         <form id="loginForm">
             <div class="form-group">
@@ -151,17 +127,18 @@
             </button>
         </form>
 
+        <p style="text-align: center; margin: 1rem 0; color: #666;">
+            Don't have an account? <a href="signup.html" style="color: #1a2a6c;">Sign up here</a>
+        </p>
+
         <button class="back-btn" onclick="window.location.href='index.html'">
             Back to Home
         </button>
     </div>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    
     <script>
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
             authDomain: "x-bet-prod-jd.firebaseapp.com",
@@ -172,13 +149,16 @@
             measurementId: "G-PTV4XMYQ6P"
         };
 
-        // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        console.log('Login page: Firebase initialized');
+        // Auto-redirect if already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = 'dashboard.html';
+            }
+        });
 
-        // Login form handler
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -187,28 +167,16 @@
             const loginButton = document.getElementById('loginButton');
             const errorMessage = document.getElementById('errorMessage');
             
-            // Show loading state
             loginButton.disabled = true;
             loginButton.textContent = 'Signing In...';
             errorMessage.style.display = 'none';
             
             try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                
-                console.log('Login successful:', user.email);
-                
-                // Redirect to dashboard
-                window.location.href = 'dashboard.html';
-                
+                await auth.signInWithEmailAndPassword(email, password);
+                // Redirect happens automatically via auth state listener
             } catch (error) {
-                console.error('Login error:', error);
-                
-                // Show error message
                 errorMessage.style.display = 'block';
                 errorMessage.textContent = `Login failed: ${error.message}`;
-                
-                // Reset button
                 loginButton.disabled = false;
                 loginButton.textContent = 'Sign In';
             }
