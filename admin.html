@@ -700,4 +700,47 @@
                 
                 if (transaction) {
                     transaction.status = 'rejected';
-                    transaction.processedBy = localStorage.getItem('currentAdmin
+                    transaction.processedBy = localStorage.getItem('currentAdmin');
+                }
+                
+                // Save data
+                localStorage.setItem('userData_' + request.user, JSON.stringify(userData));
+                localStorage.setItem('pendingRequests', JSON.stringify(pendingRequests));
+                
+                loadPendingRequests();
+                loadAllUsers();
+                updateStats();
+                
+                showMessage(document.getElementById('adminMessage'), `❌ Withdrawal rejected for ${request.user}`, 'success');
+            }
+        }
+
+        // Utility functions
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `message ${type}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function clearAdminForm() {
+            document.getElementById('adminAmount').value = '';
+            document.getElementById('adminTransactionCode').value = '';
+        }
+
+        function logout() {
+            localStorage.removeItem('isAdminLoggedIn');
+            localStorage.removeItem('currentAdmin');
+            window.location.href = 'login.html';
+        }
+
+        // Initialize admin dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkAuth()) return;
+        });
+    </script>
+</body>
+</html>
