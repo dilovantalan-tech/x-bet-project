@@ -9,195 +9,190 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
         }
 
         .login-container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 3rem;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             width: 100%;
             max-width: 400px;
-            text-align: center;
         }
 
         .logo {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #ffd700;
-            margin-bottom: 0.5rem;
+            text-align: center;
+            margin-bottom: 30px;
         }
 
-        .subtitle {
-            color: #ccc;
-            margin-bottom: 2rem;
+        .logo h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #667eea;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
-            color: #ffd700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 5px;
+            color: #333;
             font-weight: bold;
         }
 
         .form-group input {
             width: 100%;
-            padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #ffd700;
+            border-color: #667eea;
         }
 
         .login-btn {
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(45deg, #ff6b6b, #ffd700);
-            color: black;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            border-radius: 5px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.3s ease;
-            margin-bottom: 1rem;
+            transition: transform 0.2s;
         }
 
         .login-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .login-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+            transform: translateY(-2px);
         }
 
         .error-message {
-            background: rgba(255, 0, 0, 0.2);
-            color: #ff6b6b;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 15px;
             display: none;
         }
 
-        .links {
-            margin-top: 1.5rem;
+        .demo-accounts {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            font-size: 14px;
         }
 
-        .links a {
-            color: #ffd700;
-            text-decoration: none;
-            margin: 0 0.5rem;
+        .demo-accounts h3 {
+            margin-bottom: 10px;
+            color: #333;
         }
 
-        .back-btn {
-            background: transparent;
-            color: #ffd700;
-            border: 1px solid #ffd700;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-top: 1rem;
+        .demo-account {
+            margin: 5px 0;
+            color: #666;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <div class="logo">X-BET</div>
-        <div class="subtitle">Login to Your Account</div>
-        
-        <div id="errorMessage" class="error-message"></div>
+        <div class="logo">
+            <h1>X-<span>BET</span></h1>
+            <p>Welcome back! Please login to continue.</p>
+        </div>
 
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required placeholder="Enter your email">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
             </div>
-            
+
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
 
-            <button type="submit" class="login-btn" id="loginButton">
-                Sign In
-            </button>
+            <button type="submit" class="login-btn">Login</button>
+            
+            <div class="error-message" id="errorMessage">
+                Invalid username or password!
+            </div>
         </form>
 
-        <div class="links">
-            <a href="signup.html">Create Account</a> • 
-            <a href="index.html">Back to Home</a>
+        <div class="demo-accounts">
+            <h3>Demo Accounts:</h3>
+            <div class="demo-account">👤 admin / 💻 admin123</div>
+            <div class="demo-account">👤 user1 / 💻 password1</div>
+            <div class="demo-account">👤 demo / 💻 demo123</div>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
-            authDomain: "x-bet-prod-jd.firebaseapp.com",
-            projectId: "x-bet-prod-jd",
-            storageBucket: "x-bet-prod-jd.firebasestorage.app",
-            messagingSenderId: "499334334535",
-            appId: "1:499334334535:web:bebc1bf817e24d9e3c4962",
-            measurementId: "G-PTV4XMYQ6P"
+        // Predefined user accounts
+        const validUsers = {
+            'admin': 'admin123',
+            'user1': 'password1', 
+            'demo': 'demo123',
+            'test': 'test123'
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        // Auto-redirect if already logged in
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                window.location.href = 'dashboard.html';
-            }
-        });
-
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const loginButton = document.getElementById('loginButton');
             const errorMessage = document.getElementById('errorMessage');
-            
-            loginButton.disabled = true;
-            loginButton.textContent = 'Signing In...';
-            errorMessage.style.display = 'none';
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (error) {
+
+            // Validate credentials
+            if (validUsers[username] && validUsers[username] === password) {
+                // Successful login
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('currentUser', username);
+                localStorage.setItem('loginTime', new Date().toISOString());
+                
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                // Failed login
                 errorMessage.style.display = 'block';
-                errorMessage.textContent = `Login failed: ${error.message}`;
-                loginButton.disabled = false;
-                loginButton.textContent = 'Sign In';
+                document.getElementById('password').value = '';
+                
+                // Hide error after 3 seconds
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000);
             }
         });
+
+        // Auto-fill demo account for testing
+        function fillDemoAccount(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+        }
+
+        // Quick login buttons for testing (optional)
+        console.log('Quick login helpers:');
+        console.log('fillDemoAccount("admin", "admin123")');
+        console.log('fillDemoAccount("user1", "password1")');
     </script>
 </body>
 </html>
