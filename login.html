@@ -150,7 +150,7 @@
     </div>
 
     <script>
-        // Simple user accounts - no admin separation for now
+        // User accounts
         const validUsers = {
             'admin': 'admin123',
             'user1': 'password1', 
@@ -158,6 +158,23 @@
             'test': 'test123',
             'user': 'user123'
         };
+
+        // Initialize user data if not exists
+        function initializeUserData() {
+            const users = ['admin', 'user1', 'demo', 'test', 'user'];
+            users.forEach(user => {
+                if (!localStorage.getItem('userData_' + user)) {
+                    const userData = {
+                        balance: 1000.00,
+                        pendingWithdrawals: 0.00,
+                        totalProfit: 250.00,
+                        transactions: [],
+                        bets: []
+                    };
+                    localStorage.setItem('userData_' + user, JSON.stringify(userData));
+                }
+            });
+        }
 
         // Login form handler
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -172,7 +189,10 @@
             loginBtn.textContent = 'Logging in...';
             loginBtn.disabled = true;
 
-            // Simple validation - check if credentials match
+            // Initialize user data
+            initializeUserData();
+
+            // Check credentials
             if (validUsers[username] && validUsers[username] === password) {
                 // Successful login
                 localStorage.setItem('isLoggedIn', 'true');
@@ -183,7 +203,7 @@
                 errorMessage.style.display = 'none';
                 loginBtn.textContent = 'Login Successful! Redirecting...';
                 
-                // Redirect to dashboard after short delay
+                // Redirect to dashboard
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 1000);
@@ -194,7 +214,6 @@
                 loginBtn.textContent = 'Login';
                 loginBtn.disabled = false;
                 
-                // Hide error after 3 seconds
                 setTimeout(() => {
                     errorMessage.style.display = 'none';
                 }, 3000);
@@ -205,21 +224,9 @@
         window.addEventListener('load', function() {
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             if (isLoggedIn === 'true') {
-                // Redirect to dashboard if already logged in
                 window.location.href = 'dashboard.html';
             }
         });
-
-        // Auto-fill for testing (remove in production)
-        function autoFill(username, password) {
-            document.getElementById('username').value = username;
-            document.getElementById('password').value = password;
-        }
-
-        // Quick test buttons (remove in production)
-        console.log('Test login helpers:');
-        console.log('autoFill("admin", "admin123")');
-        console.log('autoFill("user1", "password1")');
     </script>
 </body>
 </html>
