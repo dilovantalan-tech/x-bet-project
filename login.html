@@ -9,13 +9,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
 
         body {
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -23,21 +21,13 @@
             padding: 20px;
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         .login-container {
-            background: rgba(255, 255, 255, 0.95);
+            background: white;
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             width: 100%;
-            max-width: 450px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 400px;
         }
 
         .logo {
@@ -46,22 +36,13 @@
         }
 
         .logo h1 {
-            color: #1a2a6c;
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
         }
 
         .logo span {
             color: #b21f1f;
-        }
-
-        .logo p {
-            color: #666;
-            font-size: 16px;
-            margin-top: 5px;
         }
 
         .form-group {
@@ -70,51 +51,40 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             color: #333;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: bold;
         }
 
         .form-group input {
             width: 100%;
-            padding: 14px;
-            border: 2px solid #e1e5ee;
-            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
             font-size: 16px;
-            transition: all 0.3s;
-            background: #f8f9fa;
+            transition: border-color 0.3s;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #1a2a6c;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+            border-color: #b21f1f;
         }
 
         .login-btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            padding: 12px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(178, 31, 31, 0.3);
-            margin-top: 10px;
+            transition: transform 0.2s;
         }
 
         .login-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(178, 31, 31, 0.4);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
         }
 
         .error-message {
@@ -125,144 +95,24 @@
             padding: 10px;
             background: #fadbd8;
             border-radius: 5px;
-            border-left: 4px solid #e74c3c;
         }
 
         .demo-accounts {
-            margin-top: 25px;
-            padding: 20px;
-            background: #e8f4fd;
-            border-radius: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
             font-size: 14px;
-            border-left: 4px solid #3498db;
         }
 
         .demo-accounts h3 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .demo-accounts h3::before {
-            content: "💡";
+            margin-bottom: 10px;
+            color: #333;
         }
 
         .demo-account {
-            margin: 8px 0;
-            color: #34495e;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 5px 0;
-        }
-
-        .demo-account .badge {
-            background: #3498db;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .demo-account .badge.admin {
-            background: #e74c3c;
-        }
-
-        .demo-account .badge.user {
-            background: #2ecc71;
-        }
-
-        .role-selector {
-            display: flex;
-            margin-bottom: 20px;
-            background: #f1f3f4;
-            border-radius: 8px;
-            padding: 4px;
-        }
-
-        .role-option {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 6px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .role-option.active {
-            background: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .role-option.user-role.active {
-            color: #2ecc71;
-        }
-
-        .role-option.admin-role.active {
-            color: #e74c3c;
-        }
-
-        .password-container {
-            position: relative;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #7f8c8d;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .forgot-password {
-            text-align: right;
-            margin-top: 5px;
-        }
-
-        .forgot-password a {
-            color: #3498db;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-
-        .security-notice {
-            margin-top: 20px;
-            padding: 12px;
-            background: #fff8e1;
-            border-radius: 8px;
-            font-size: 12px;
-            color: #8d6e00;
-            border-left: 4px solid #ffc107;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .security-notice::before {
-            content: "🔒";
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 25px;
-            }
-            
-            .logo h1 {
-                font-size: 28px;
-            }
+            margin: 5px 0;
+            color: #666;
         }
     </style>
 </head>
@@ -270,12 +120,7 @@
     <div class="login-container">
         <div class="logo">
             <h1>X-<span>BET</span></h1>
-            <p>Secure Login Portal</p>
-        </div>
-
-        <div class="role-selector">
-            <div class="role-option user-role active" onclick="selectRole('user')">User Login</div>
-            <div class="role-option admin-role" onclick="selectRole('admin')">Admin Login</div>
+            <p>Welcome back! Please login to continue.</p>
         </div>
 
         <form id="loginForm">
@@ -286,16 +131,10 @@
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <div class="password-container">
-                    <input type="password" id="password" name="password" required placeholder="Enter your password">
-                    <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
-                </div>
-                <div class="forgot-password">
-                    <a href="#" onclick="alert('Please contact system administrator to reset your password.')">Forgot Password?</a>
-                </div>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
 
-            <button type="submit" class="login-btn" id="loginButton">Login to Dashboard</button>
+            <button type="submit" class="login-btn" id="loginBtn">Login</button>
             
             <div class="error-message" id="errorMessage">
                 Invalid username or password!
@@ -303,173 +142,84 @@
         </form>
 
         <div class="demo-accounts">
-            <h3>Demo Accounts</h3>
-            <div class="demo-account">
-                <span class="badge user">User</span>
-                <span>user1 / password1</span>
-            </div>
-            <div class="demo-account">
-                <span class="badge user">User</span>
-                <span>demo / demo123</span>
-            </div>
-            <div class="demo-account">
-                <span class="badge admin">Admin</span>
-                <span>admin1 / admin1pass</span>
-            </div>
-            <div class="demo-account">
-                <span class="badge admin">Admin</span>
-                <span>admin2 / admin2pass</span>
-            </div>
-        </div>
-
-        <div class="security-notice">
-            This is a secure system. Unauthorized access is prohibited.
+            <h3>Test Accounts:</h3>
+            <div class="demo-account">👤 admin / admin123</div>
+            <div class="demo-account">👤 user1 / password1</div>
+            <div class="demo-account">👤 demo / demo123</div>
         </div>
     </div>
 
     <script>
-        // Predefined user accounts
+        // Simple user accounts - no admin separation for now
         const validUsers = {
-            'user1': 'password1',
+            'admin': 'admin123',
+            'user1': 'password1', 
             'demo': 'demo123',
             'test': 'test123',
-            'player1': 'player123',
-            'player2': 'player123'
+            'user': 'user123'
         };
-
-        // Admin credentials
-        const adminCredentials = {
-            'admin1': 'admin1pass',
-            'admin2': 'admin2pass', 
-            'admin3': 'admin3pass'
-        };
-
-        let currentRole = 'user';
 
         // Login form handler
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const username = document.getElementById('username').value;
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('errorMessage');
-            const loginButton = document.getElementById('loginButton');
+            const loginBtn = document.getElementById('loginBtn');
 
             // Show loading state
-            loginButton.innerHTML = 'Authenticating...';
-            loginButton.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            loginBtn.disabled = true;
 
-            // Simulate network delay
-            setTimeout(() => {
-                // Check admin login first
-                if (currentRole === 'admin' && adminCredentials[username] && adminCredentials[username] === password) {
-                    // Successful admin login
-                    localStorage.setItem('isAdminLoggedIn', 'true');
-                    localStorage.setItem('currentAdmin', username);
-                    
-                    // Redirect to appropriate admin dashboard
-                    if (username === 'admin1') {
-                        window.location.href = 'admin.html';
-                    } else if (username === 'admin2') {
-                        window.location.href = 'admin1.html';
-                    } else if (username === 'admin3') {
-                        window.location.href = 'admin2.html';
-                    }
-                    return;
-                }
+            // Simple validation - check if credentials match
+            if (validUsers[username] && validUsers[username] === password) {
+                // Successful login
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('currentUser', username);
+                localStorage.setItem('loginTime', new Date().toISOString());
                 
-                // Check user login
-                if (currentRole === 'user' && validUsers[username] && validUsers[username] === password) {
-                    // Successful user login
-                    localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('currentUser', username);
-                    localStorage.setItem('loginTime', new Date().toISOString());
-                    
-                    // Redirect to user dashboard
+                // Show success message
+                errorMessage.style.display = 'none';
+                loginBtn.textContent = 'Login Successful! Redirecting...';
+                
+                // Redirect to dashboard after short delay
+                setTimeout(() => {
                     window.location.href = 'dashboard.html';
-                } else {
-                    // Failed login
-                    errorMessage.style.display = 'block';
-                    document.getElementById('password').value = '';
-                    loginButton.innerHTML = 'Login to Dashboard';
-                    loginButton.disabled = false;
-                    
-                    // Hide error after 5 seconds
-                    setTimeout(() => {
-                        errorMessage.style.display = 'none';
-                    }, 5000);
-                }
-            }, 1000);
+                }, 1000);
+                
+            } else {
+                // Failed login
+                errorMessage.style.display = 'block';
+                loginBtn.textContent = 'Login';
+                loginBtn.disabled = false;
+                
+                // Hide error after 3 seconds
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000);
+            }
         });
 
-        // Select role function
-        function selectRole(role) {
-            currentRole = role;
-            const userOption = document.querySelector('.user-role');
-            const adminOption = document.querySelector('.admin-role');
-            const loginButton = document.getElementById('loginButton');
-            
-            if (role === 'user') {
-                userOption.classList.add('active');
-                adminOption.classList.remove('active');
-                loginButton.textContent = 'Login to User Dashboard';
-            } else {
-                adminOption.classList.add('active');
-                userOption.classList.remove('active');
-                loginButton.textContent = 'Login to Admin Dashboard';
+        // Check if already logged in
+        window.addEventListener('load', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn === 'true') {
+                // Redirect to dashboard if already logged in
+                window.location.href = 'dashboard.html';
             }
-            
-            // Clear form
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('errorMessage').style.display = 'none';
-        }
+        });
 
-        // Toggle password visibility
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleButton = document.querySelector('.toggle-password');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleButton.textContent = '🙈';
-            } else {
-                passwordInput.type = 'password';
-                toggleButton.textContent = '👁️';
-            }
-        }
-
-        // Auto-fill demo account for testing
-        function fillDemoAccount(username, password) {
+        // Auto-fill for testing (remove in production)
+        function autoFill(username, password) {
             document.getElementById('username').value = username;
             document.getElementById('password').value = password;
         }
 
-        // Quick login helpers for testing (accessible via console)
-        console.log('Quick login helpers:');
-        console.log('fillDemoAccount("user1", "password1") - User login');
-        console.log('fillDemoAccount("admin1", "admin1pass") - Admin login');
-        
-        // Check if user is already logged in
-        window.addEventListener('load', function() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn');
-            
-            if (isLoggedIn === 'true') {
-                // Redirect to user dashboard if already logged in as user
-                window.location.href = 'dashboard.html';
-            } else if (isAdminLoggedIn === 'true') {
-                // Redirect to admin dashboard if already logged in as admin
-                const currentAdmin = localStorage.getItem('currentAdmin');
-                if (currentAdmin === 'admin1') {
-                    window.location.href = 'admin.html';
-                } else if (currentAdmin === 'admin2') {
-                    window.location.href = 'admin1.html';
-                } else if (currentAdmin === 'admin3') {
-                    window.location.href = 'admin2.html';
-                }
-            }
-        });
+        // Quick test buttons (remove in production)
+        console.log('Test login helpers:');
+        console.log('autoFill("admin", "admin123")');
+        console.log('autoFill("user1", "password1")');
     </script>
 </body>
 </html>
