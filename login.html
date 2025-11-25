@@ -136,6 +136,36 @@
         .register-link a:hover {
             text-decoration: underline;
         }
+
+        .demo-accounts {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .demo-accounts h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .demo-account {
+            margin: 5px 0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-account .badge {
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -167,6 +197,25 @@
             </div>
         </form>
 
+        <div class="demo-accounts">
+            <h3>🎯 Demo User Accounts (Public):</h3>
+            <div class="demo-account">
+                <span class="badge">USER</span>
+                <span>john_doe / Football2024!</span>
+            </div>
+            <div class="demo-account">
+                <span class="badge">USER</span>
+                <span>sarah_w / Basketball$123</span>
+            </div>
+            <div class="demo-account">
+                <span class="badge">USER</span>
+                <span>mike_t / TennisStar99!</span>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px; color: #e74c3c;">
+                🔒 Admin accounts are private
+            </div>
+        </div>
+
         <div class="register-link">
             <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
         </div>
@@ -177,14 +226,14 @@
     </div>
 
     <script>
-        // PRIVATE USER ACCOUNTS
+        // PUBLIC USER ACCOUNTS (Visible to everyone)
         const validUsers = {
             'john_doe': 'Football2024!',
             'sarah_w': 'Basketball$123',
             'mike_t': 'TennisStar99!'
         };
 
-        // PRIVATE ADMIN CREDENTIALS
+        // PRIVATE ADMIN CREDENTIALS (Not shown to public)
         const adminCredentials = {
             'admin_master': 'MasterAdmin2024!',
             'finance_manager': 'Finance14M$2024',
@@ -193,7 +242,7 @@
 
         // Initialize user data and load registered users
         function initializeUserData() {
-            // Initialize regular users
+            // Initialize demo users
             const users = ['john_doe', 'sarah_w', 'mike_t'];
             users.forEach(user => {
                 if (!localStorage.getItem('userData_' + user)) {
@@ -294,7 +343,7 @@
                 }, 5000);
             }
 
-            // Check admin login first
+            // Check admin login first (private - not shown to users)
             if (adminCredentials[username] && adminCredentials[username] === password) {
                 // Successful admin login
                 localStorage.setItem('isAdminLoggedIn', 'true');
@@ -356,6 +405,20 @@
                 localStorage.removeItem('registrationSuccess');
             }
         });
+
+        // Auto-fill for testing
+        function autoFillDemo(userIndex) {
+            const users = [
+                {user: 'john_doe', pass: 'Football2024!'},
+                {user: 'sarah_w', pass: 'Basketball$123'},
+                {user: 'mike_t', pass: 'TennisStar99!'}
+            ];
+            
+            if (userIndex >= 0 && userIndex < users.length) {
+                document.getElementById('username').value = users[userIndex].user;
+                document.getElementById('password').value = users[userIndex].pass;
+            }
+        }
     </script>
 </body>
 </html>
