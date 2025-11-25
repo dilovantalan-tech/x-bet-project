@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET - Dashboard</title>
+    <title>X-BET - User Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -130,7 +130,7 @@
             font-weight: bold;
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 10px;
             border: 2px solid #ddd;
@@ -138,7 +138,7 @@
             font-size: 14px;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #1a2a6c;
         }
@@ -150,26 +150,6 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn-primary {
-            background: #1a2a6c;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #15225a;
-        }
-
-        .btn-success {
-            background: #2ecc71;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #27ae60;
         }
 
         .btn-warning {
@@ -179,15 +159,6 @@
 
         .btn-warning:hover {
             background: #e67e22;
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c0392b;
         }
 
         .transaction-history {
@@ -251,6 +222,14 @@
             border: 1px solid #f5c6cb;
         }
 
+        .contact-admin {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
+        }
+
         .betting-section {
             margin-top: 30px;
         }
@@ -268,11 +247,6 @@
             border-radius: 10px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             border-left: 4px solid #fdbb2d;
-        }
-
-        .bet-card h4 {
-            margin-bottom: 10px;
-            color: #333;
         }
 
         .bet-odds {
@@ -302,46 +276,6 @@
             color: white;
             border-color: #1a2a6c;
         }
-
-        .contact-admin {
-            background: #e8f4fd;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            border-left: 4px solid #3498db;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            background: white;
-            border-radius: 10px;
-            padding: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .tab.active {
-            background: #1a2a6c;
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -356,83 +290,70 @@
     </nav>
 
     <div class="dashboard-content">
-        <!-- Tabs Navigation -->
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
-            <div class="tab" onclick="switchTab('betting')">⚽ Betting</div>
-            <div class="tab" onclick="switchTab('transactions')">💰 Transactions</div>
-            <div class="tab" onclick="switchTab('account')">👤 Account</div>
+        <div class="welcome-card">
+            <h2>Account Overview</h2>
+            <p>Welcome back to your X-BET dashboard</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Available Balance</h3>
+                    <div class="balance" id="currentBalance">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pending Withdrawals</h3>
+                    <div id="pendingWithdrawals">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Profit</h3>
+                    <div id="totalProfit">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Bets</h3>
+                    <div id="activeBets">0</div>
+                </div>
+            </div>
         </div>
 
-        <!-- Overview Tab -->
-        <div class="tab-content active" id="overview-tab">
-            <div class="welcome-card">
-                <h2>Account Overview</h2>
-                <p>Welcome back to your X-BET dashboard</p>
+        <div class="actions-grid">
+            <div class="action-card">
+                <h3>💰 Withdrawal Request</h3>
+                <p>Request withdrawal using transaction code</p>
                 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Available Balance</h3>
-                        <div class="balance" id="currentBalance">$0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Pending Withdrawals</h3>
-                        <div id="pendingWithdrawals">$0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Total Profit</h3>
-                        <div id="totalProfit">$0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Active Bets</h3>
-                        <div id="activeBets">0</div>
-                    </div>
+                <div class="form-group">
+                    <label for="withdrawAmount">Amount ($)</label>
+                    <input type="number" id="withdrawAmount" placeholder="Enter amount" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="transactionCode">Transaction Code</label>
+                    <input type="text" id="transactionCode" placeholder="Enter transaction code">
+                </div>
+                
+                <button class="btn btn-warning" onclick="requestWithdrawal()">Request Withdrawal</button>
+                
+                <div class="message" id="withdrawMessage"></div>
+            </div>
+
+            <div class="action-card">
+                <h3>📋 Recent Transactions</h3>
+                <div id="recentTransactions">
+                    <p>No recent transactions</p>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="actions-grid">
-                <div class="action-card">
-                    <h3>💰 Withdrawal Request</h3>
-                    <p>Request withdrawal using transaction code</p>
-                    
-                    <div class="form-group">
-                        <label for="withdrawAmount">Amount ($)</label>
-                        <input type="number" id="withdrawAmount" placeholder="Enter amount" min="1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="transactionCode">Transaction Code</label>
-                        <input type="text" id="transactionCode" placeholder="Enter transaction code">
-                    </div>
-                    
-                    <button class="btn btn-warning" onclick="requestWithdrawal()">Request Withdrawal</button>
-                    
-                    <div class="message" id="withdrawMessage"></div>
-                </div>
-
-                <div class="action-card">
-                    <h3>📋 Recent Transactions</h3>
-                    <div id="recentTransactions">
-                        <p>No recent transactions</p>
-                    </div>
-                </div>
-
-                <div class="action-card">
-                    <h3>📞 Contact Support</h3>
-                    <div class="contact-admin">
-                        <p><strong>For deposits or issues, contact administrators:</strong></p>
-                        <p>• Email: support@xbet.com</p>
-                        <p>• Telegram: @xbet_support</p>
-                        <p>• Phone: +1-234-567-8900</p>
-                        <p><em>Only admins can process deposits</em></p>
-                    </div>
+            <div class="action-card">
+                <h3>📞 Contact Support</h3>
+                <div class="contact-admin">
+                    <p><strong>For deposits or issues, contact administrators:</strong></p>
+                    <p>• Email: support@xbet.com</p>
+                    <p>• Telegram: @xbet_support</p>
+                    <p>• Phone: +1-234-567-8900</p>
+                    <p><em>Only admins can process deposits</em></p>
                 </div>
             </div>
         </div>
 
-        <!-- Betting Tab -->
-        <div class="tab-content" id="betting-tab">
+        <div class="betting-section">
             <div class="welcome-card">
                 <h2>🏆 Live Betting</h2>
                 <p>Place your bets on upcoming matches</p>
@@ -455,7 +376,7 @@
                         <input type="number" id="betAmount1" placeholder="Enter stake" min="1">
                     </div>
                     
-                    <button class="btn btn-primary" onclick="placeBet('Real Madrid vs Bayern Munich', 2.1, 'betAmount1')">Place Bet</button>
+                    <button class="btn btn-warning" onclick="placeBet('Real Madrid vs Bayern Munich', 2.1, 'betAmount1')">Place Bet</button>
                 </div>
 
                 <div class="bet-card">
@@ -473,42 +394,14 @@
                         <input type="number" id="betAmount2" placeholder="Enter stake" min="1">
                     </div>
                     
-                    <button class="btn btn-primary" onclick="placeBet('Lakers vs Celtics', 1.8, 'betAmount2')">Place Bet</button>
-                </div>
-
-                <div class="bet-card">
-                    <h4>🎾 Wimbledon</h4>
-                    <p>Djokovic vs Alcaraz</p>
-                    <p><small>Tomorrow, 14:00 GMT</small></p>
-                    
-                    <div class="bet-odds">
-                        <div class="odd-btn" onclick="selectOdd(this, 1.9)">Djokovic @1.9</div>
-                        <div class="odd-btn" onclick="selectOdd(this, 1.9)">Alcaraz @1.9</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="betAmount3">Stake Amount ($)</label>
-                        <input type="number" id="betAmount3" placeholder="Enter stake" min="1">
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="placeBet('Djokovic vs Alcaraz', 1.9, 'betAmount3')">Place Bet</button>
-                </div>
-            </div>
-
-            <div class="welcome-card">
-                <h3>📊 My Active Bets</h3>
-                <div id="activeBetsList">
-                    <p>No active bets</p>
+                    <button class="btn btn-warning" onclick="placeBet('Lakers vs Celtics', 1.8, 'betAmount2')">Place Bet</button>
                 </div>
             </div>
         </div>
 
-        <!-- Transactions Tab -->
-        <div class="tab-content" id="transactions-tab">
+        <div class="transaction-history">
             <div class="welcome-card">
                 <h2>💰 Transaction History</h2>
-                <p>Complete history of your deposits, withdrawals, and bets</p>
-                
                 <div class="transaction-table">
                     <table style="width: 100%;">
                         <thead>
@@ -527,59 +420,15 @@
                 </div>
             </div>
         </div>
-
-        <!-- Account Tab -->
-        <div class="tab-content" id="account-tab">
-            <div class="welcome-card">
-                <h2>👤 Account Settings</h2>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Member Since</h3>
-                        <div id="memberSince">Today</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Total Bets</h3>
-                        <div id="totalBets">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Win Rate</h3>
-                        <div id="winRate">0%</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Account Status</h3>
-                        <div style="color: #2ecc71;">Active</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="actions-grid">
-                <div class="action-card">
-                    <h3>🔒 Security</h3>
-                    <p>Change your password and security settings</p>
-                    <button class="btn btn-primary">Change Password</button>
-                    <button class="btn btn-warning">Two-Factor Auth</button>
-                </div>
-
-                <div class="action-card">
-                    <h3>📧 Notifications</h3>
-                    <p>Manage your email and notification preferences</p>
-                    <button class="btn btn-primary">Email Settings</button>
-                    <button class="btn btn-success">Bet Alerts</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
-        // User data management
         let userData = {
-            balance: 1000.00,
+            balance: 1500.00,
             pendingWithdrawals: 0.00,
-            totalProfit: 250.00,
+            totalProfit: 350.00,
             transactions: [],
-            bets: [],
-            memberSince: new Date().toISOString()
+            bets: []
         };
 
         // Check authentication
@@ -618,26 +467,15 @@
 
         // Update dashboard UI
         function updateDashboard() {
-            // Update balance and stats
             document.getElementById('currentBalance').textContent = '$' + userData.balance.toFixed(2);
             document.getElementById('pendingWithdrawals').textContent = '$' + userData.pendingWithdrawals.toFixed(2);
             document.getElementById('totalProfit').textContent = '$' + userData.totalProfit.toFixed(2);
             
-            // Update active bets count
             const activeBets = userData.bets.filter(bet => bet.status === 'active').length;
             document.getElementById('activeBets').textContent = activeBets;
             
-            // Update transaction history
             updateTransactionHistory();
-            
-            // Update recent transactions
             updateRecentTransactions();
-            
-            // Update active bets list
-            updateActiveBets();
-            
-            // Update account stats
-            updateAccountStats();
         }
 
         // Update transaction history
@@ -688,41 +526,6 @@
             container.innerHTML = html;
         }
 
-        // Update active bets
-        function updateActiveBets() {
-            const container = document.getElementById('activeBetsList');
-            const activeBets = userData.bets.filter(bet => bet.status === 'active');
-            
-            if (activeBets.length === 0) {
-                container.innerHTML = '<p>No active bets</p>';
-                return;
-            }
-            
-            let html = '<div style="display: grid; gap: 10px;">';
-            activeBets.forEach(bet => {
-                html += `
-                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                        <strong>${bet.match}</strong> - ${bet.selection} @${bet.odds}
-                        <br>Stake: $${bet.stake.toFixed(2)} | Potential Win: $${(bet.stake * bet.odds).toFixed(2)}
-                        <br><small>Placed: ${new Date(bet.date).toLocaleDateString()}</small>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            
-            container.innerHTML = html;
-        }
-
-        // Update account stats
-        function updateAccountStats() {
-            document.getElementById('memberSince').textContent = new Date(userData.memberSince).toLocaleDateString();
-            document.getElementById('totalBets').textContent = userData.bets.length;
-            
-            const wonBets = userData.bets.filter(bet => bet.status === 'won').length;
-            const winRate = userData.bets.length > 0 ? (wonBets / userData.bets.length * 100).toFixed(1) : 0;
-            document.getElementById('winRate').textContent = winRate + '%';
-        }
-
         // Request withdrawal
         function requestWithdrawal() {
             const amount = parseFloat(document.getElementById('withdrawAmount').value);
@@ -745,10 +548,23 @@
             }
             
             // Create withdrawal request
+            const request = {
+                id: Date.now(),
+                user: localStorage.getItem('currentUser'),
+                type: 'withdrawal',
+                amount: amount,
+                code: code,
+                date: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            // Save to pending requests
+            savePendingRequest(request);
+            
+            // Update user data
             userData.balance -= amount;
             userData.pendingWithdrawals += amount;
             
-            // Add transaction
             userData.transactions.push({
                 type: 'Withdrawal Request',
                 amount: amount,
@@ -761,9 +577,15 @@
             saveUserData();
             showMessage(messageEl, 'Withdrawal request submitted. Waiting for admin approval.', 'success');
             
-            // Clear form
             document.getElementById('withdrawAmount').value = '';
             document.getElementById('transactionCode').value = '';
+        }
+
+        // Save pending request
+        function savePendingRequest(request) {
+            let pendingRequests = JSON.parse(localStorage.getItem('pendingRequests') || '[]');
+            pendingRequests.push(request);
+            localStorage.setItem('pendingRequests', JSON.stringify(pendingRequests));
         }
 
         // Betting functions
@@ -771,12 +593,10 @@
         let selectedOddValue = 0;
 
         function selectOdd(element, oddValue) {
-            // Remove selected class from all buttons
             document.querySelectorAll('.odd-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
             
-            // Add selected class to clicked button
             element.classList.add('selected');
             selectedOdd = element;
             selectedOddValue = oddValue;
@@ -796,7 +616,6 @@
                 return;
             }
             
-            // Place bet
             userData.balance -= amount;
             
             const bet = {
@@ -811,7 +630,6 @@
             
             userData.bets.push(bet);
             
-            // Add transaction
             userData.transactions.push({
                 type: 'Bet Placed',
                 amount: amount,
@@ -823,32 +641,12 @@
             saveUserData();
             alert(`Bet placed successfully! Stake: $${amount.toFixed(2)}, Potential win: $${(amount * odd).toFixed(2)}`);
             
-            // Clear form
             document.getElementById(amountFieldId).value = '';
             document.querySelectorAll('.odd-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
             selectedOdd = null;
             selectedOddValue = 0;
-        }
-
-        // Tab switching
-        function switchTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab content
-            document.getElementById(tabName + '-tab').classList.add('active');
-            
-            // Add active class to clicked tab
-            event.target.classList.add('active');
         }
 
         // Utility functions
@@ -872,18 +670,6 @@
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             if (!checkAuth()) return;
-            
-            // Initialize with some demo transactions if empty
-            if (userData.transactions.length === 0) {
-                userData.transactions.push({
-                    type: 'Welcome Bonus',
-                    amount: 50.00,
-                    status: 'completed',
-                    date: new Date().toISOString(),
-                    details: 'New account bonus'
-                });
-                saveUserData();
-            }
         });
     </script>
 </body>
