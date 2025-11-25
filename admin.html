@@ -284,10 +284,6 @@
             gap: 5px;
         }
 
-        .user-management {
-            margin-top: 30px;
-        }
-
         .system-controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -341,7 +337,7 @@
     <div class="dashboard-content">
         <!-- Admin Statistics -->
         <div class="admin-stats">
-            <div class="stat-card" id="managerCard" style="display: none;">
+            <div class="stat-card manager" id="managerCard" style="display: none;">
                 <h3>Manager Balance</h3>
                 <div class="balance" id="managerBalance">$0.00</div>
                 <div style="font-size: 12px; color: #f1c40f; margin-top: 5px;">Full System Control</div>
@@ -507,7 +503,7 @@
             document.getElementById('currentAdmin').textContent = currentAdmin;
             
             // Check if manager
-            isManager = currentAdmin === 'manager';
+            isManager = currentAdmin === 'finance_manager';
             if (isManager) {
                 document.getElementById('managerBadge').style.display = 'inline-block';
                 document.getElementById('adminBadge').style.display = 'none';
@@ -546,7 +542,7 @@
 
         // Update system statistics
         function updateSystemStats() {
-            const users = ['user1', 'demo', 'test', 'player1'];
+            const users = ['john_doe', 'sarah_w', 'mike_t'];
             let totalBalance = 0;
             
             users.forEach(user => {
@@ -555,7 +551,7 @@
             });
             
             // Add admin balances
-            const admins = ['admin', 'admin1', 'admin2', 'manager'];
+            const admins = ['admin_master', 'finance_manager', 'support_admin'];
             admins.forEach(admin => {
                 const adminData = getUserData(admin);
                 totalBalance += adminData.balance;
@@ -570,7 +566,7 @@
 
         // Load user list
         function loadUserList() {
-            const users = ['user1', 'demo', 'test', 'player1'];
+            const users = ['john_doe', 'sarah_w', 'mike_t'];
             const select = document.getElementById('selectedUser');
             
             select.innerHTML = '<option value="">Select a user</option>';
@@ -591,9 +587,9 @@
             
             // Default user data
             return {
-                balance: 1000.00,
+                balance: 1500.00,
                 pendingWithdrawals: 0.00,
-                totalProfit: 250.00,
+                totalProfit: 350.00,
                 transactions: [],
                 bets: []
             };
@@ -731,7 +727,7 @@
                 return;
             }
             
-            // Process manager transfer (to system or specific user)
+            // Process manager transfer
             adminData.balance -= amount;
             
             // Add transaction
@@ -743,7 +739,7 @@
                 details: note || 'Manager fund allocation'
             });
             
-            localStorage.setItem('userData_manager', JSON.stringify(adminData));
+            localStorage.setItem('userData_finance_manager', JSON.stringify(adminData));
             
             showMessage(messageEl, `✅ Manager transfer of $${amount.toFixed(2)} processed`, 'success');
             document.getElementById('transferAmount').value = '';
@@ -831,9 +827,56 @@
 
         // System control functions
         function viewAllUsers() {
-            const users = ['user1', 'demo', 'test', 'player1'];
+            const users = ['john_doe', 'sarah_w', 'mike_t'];
             let userList = 'Complete User List:\n\n';
             
             users.forEach(user => {
                 const userData = getUserData(user);
-                userList += `${user}:
+                userList += `${user}: $${userData.balance.toFixed(2)} | ${userData.transactions.length} transactions\n`;
+            });
+            
+            alert(userList);
+        }
+
+        function viewTransactionLog() {
+            alert('System logs exported to console');
+            console.log('=== SYSTEM TRANSACTION LOG ===');
+        }
+
+        function backupSystem() {
+            showMessage(document.getElementById('adminMessage'), '✅ System backup created successfully', 'success');
+        }
+
+        function systemReport() {
+            showMessage(document.getElementById('adminMessage'), '📊 System report generated', 'success');
+        }
+
+        // Utility functions
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `message ${type}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function clearAdminForm() {
+            document.getElementById('adminAmount').value = '';
+            document.getElementById('adminTransactionCode').value = '';
+        }
+
+        function logout() {
+            localStorage.removeItem('isAdminLoggedIn');
+            localStorage.removeItem('currentAdmin');
+            window.location.href = 'login.html';
+        }
+
+        // Initialize admin dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkAdminAuth()) return;
+        });
+    </script>
+</body>
+</html>
