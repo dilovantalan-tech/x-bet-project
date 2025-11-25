@@ -148,6 +148,19 @@
             color: #666;
             text-align: center;
         }
+
+        .demo-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .demo-info h4 {
+            margin-bottom: 8px;
+            color: #3498db;
+        }
     </style>
 </head>
 <body>
@@ -189,6 +202,13 @@
             </div>
         </form>
 
+        <div class="demo-info">
+            <h4>💡 Quick Testing:</h4>
+            <p>Use demo accounts on login page for instant access:</p>
+            <p><strong>john_doe / Football2024!</strong></p>
+            <p><strong>sarah_w / Basketball$123</strong></p>
+        </div>
+
         <div class="login-link">
             <p>Already have an account? <a href="login.html">Login here</a></p>
         </div>
@@ -213,13 +233,6 @@
             'support_admin': true
         };
 
-        // Existing emails (cannot be used again)
-        const existingEmails = {
-            'john@example.com': true,
-            'sarah@example.com': true,
-            'mike@example.com': true
-        };
-
         // Check if username already exists in localStorage
         function isUsernameTaken(username) {
             const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
@@ -230,7 +243,7 @@
         function isEmailTaken(email) {
             const userEmails = JSON.parse(localStorage.getItem('userEmails') || '{}');
             const emails = Object.values(userEmails);
-            return emails.includes(email) || existingEmails[email];
+            return emails.includes(email);
         }
 
         // Registration form handler
