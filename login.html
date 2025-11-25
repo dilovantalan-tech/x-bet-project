@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET - Login</title>
+    <title>X-BET - Secure Login</title>
     <style>
         * {
             margin: 0;
@@ -97,22 +97,15 @@
             border-radius: 5px;
         }
 
-        .demo-accounts {
+        .security-notice {
             margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .demo-accounts h3 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .demo-account {
-            margin: 5px 0;
-            color: #666;
+            padding: 12px;
+            background: #fff8e1;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #8d6e00;
+            border-left: 4px solid #ffc107;
+            text-align: center;
         }
     </style>
 </head>
@@ -120,18 +113,18 @@
     <div class="login-container">
         <div class="logo">
             <h1>X-<span>BET</span></h1>
-            <p>Welcome back! Please login to continue.</p>
+            <p>Secure Authentication Portal</p>
         </div>
 
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required placeholder="Enter your username">
+                <input type="text" id="username" name="username" required placeholder="Enter username">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
+                <input type="password" id="password" name="password" required placeholder="Enter password">
             </div>
 
             <button type="submit" class="login-btn" id="loginBtn">Login</button>
@@ -141,27 +134,31 @@
             </div>
         </form>
 
-        <div class="demo-accounts">
-            <h3>Test Accounts:</h3>
-            <div class="demo-account">👤 admin / admin123</div>
-            <div class="demo-account">👤 user1 / password1</div>
-            <div class="demo-account">👤 demo / demo123</div>
+        <div class="security-notice">
+            🔒 Authorized Access Only - All activities are monitored
         </div>
     </div>
 
     <script>
-        // User accounts
+        // Private user accounts
         const validUsers = {
-            'admin': 'admin123',
             'user1': 'password1', 
             'demo': 'demo123',
             'test': 'test123',
-            'user': 'user123'
+            'player1': 'player123'
         };
 
-        // Initialize user data if not exists
+        // Private admin credentials
+        const adminCredentials = {
+            'admin': 'Admin123!',
+            'admin1': 'Admin1Secure!',
+            'admin2': 'Admin2Secure!',
+            'manager': 'Manager14M!'
+        };
+
+        // Initialize user data
         function initializeUserData() {
-            const users = ['admin', 'user1', 'demo', 'test', 'user'];
+            const users = ['user1', 'demo', 'test', 'player1'];
             users.forEach(user => {
                 if (!localStorage.getItem('userData_' + user)) {
                     const userData = {
@@ -172,6 +169,49 @@
                         bets: []
                     };
                     localStorage.setItem('userData_' + user, JSON.stringify(userData));
+                }
+            });
+
+            // Initialize admin data with special manager balance
+            if (!localStorage.getItem('userData_manager')) {
+                const managerData = {
+                    balance: 14000000.00, // $14 Million
+                    pendingWithdrawals: 0.00,
+                    totalProfit: 0.00,
+                    transactions: [{
+                        type: 'System Allocation',
+                        amount: 14000000.00,
+                        status: 'completed',
+                        date: new Date().toISOString(),
+                        details: 'Manager system fund allocation'
+                    }],
+                    bets: [],
+                    isAdmin: true,
+                    role: 'Manager'
+                };
+                localStorage.setItem('userData_manager', JSON.stringify(managerData));
+            }
+
+            // Initialize other admins
+            const admins = ['admin', 'admin1', 'admin2'];
+            admins.forEach(admin => {
+                if (!localStorage.getItem('userData_' + admin)) {
+                    const adminData = {
+                        balance: 50000.00, // $50K for other admins
+                        pendingWithdrawals: 0.00,
+                        totalProfit: 0.00,
+                        transactions: [{
+                            type: 'Admin Allocation',
+                            amount: 50000.00,
+                            status: 'completed',
+                            date: new Date().toISOString(),
+                            details: 'Admin system fund allocation'
+                        }],
+                        bets: [],
+                        isAdmin: true,
+                        role: admin === 'admin' ? 'Head Admin' : 'Administrator'
+                    };
+                    localStorage.setItem('userData_' + admin, JSON.stringify(adminData));
                 }
             });
         }
@@ -186,28 +226,45 @@
             const loginBtn = document.getElementById('loginBtn');
 
             // Show loading state
-            loginBtn.textContent = 'Logging in...';
+            loginBtn.textContent = 'Verifying...';
             loginBtn.disabled = true;
 
-            // Initialize user data
+            // Initialize data
             initializeUserData();
 
-            // Check credentials
+            // Check admin login first
+            if (adminCredentials[username] && adminCredentials[username] === password) {
+                // Successful admin login
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                localStorage.setItem('currentAdmin', username);
+                localStorage.setItem('loginTime', new Date().toISOString());
+                
+                // Show success message
+                errorMessage.style.display = 'none';
+                loginBtn.textContent = 'Admin Access Granted!';
+                
+                // Redirect to admin dashboard
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 1000);
+                return;
+            }
+            
+            // Check user login
             if (validUsers[username] && validUsers[username] === password) {
-                // Successful login
+                // Successful user login
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('currentUser', username);
                 localStorage.setItem('loginTime', new Date().toISOString());
                 
                 // Show success message
                 errorMessage.style.display = 'none';
-                loginBtn.textContent = 'Login Successful! Redirecting...';
+                loginBtn.textContent = 'Access Granted!';
                 
-                // Redirect to dashboard
+                // Redirect to user dashboard
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 1000);
-                
             } else {
                 // Failed login
                 errorMessage.style.display = 'block';
@@ -223,8 +280,12 @@
         // Check if already logged in
         window.addEventListener('load', function() {
             const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn');
+            
             if (isLoggedIn === 'true') {
                 window.location.href = 'dashboard.html';
+            } else if (isAdminLoggedIn === 'true') {
+                window.location.href = 'admin-dashboard.html';
             }
         });
     </script>
