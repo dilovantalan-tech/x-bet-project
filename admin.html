@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET Admin - Fix Permissions</title>
+    <title>X-BET Admin Panel</title>
     <style>
         :root {
             --primary: #1a1f36;
@@ -47,63 +47,35 @@
             margin-bottom: 10px;
         }
         
-        .permission-fix {
+        .connection-status {
             background: var(--secondary);
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border-left: 4px solid var(--warning);
-        }
-        
-        .permission-fix h3 {
-            color: var(--warning);
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-        
-        .steps {
-            background: var(--primary);
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status-connected {
+            border-left: 4px solid var(--success);
+        }
+        
+        .status-error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
             margin: 20px 0;
-        }
-        
-        .step {
-            margin-bottom: 15px;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 5px;
-        }
-        
-        .step-number {
-            background: var(--accent);
-            color: var(--primary);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        
-        .code-block {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-family: monospace;
-            border-left: 4px solid var(--accent);
+            flex-wrap: wrap;
         }
         
         .btn {
-            padding: 12px 24px;
+            padding: 12px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: 600;
-            margin: 5px;
         }
         
         .btn-primary {
@@ -115,6 +87,11 @@
             background: var(--primary);
             color: var(--text);
             border: 1px solid var(--border);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
         }
         
         .stats-grid {
@@ -160,6 +137,10 @@
             border-bottom: 1px solid var(--border);
         }
         
+        .user-row:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
         .notification {
             position: fixed;
             top: 20px;
@@ -179,6 +160,15 @@
             padding: 40px;
             color: var(--text-muted);
         }
+        
+        .debug-info {
+            background: var(--primary);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
     </style>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -188,56 +178,25 @@
     <div class="container">
         <div class="header">
             <h1>X-BET Admin Panel</h1>
-            <p>Firebase Permission Fix Required</p>
+            <p>User Management System</p>
         </div>
 
-        <!-- Permission Fix Instructions -->
-        <div class="permission-fix">
-            <h3>🔐 Firebase Permission Error Detected</h3>
-            <p>Your Firebase Firestore has security rules that block write operations. Here's how to fix it:</p>
-            
-            <div class="steps">
-                <div class="step">
-                    <span class="step-number">1</span>
-                    Go to <a href="https://console.firebase.google.com/" target="_blank" style="color: var(--accent);">Firebase Console</a>
-                </div>
-                
-                <div class="step">
-                    <span class="step-number">2</span>
-                    Select your project: <strong>x-bet-prod-jd</strong>
-                </div>
-                
-                <div class="step">
-                    <span class="step-number">3</span>
-                    Go to <strong>Firestore Database</strong> → <strong>Rules</strong>
-                </div>
-                
-                <div class="step">
-                    <span class="step-number">4</span>
-                    <strong>Replace the current rules</strong> with this temporary development rules:
-                    
-                    <div class="code-block">
-rules_version = '2';<br>
-service cloud.firestore {<br>
-&nbsp;&nbsp;match /databases/{database}/documents {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;match /{document=**} {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read, write: if true;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;}<br>
-}
-                    </div>
-                </div>
-                
-                <div class="step">
-                    <span class="step-number">5</span>
-                    Click <strong>Publish</strong> to save the rules
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="btn btn-primary" onclick="testConnection()">Test Connection After Fix</button>
-                <button class="btn btn-secondary" onclick="loadUsersReadOnly()">Try Read-Only Mode</button>
-            </div>
+        <!-- Connection Status -->
+        <div class="connection-status" id="connection-status">
+            <div class="loading">Connecting to Firebase...</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn btn-primary" onclick="loadUsersFromFirebase()">Load Users</button>
+            <button class="btn btn-success" onclick="createSampleUser()">Add Sample User</button>
+            <button class="btn btn-secondary" onclick="checkFirestoreAccess()">Test Permissions</button>
+            <button class="btn btn-secondary" onclick="loadDemoData()">Load Demo Data</button>
+        </div>
+
+        <!-- Debug Info -->
+        <div class="debug-info" id="debug-info">
+            Click "Test Permissions" to check database access
         </div>
 
         <!-- Stats -->
@@ -267,16 +226,9 @@ service cloud.firestore {<br>
             </div>
             <div id="users-container">
                 <div class="loading">
-                    Fix permissions above to see users
+                    Click "Load Users" to see your database users
                 </div>
             </div>
-        </div>
-
-        <!-- Demo Data Section -->
-        <div style="margin-top: 40px; padding: 20px; background: var(--secondary); border-radius: 10px;">
-            <h3 style="color: var(--accent); margin-bottom: 15px;">🔄 Temporary Demo Mode</h3>
-            <p>While fixing permissions, you can use demo data:</p>
-            <button class="btn btn-primary" onclick="loadDemoData()">Load Demo Users</button>
         </div>
     </div>
 
@@ -297,76 +249,65 @@ service cloud.firestore {<br>
 
         // Initialize Firebase
         document.addEventListener('DOMContentLoaded', function() {
+            initializeFirebase();
+        });
+
+        // Initialize Firebase
+        function initializeFirebase() {
             try {
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
-                showNotification('✅ Firebase connected! Checking permissions...', 'success');
-                testConnection();
+                
+                updateConnectionStatus('✅ Connected to Firebase successfully!', 'success');
+                checkFirestoreAccess();
+                
             } catch (error) {
-                showNotification('❌ Firebase connection failed', 'error');
+                updateConnectionStatus('❌ Firebase connection failed: ' + error.message, 'error');
             }
-        });
+        }
 
-        // Test connection and permissions
-        async function testConnection() {
-            showNotification('🔍 Testing database permissions...', 'warning');
+        // Check Firestore access
+        async function checkFirestoreAccess() {
+            const debugInfo = document.getElementById('debug-info');
+            debugInfo.innerHTML = 'Testing database access...';
             
             try {
-                // Test read permission
-                const testRead = await db.collection('test').limit(1).get();
-                showNotification('✅ Read permissions: OK', 'success');
+                // Test read access by trying to get users
+                const usersSnapshot = await db.collection('users').limit(1).get();
                 
-                // Test write permission
-                const testDoc = db.collection('test').doc('permission-test');
-                await testDoc.set({ 
-                    test: true, 
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-                });
-                await testDoc.delete();
-                showNotification('✅ Write permissions: OK', 'success');
-                
-                // If we get here, permissions are fixed
-                loadUsersFromFirebase();
-                
-            } catch (error) {
-                if (error.code === 'permission-denied') {
-                    showNotification('❌ Permission denied. Please update Firestore rules.', 'error');
+                if (!usersSnapshot.empty) {
+                    debugInfo.innerHTML = '✅ Read access: OK - Users collection exists';
+                    showNotification('✅ Database access confirmed', 'success');
                 } else {
-                    showNotification('❌ Connection error: ' + error.message, 'error');
+                    debugInfo.innerHTML = 'ℹ️ Read access: OK - Users collection is empty';
+                    showNotification('✅ Database access confirmed (empty)', 'success');
                 }
-            }
-        }
-
-        // Try to load users in read-only mode
-        async function loadUsersReadOnly() {
-            try {
-                showNotification('🔍 Trying to read users...', 'warning');
-                const usersSnapshot = await db.collection('users').get();
                 
-                if (usersSnapshot.empty) {
-                    showNotification('📭 No users found in database', 'warning');
-                } else {
-                    realUsers = [];
-                    usersSnapshot.forEach(doc => {
-                        realUsers.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
+                // Test write access
+                try {
+                    const testDoc = db.collection('test_permissions').doc('temp');
+                    await testDoc.set({ 
+                        test: true, 
+                        timestamp: new Date().toISOString() 
                     });
-                    renderUsers(realUsers);
-                    showNotification(`✅ Read ${realUsers.length} users successfully`, 'success');
+                    await testDoc.delete();
+                    debugInfo.innerHTML += '<br>✅ Write access: OK';
+                } catch (writeError) {
+                    debugInfo.innerHTML += '<br>❌ Write access: Blocked - ' + writeError.message;
                 }
                 
             } catch (error) {
                 if (error.code === 'permission-denied') {
-                    showNotification('❌ Read permission denied. Update Firestore rules.', 'error');
+                    debugInfo.innerHTML = '❌ Permission denied. Please update Firestore rules.';
+                    showNotification('❌ Permission denied - Update Firestore rules', 'error');
                 } else {
-                    showNotification('❌ Error: ' + error.message, 'error');
+                    debugInfo.innerHTML = '❌ Error: ' + error.message;
+                    showNotification('❌ Database error: ' + error.message, 'error');
                 }
             }
         }
 
-        // Load users with full access
+        // Load users from Firebase
         async function loadUsersFromFirebase() {
             try {
                 const usersContainer = document.getElementById('users-container');
@@ -375,45 +316,59 @@ service cloud.firestore {<br>
                 const usersSnapshot = await db.collection('users').get();
                 
                 if (usersSnapshot.empty) {
-                    usersContainer.innerHTML = '<div class="loading">No users found. Ready to add users.</div>';
+                    usersContainer.innerHTML = '<div class="loading">No users found in database. Click "Add Sample User" to create one.</div>';
                     updateUserStats(0);
+                    showNotification('📭 No users found in database', 'warning');
                     return;
                 }
 
                 realUsers = [];
                 usersSnapshot.forEach(doc => {
+                    const userData = doc.data();
                     realUsers.push({
                         id: doc.id,
-                        ...doc.data()
+                        ...userData
                     });
                 });
 
                 renderUsers(realUsers);
-                showNotification(`✅ Loaded ${realUsers.length} users`, 'success');
+                showNotification(`✅ Loaded ${realUsers.length} users from database`, 'success');
                 
             } catch (error) {
-                showNotification('❌ Error loading users: ' + error.message, 'error');
+                if (error.code === 'permission-denied') {
+                    showNotification('❌ Read permission denied. Please update Firestore rules.', 'error');
+                } else {
+                    showNotification('❌ Error loading users: ' + error.message, 'error');
+                }
             }
         }
 
-        // Add sample user (for testing write permissions)
-        async function addSampleUser() {
+        // Create a sample user
+        async function createSampleUser() {
             try {
                 const sampleUser = {
-                    email: "test@xbet.com",
-                    displayName: "Test User",
-                    balance: 1000,
-                    profit: 500,
+                    email: "sample@xbet.com",
+                    displayName: "Sample User",
+                    balance: 1000.00,
+                    profit: 250.50,
                     status: "active",
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                await db.collection('users').doc('test-user').set(sampleUser);
-                showNotification('✅ Sample user added successfully!', 'success');
-                loadUsersFromFirebase();
+                // Generate a unique ID
+                const userId = 'user_' + Date.now();
+                await db.collection('users').doc(userId).set(sampleUser);
+                
+                showNotification('✅ Sample user created successfully!', 'success');
+                loadUsersFromFirebase(); // Reload users
                 
             } catch (error) {
-                showNotification('❌ Cannot add user: ' + error.message, 'error');
+                if (error.code === 'permission-denied') {
+                    showNotification('❌ Write permission denied. Please update Firestore rules.', 'error');
+                } else {
+                    showNotification('❌ Error creating user: ' + error.message, 'error');
+                }
             }
         }
 
@@ -426,16 +381,32 @@ service cloud.firestore {<br>
                 const userRow = document.createElement('div');
                 userRow.className = 'user-row';
                 
+                const displayName = user.displayName || user.username || user.name || 'Unknown';
+                const email = user.email || user.userEmail || 'No email';
+                const balance = user.balance || user.walletBalance || 0;
+                const status = user.status || 'active';
+                const registered = user.createdAt ? 
+                    new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 
+                    'N/A';
+
                 userRow.innerHTML = `
                     <div>
-                        <strong>${user.displayName || 'No Name'}</strong><br>
-                        <small>${user.email || 'No Email'}</small>
+                        <strong>${displayName}</strong><br>
+                        <small style="color: var(--text-muted);">${email}</small>
                     </div>
-                    <div>$${(user.balance || 0).toFixed(2)}</div>
-                    <div>${user.status || 'unknown'}</div>
-                    <div>${user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</div>
+                    <div><strong>$${balance.toFixed(2)}</strong></div>
                     <div>
-                        <button class="btn btn-primary" onclick="transferToUser('${user.id}', '${user.email}')">
+                        <span style="
+                            padding: 4px 8px; 
+                            border-radius: 12px; 
+                            font-size: 12px;
+                            background: ${status === 'active' ? 'rgba(46, 204, 113, 0.2)' : 'rgba(231, 76, 60, 0.2)'};
+                            color: ${status === 'active' ? '#2ecc71' : '#e74c3c'};
+                        ">${status}</span>
+                    </div>
+                    <div>${registered}</div>
+                    <div>
+                        <button class="btn btn-primary" onclick="transferToUser('${user.id}', '${email}')" style="padding: 8px 12px; font-size: 12px;">
                             Transfer
                         </button>
                     </div>
@@ -450,7 +421,9 @@ service cloud.firestore {<br>
         // Update stats
         function updateUserStats(total) {
             document.getElementById('total-users').textContent = total;
-            document.getElementById('active-users').textContent = realUsers.filter(user => user.status === 'active').length;
+            document.getElementById('active-users').textContent = realUsers.filter(user => 
+                user.status === 'active' || user.isActive !== false
+            ).length;
         }
 
         // Load demo data
@@ -467,8 +440,8 @@ service cloud.firestore {<br>
                 },
                 {
                     id: 'demo-2',
-                    email: "player1@example.com",
-                    displayName: "john_doe", 
+                    email: "player1@example.com", 
+                    displayName: "john_doe",
                     balance: 2500.50,
                     profit: 1200.75,
                     status: "active",
@@ -494,7 +467,15 @@ service cloud.firestore {<br>
             const amount = prompt(`Enter amount to transfer to ${userEmail}:`);
             if (amount && !isNaN(amount)) {
                 showNotification(`✅ Transferring $${amount} to ${userEmail}`, 'success');
+                // Add actual transaction logic here
             }
+        }
+
+        // Update connection status
+        function updateConnectionStatus(message, type) {
+            const statusDiv = document.getElementById('connection-status');
+            statusDiv.innerHTML = message;
+            statusDiv.className = `connection-status status-${type === 'success' ? 'connected' : 'error'}`;
         }
 
         // Show notification
@@ -508,6 +489,14 @@ service cloud.firestore {<br>
                 notification.remove();
             }, 5000);
         }
+
+        // Debug function to check Firebase
+        window.debugFirebase = function() {
+            console.log('Firebase Config:', firebaseConfig);
+            console.log('Firebase App:', firebase.apps);
+            console.log('Firestore DB:', db);
+            console.log('Loaded Users:', realUsers);
+        };
     </script>
 </body>
 </html>
