@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET Admin - Real Database Users</title>
+    <title>X-BET Admin - Firebase Users</title>
     <style>
         :root {
             --primary: #1a1f36;
@@ -49,7 +49,7 @@
             margin-bottom: 10px;
         }
         
-        .api-config {
+        .firebase-config {
             background: var(--secondary);
             padding: 15px;
             border-radius: 8px;
@@ -57,7 +57,7 @@
             border-left: 4px solid var(--warning);
         }
         
-        .api-config h3 {
+        .firebase-config h3 {
             margin-bottom: 10px;
             color: var(--warning);
         }
@@ -163,6 +163,16 @@
             border: 1px solid var(--border);
         }
         
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
         .users-table {
             background-color: var(--secondary);
             border-radius: 10px;
@@ -173,7 +183,7 @@
         
         .table-header {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 150px;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 150px 150px;
             padding: 15px 20px;
             background-color: var(--primary);
             font-weight: 600;
@@ -182,7 +192,7 @@
         
         .user-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 150px;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 150px 150px;
             padding: 15px 20px;
             border-bottom: 1px solid var(--border);
             align-items: center;
@@ -228,7 +238,7 @@
             color: var(--danger);
         }
         
-        .transfer-modal {
+        .transaction-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -322,6 +332,14 @@
             color: var(--text-muted);
         }
         
+        .transaction-code {
+            font-family: monospace;
+            background: var(--primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -329,10 +347,10 @@
         
         @media (max-width: 1200px) {
             .table-header, .user-row {
-                grid-template-columns: 1fr 1fr 1fr 1fr 120px;
+                grid-template-columns: 1fr 1fr 1fr 150px 150px;
             }
             
-            .user-registered, .user-sets {
+            .user-registered, .user-profit {
                 display: none;
             }
         }
@@ -351,21 +369,28 @@
             }
         }
     </style>
+    
+    <!-- Include Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
 </head>
 <body>
     <div class="admin-container">
         <div class="header">
-            <h1>X-BET Admin Panel</h1>
-            <p>Real Database Users & Fund Transfers</p>
+            <h1>X-BET Admin - Firebase Users</h1>
+            <p>Real User Management with Transaction Codes</p>
         </div>
         
-        <!-- API Configuration -->
-        <div class="api-config">
-            <h3>Database Connection</h3>
+        <!-- Firebase Configuration -->
+        <div class="firebase-config">
+            <h3>Firebase Connection</h3>
             <div class="config-inputs">
-                <input type="text" id="api-endpoint" placeholder="Enter your API endpoint (e.g., https://api.xbet.com/users)" value="https://api.xbet.com/users">
-                <input type="text" id="api-key" placeholder="Enter API Key (if required)">
-                <button id="connect-api" class="btn-primary">Connect to Database</button>
+                <input type="text" id="firebase-config" placeholder="Paste your Firebase config object here">
+                <button id="connect-firebase" class="btn-primary">Connect to Firebase</button>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
+                Get your config from Firebase Console > Project Settings > General > Your apps
             </div>
         </div>
         
@@ -391,10 +416,10 @@
         
         <!-- Controls -->
         <div class="controls">
-            <input type="text" class="search-box" placeholder="Search users..." id="search-users">
+            <input type="text" class="search-box" placeholder="Search users by email or name..." id="search-users">
             <div class="action-buttons">
                 <button class="btn btn-primary" id="refresh-users">Refresh Users</button>
-                <button class="btn btn-secondary" id="export-users">Export CSV</button>
+                <button class="btn btn-secondary" id="show-transactions">View Transactions</button>
             </div>
         </div>
         
@@ -406,28 +431,28 @@
                 <div>Profit</div>
                 <div>Status</div>
                 <div>Registered</div>
-                <div>Last Login</div>
-                <div>Actions</div>
+                <div>Deposit</div>
+                <div>Withdraw</div>
             </div>
             
             <div id="users-container">
                 <div class="loading" id="loading-message">
-                    Please connect to your database to load real users...
+                    Connect to Firebase to load real users from your database...
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Transfer Money Modal -->
-    <div class="transfer-modal" id="transfer-modal">
+    <!-- Transaction Modal -->
+    <div class="transaction-modal" id="transaction-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Transfer Funds to User</h3>
+                <h3 id="modal-title">Process Transaction</h3>
                 <button class="close-modal" id="close-modal">&times;</button>
             </div>
-            <form id="transfer-form">
+            <form id="transaction-form">
                 <div class="form-group">
-                    <label for="recipient">Recipient</label>
+                    <label for="recipient">User</label>
                     <input type="text" class="form-control" id="recipient" readonly>
                 </div>
                 <div class="form-group">
@@ -439,183 +464,121 @@
                     <input type="number" class="form-control" id="amount" min="0.01" step="0.01" placeholder="Enter amount" required>
                 </div>
                 <div class="form-group">
-                    <label for="transaction-type">Transaction Type</label>
-                    <select class="form-control" id="transaction-type">
-                        <option value="deposit">Deposit</option>
-                        <option value="bonus">Bonus</option>
-                        <option value="winning">Winning</option>
-                        <option value="refund">Refund</option>
-                    </select>
+                    <label for="transaction-code">Transaction Code</label>
+                    <input type="text" class="form-control" id="transaction-code" placeholder="Enter transaction code" required>
                 </div>
                 <div class="form-group">
                     <label for="notes">Notes (Optional)</label>
                     <textarea class="form-control" id="notes" rows="3" placeholder="Transaction notes"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancel-transfer">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Transfer Funds</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-transaction">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submit-transaction">Process</button>
                 </div>
             </form>
         </div>
     </div>
     
     <script>
-        // Global variables
+        // Firebase variables
+        let db;
+        let currentUser = null;
+        let currentTransactionType = '';
         let realUsers = [];
-        let currentTransferUser = null;
-        let apiEndpoint = '';
-        let apiKey = '';
-        
-        // DOM Elements
-        const usersContainer = document.getElementById('users-container');
-        const totalUsersEl = document.getElementById('total-users');
-        const activeUsersEl = document.getElementById('active-users');
-        const loadingMessage = document.getElementById('loading-message');
         
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            // Load saved API configuration
-            const savedEndpoint = localStorage.getItem('xbet_api_endpoint');
-            const savedApiKey = localStorage.getItem('xbet_api_key');
-            
-            if (savedEndpoint) {
-                document.getElementById('api-endpoint').value = savedEndpoint;
-            }
-            
-            if (savedApiKey) {
-                document.getElementById('api-key').value = savedApiKey;
+            // Load saved Firebase config
+            const savedConfig = localStorage.getItem('xbet_firebase_config');
+            if (savedConfig) {
+                document.getElementById('firebase-config').value = savedConfig;
             }
             
             // Event listeners
-            document.getElementById('connect-api').addEventListener('click', connectToDatabase);
-            document.getElementById('refresh-users').addEventListener('click', loadRealUsers);
-            document.getElementById('close-modal').addEventListener('click', closeTransferModal);
-            document.getElementById('cancel-transfer').addEventListener('click', closeTransferModal);
-            document.getElementById('transfer-form').addEventListener('submit', processTransfer);
+            document.getElementById('connect-firebase').addEventListener('click', connectToFirebase);
+            document.getElementById('refresh-users').addEventListener('click', loadUsersFromFirebase);
+            document.getElementById('close-modal').addEventListener('click', closeTransactionModal);
+            document.getElementById('cancel-transaction').addEventListener('click', closeTransactionModal);
+            document.getElementById('transaction-form').addEventListener('submit', processTransaction);
             document.getElementById('search-users').addEventListener('input', filterUsers);
             
-            // Auto-connect if credentials are saved
-            if (savedEndpoint && savedEndpoint !== 'https://api.xbet.com/users') {
-                connectToDatabase();
+            // Auto-connect if config is saved
+            if (savedConfig) {
+                connectToFirebase();
             }
         });
         
-        // Connect to database
-        async function connectToDatabase() {
-            apiEndpoint = document.getElementById('api-endpoint').value;
-            apiKey = document.getElementById('api-key').value;
+        // Connect to Firebase
+        async function connectToFirebase() {
+            const configInput = document.getElementById('firebase-config').value;
             
-            if (!apiEndpoint) {
-                showNotification('Please enter your API endpoint', 'error');
-                return;
-            }
-            
-            // Save configuration
-            localStorage.setItem('xbet_api_endpoint', apiEndpoint);
-            localStorage.setItem('xbet_api_key', apiKey);
-            
-            showNotification('Connecting to database...', 'success');
-            await loadRealUsers();
-        }
-        
-        // Load real users from your database
-        async function loadRealUsers() {
-            if (!apiEndpoint) {
-                showNotification('Please configure API endpoint first', 'error');
+            if (!configInput) {
+                showNotification('Please enter your Firebase configuration', 'error');
                 return;
             }
             
             try {
-                loadingMessage.textContent = 'Loading real users from database...';
-                loadingMessage.style.display = 'block';
+                const firebaseConfig = JSON.parse(configInput);
                 
-                // Prepare request headers
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
                 
-                if (apiKey) {
-                    headers['Authorization'] = `Bearer ${apiKey}`;
-                }
+                // Save config
+                localStorage.setItem('xbet_firebase_config', configInput);
                 
-                // Make API call to your backend
-                const response = await fetch(apiEndpoint, {
-                    method: 'GET',
-                    headers: headers
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                
-                // Process the response based on your API structure
-                // Adjust this based on your actual API response format
-                if (data.users) {
-                    realUsers = data.users;
-                } else if (Array.isArray(data)) {
-                    realUsers = data;
-                } else {
-                    realUsers = [data]; // Single user object
-                }
-                
-                renderUsers(realUsers);
-                showNotification(`Successfully loaded ${realUsers.length} users from database`, 'success');
+                showNotification('Successfully connected to Firebase!', 'success');
+                await loadUsersFromFirebase();
                 
             } catch (error) {
-                console.error('Error loading users:', error);
-                
-                // For demo purposes - show sample data if API fails
-                // REMOVE THIS IN PRODUCTION AND USE ACTUAL API
-                showNotification('Using demo data - configure your real API endpoint', 'error');
-                loadDemoData();
+                console.error('Firebase connection error:', error);
+                showNotification('Invalid Firebase configuration. Please check your config object.', 'error');
             }
         }
         
-        // Demo data fallback (remove in production)
-        function loadDemoData() {
-            realUsers = [
-                {
-                    id: 1,
-                    username: "xherbbet",
-                    email: "toiodulbok@zbet.com",
-                    balance: 0.00,
-                    pending: 0.00,
-                    profit: 0.00,
-                    registered: "11/26/2025",
-                    lastLogin: "11/26/2025",
-                    sets: 0,
-                    transactions: 3,
-                    status: "active",
-                    isAdmin: false
-                },
-                {
-                    id: 2,
-                    username: "john_doe",
-                    email: "john@example.com",
-                    balance: 1250.50,
-                    pending: 250.00,
-                    profit: 500.75,
-                    registered: "11/25/2025",
-                    lastLogin: "11/26/2025",
-                    sets: 12,
-                    transactions: 8,
-                    status: "active",
-                    isAdmin: false
-                }
-            ];
+        // Load users from Firebase Firestore
+        async function loadUsersFromFirebase() {
+            if (!db) {
+                showNotification('Please connect to Firebase first', 'error');
+                return;
+            }
             
-            renderUsers(realUsers);
+            try {
+                const loadingMessage = document.getElementById('loading-message');
+                loadingMessage.textContent = 'Loading users from Firebase...';
+                loadingMessage.style.display = 'block';
+                
+                // Get users from Firestore - adjust collection name as needed
+                const usersSnapshot = await db.collection('users').get();
+                
+                realUsers = [];
+                usersSnapshot.forEach(doc => {
+                    const userData = doc.data();
+                    realUsers.push({
+                        id: doc.id,
+                        ...userData
+                    });
+                });
+                
+                renderUsers(realUsers);
+                showNotification(`Loaded ${realUsers.length} users from Firebase`, 'success');
+                
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('Error loading users: ' + error.message, 'error');
+            }
         }
         
         // Render users in the table
         function renderUsers(users) {
+            const loadingMessage = document.getElementById('loading-message');
+            const usersContainer = document.getElementById('users-container');
+            
             loadingMessage.style.display = 'none';
             usersContainer.innerHTML = '';
             
             if (users.length === 0) {
-                usersContainer.innerHTML = '<div class="loading">No users found in database</div>';
+                usersContainer.innerHTML = '<div class="loading">No users found in Firebase</div>';
                 updateUserCount(0);
                 return;
             }
@@ -624,27 +587,30 @@
                 const userRow = document.createElement('div');
                 userRow.className = 'user-row';
                 
-                // Use appropriate fields from your database
-                const username = user.username || user.name || user.email.split('@')[0];
-                const balance = user.balance || 0;
-                const profit = user.profit || user.winnings || 0;
-                const status = user.status || (user.isActive ? 'active' : 'inactive');
-                const registered = user.registered || user.createdAt || 'N/A';
-                const lastLogin = user.lastLogin || user.lastActive || 'N/A';
+                // Use appropriate fields from your Firebase structure
+                const displayName = user.displayName || user.username || user.email.split('@')[0];
+                const balance = user.balance || user.walletBalance || 0;
+                const profit = user.profit || user.totalProfit || 0;
+                const status = user.status || (user.isActive !== false ? 'active' : 'inactive');
+                const registered = user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
                 
                 userRow.innerHTML = `
                     <div class="user-info-col">
-                        <span class="user-name">${username} ${user.isAdmin ? '(Admin)' : ''}</span>
+                        <span class="user-name">${displayName}</span>
                         <span class="user-email">${user.email}</span>
                     </div>
                     <div>$${balance.toFixed(2)}</div>
-                    <div>$${profit.toFixed(2)}</div>
+                    <div class="user-profit">$${profit.toFixed(2)}</div>
                     <div><span class="status-badge status-${status}">${status}</span></div>
-                    <div>${registered}</div>
-                    <div>${lastLogin}</div>
+                    <div class="user-registered">${registered}</div>
                     <div>
-                        <button class="btn btn-primary transfer-btn" data-user-id="${user.id}" ${user.isAdmin ? 'disabled' : ''}>
-                            Transfer
+                        <button class="btn btn-success deposit-btn" data-user-id="${user.id}">
+                            Deposit
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning withdraw-btn" data-user-id="${user.id}">
+                            Withdraw
                         </button>
                     </div>
                 `;
@@ -652,11 +618,18 @@
                 usersContainer.appendChild(userRow);
             });
             
-            // Add event listeners to transfer buttons
-            document.querySelectorAll('.transfer-btn').forEach(btn => {
+            // Add event listeners
+            document.querySelectorAll('.deposit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const userId = this.getAttribute('data-user-id');
-                    openTransferModal(userId);
+                    openTransactionModal(userId, 'deposit');
+                });
+            });
+            
+            document.querySelectorAll('.withdraw-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    openTransactionModal(userId, 'withdraw');
                 });
             });
             
@@ -665,86 +638,114 @@
         
         // Update user count statistics
         function updateUserCount(total) {
-            totalUsersEl.textContent = total;
-            activeUsersEl.textContent = realUsers.filter(user => user.status === 'active').length;
+            document.getElementById('total-users').textContent = total;
+            document.getElementById('active-users').textContent = realUsers.filter(user => 
+                user.status === 'active' || user.isActive !== false
+            ).length;
         }
         
-        // Open transfer modal
-        function openTransferModal(userId) {
-            const user = realUsers.find(u => u.id == userId);
+        // Open transaction modal
+        function openTransactionModal(userId, type) {
+            const user = realUsers.find(u => u.id === userId);
             if (!user) return;
             
-            currentTransferUser = user;
-            const username = user.username || user.name || user.email.split('@')[0];
+            currentUser = user;
+            currentTransactionType = type;
             
-            document.getElementById('recipient').value = `${username} (${user.email})`;
-            document.getElementById('current-balance').value = `$${(user.balance || 0).toFixed(2)}`;
-            document.getElementById('transfer-modal').style.display = 'flex';
+            const displayName = user.displayName || user.username || user.email.split('@')[0];
+            const balance = user.balance || user.walletBalance || 0;
+            
+            document.getElementById('modal-title').textContent = 
+                type === 'deposit' ? 'Process Deposit' : 'Process Withdrawal';
+            document.getElementById('recipient').value = `${displayName} (${user.email})`;
+            document.getElementById('current-balance').value = `$${balance.toFixed(2)}`;
+            document.getElementById('submit-transaction').textContent = 
+                type === 'deposit' ? 'Process Deposit' : 'Process Withdrawal';
+            
+            document.getElementById('transaction-modal').style.display = 'flex';
         }
         
-        // Close transfer modal
-        function closeTransferModal() {
-            document.getElementById('transfer-modal').style.display = 'none';
-            document.getElementById('transfer-form').reset();
-            currentTransferUser = null;
+        // Close transaction modal
+        function closeTransactionModal() {
+            document.getElementById('transaction-modal').style.display = 'none';
+            document.getElementById('transaction-form').reset();
+            currentUser = null;
+            currentTransactionType = '';
         }
         
-        // Process fund transfer
-        async function processTransfer(e) {
+        // Process transaction (deposit/withdrawal)
+        async function processTransaction(e) {
             e.preventDefault();
             
-            const amount = document.getElementById('amount').value;
-            const notes = document.getElementById('notes').value;
-            const transactionType = document.getElementById('transaction-type').value;
+            if (!db) {
+                showNotification('Not connected to Firebase', 'error');
+                return;
+            }
             
-            if (!amount || parseFloat(amount) <= 0) {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const transactionCode = document.getElementById('transaction-code').value;
+            const notes = document.getElementById('notes').value;
+            
+            if (!amount || amount <= 0) {
                 showNotification('Please enter a valid amount', 'error');
                 return;
             }
             
+            if (!transactionCode) {
+                showNotification('Please enter a transaction code', 'error');
+                return;
+            }
+            
             try {
-                // Prepare transfer data
-                const transferData = {
-                    userId: currentTransferUser.id,
-                    amount: parseFloat(amount),
-                    type: transactionType,
-                    notes: notes,
-                    timestamp: new Date().toISOString()
-                };
+                const userRef = db.collection('users').doc(currentUser.id);
+                const currentBalance = currentUser.balance || currentUser.walletBalance || 0;
+                let newBalance;
                 
-                // Send transfer request to your backend API
-                // Replace this with your actual transfer endpoint
-                const transferEndpoint = apiEndpoint.replace('/users', '/transfer') || `${apiEndpoint}/transfer`;
-                
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-                
-                if (apiKey) {
-                    headers['Authorization'] = `Bearer ${apiKey}`;
+                if (currentTransactionType === 'deposit') {
+                    newBalance = currentBalance + amount;
+                } else { // withdrawal
+                    if (currentBalance < amount) {
+                        showNotification('Insufficient balance for withdrawal', 'error');
+                        return;
+                    }
+                    newBalance = currentBalance - amount;
                 }
                 
-                const response = await fetch(transferEndpoint, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(transferData)
+                // Update user balance in Firebase
+                await userRef.update({
+                    balance: newBalance,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`Transfer failed: ${response.status}`);
-                }
+                // Create transaction record
+                const transactionData = {
+                    userId: currentUser.id,
+                    userEmail: currentUser.email,
+                    type: currentTransactionType,
+                    amount: amount,
+                    previousBalance: currentBalance,
+                    newBalance: newBalance,
+                    transactionCode: transactionCode,
+                    notes: notes,
+                    status: 'completed',
+                    processedBy: 'admin',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
                 
-                const result = await response.json();
+                await db.collection('transactions').add(transactionData);
                 
-                showNotification(`Successfully transferred $${amount} to ${currentTransferUser.username || currentTransferUser.email}`, 'success');
+                showNotification(
+                    `Successfully processed ${currentTransactionType} of $${amount.toFixed(2)} for ${currentUser.email}`,
+                    'success'
+                );
                 
-                // Refresh user data to show updated balance
-                await loadRealUsers();
-                closeTransferModal();
+                // Refresh user data
+                await loadUsersFromFirebase();
+                closeTransactionModal();
                 
             } catch (error) {
-                console.error('Transfer error:', error);
-                showNotification('Transfer failed: ' + error.message, 'error');
+                console.error('Transaction error:', error);
+                showNotification('Transaction failed: ' + error.message, 'error');
             }
         }
         
@@ -757,9 +758,9 @@
             }
             
             const filteredUsers = realUsers.filter(user => {
-                const username = (user.username || user.name || '').toLowerCase();
                 const email = (user.email || '').toLowerCase();
-                return username.includes(searchTerm) || email.includes(searchTerm);
+                const displayName = (user.displayName || user.username || '').toLowerCase();
+                return email.includes(searchTerm) || displayName.includes(searchTerm);
             });
             
             renderUsers(filteredUsers);
