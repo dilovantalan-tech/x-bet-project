@@ -28,83 +28,67 @@
             background-color: #0f1419;
             color: var(--text);
             line-height: 1.6;
+            padding: 20px;
         }
         
-        .admin-container {
-            display: flex;
-            min-height: 100vh;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .sidebar {
-            width: 280px;
-            background-color: var(--primary);
-            padding: 0;
-            border-right: 1px solid var(--border);
-        }
-        
-        .logo {
-            padding: 25px 30px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .logo h1 {
-            font-size: 24px;
-            color: var(--accent);
-            font-weight: 700;
-        }
-        
-        .nav-links {
-            list-style: none;
-            padding: 20px 0;
-        }
-        
-        .nav-links li {
-            padding: 15px 30px;
-            border-left: 4px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .nav-links li.active {
-            border-left-color: var(--accent);
-            background-color: rgba(0, 212, 170, 0.1);
-        }
-        
-        .nav-links a {
-            color: var(--text);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-        }
-        
-        .nav-links i {
-            margin-right: 12px;
-            width: 20px;
+        .header {
             text-align: center;
+            margin-bottom: 30px;
         }
         
-        .main-content {
-            flex: 1;
-            padding: 0;
-            overflow-y: auto;
+        .header h1 {
+            color: var(--accent);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
         }
         
-        .top-header {
+        .debug-panel {
             background: var(--secondary);
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--warning);
         }
         
-        .header h2 {
-            font-size: 24px;
+        .debug-panel h3 {
+            color: var(--warning);
+            margin-bottom: 15px;
+        }
+        
+        .debug-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
             font-weight: 600;
         }
         
-        .content-area {
-            padding: 30px;
+        .btn-primary {
+            background: var(--accent);
+            color: var(--primary);
+        }
+        
+        .btn-secondary {
+            background: var(--primary);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
         }
         
         .stats-grid {
@@ -115,104 +99,38 @@
         }
         
         .stat-card {
-            background-color: var(--secondary);
-            border-radius: 10px;
+            background: var(--secondary);
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid var(--accent);
+            border-radius: 10px;
             text-align: center;
-        }
-        
-        .stat-card h3 {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            text-transform: uppercase;
+            border-left: 4px solid var(--accent);
         }
         
         .stat-card .value {
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 2rem;
+            font-weight: bold;
             color: var(--accent);
         }
         
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            background-color: var(--secondary);
-            padding: 15px;
-            border-radius: 8px;
-        }
-        
-        .search-box {
-            background-color: var(--primary);
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            padding: 10px 15px;
-            color: var(--text);
-            width: 300px;
-        }
-        
         .users-table {
-            background-color: var(--secondary);
+            background: var(--secondary);
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .table-header {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 150px;
+            grid-template-columns: 2fr 1fr 1fr 1fr 150px;
             padding: 15px 20px;
-            background-color: var(--primary);
+            background: var(--primary);
             font-weight: 600;
-            border-bottom: 1px solid var(--border);
         }
         
         .user-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 150px;
+            grid-template-columns: 2fr 1fr 1fr 1fr 150px;
             padding: 15px 20px;
             border-bottom: 1px solid var(--border);
-            align-items: center;
-        }
-        
-        .user-row:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-        
-        .user-info-col {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .user-name {
-            font-weight: 600;
-        }
-        
-        .user-email {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        
-        .btn {
-            padding: 8px 16px;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .btn-primary {
-            background-color: var(--accent);
-            color: var(--primary);
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
         }
         
         .notification {
@@ -222,119 +140,82 @@
             padding: 15px 20px;
             border-radius: 5px;
             color: white;
-            z-index: 1100;
+            z-index: 1000;
         }
         
-        .notification.success {
-            background-color: var(--success);
-        }
+        .success { background: var(--success); }
+        .error { background: var(--danger); }
+        .warning { background: var(--warning); }
         
-        .notification.error {
-            background-color: var(--danger);
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-active {
-            background-color: rgba(46, 204, 113, 0.2);
-            color: var(--success);
-        }
-        
-        .status-inactive {
-            background-color: rgba(231, 76, 60, 0.2);
-            color: var(--danger);
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
         }
     </style>
     
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div class="admin-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="logo">
-                <h1>X-BET ADMIN</h1>
-            </div>
-            <ul class="nav-links">
-                <li class="active"><a href="#"><i>📊</i> Dashboard</a></li>
-                <li><a href="#"><i>👥</i> User Management</a></li>
-                <li><a href="#"><i>💳</i> Transactions</a></li>
-                <li><a href="#"><i>⏳</i> Pending Withdrawals</a></li>
-                <li><a href="#"><i>📈</i> Analytics</a></li>
-            </ul>
+    <div class="container">
+        <div class="header">
+            <h1>X-BET Admin Panel</h1>
+            <p>Firebase Database Setup & User Management</p>
         </div>
-        
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="top-header">
-                <div class="header">
-                    <h2>User Management Dashboard</h2>
-                </div>
-                <div style="color: var(--success); font-weight: 600;">
-                    ● Connected to Firebase
-                </div>
+
+        <!-- Debug Panel -->
+        <div class="debug-panel">
+            <h3>🔧 Database Setup Required</h3>
+            <p>Your Firebase database doesn't have a users collection yet. Let's set it up:</p>
+            
+            <div class="debug-buttons">
+                <button class="btn btn-success" onclick="createUsersCollection()">1. Create Users Collection</button>
+                <button class="btn btn-primary" onclick="addSampleUsers()">2. Add Sample Users</button>
+                <button class="btn btn-secondary" onclick="checkDatabaseStructure()">3. Check Database</button>
+                <button class="btn btn-primary" onclick="loadUsersFromFirebase()">4. Load Users</button>
             </div>
             
-            <div class="content-area">
-                <!-- Stats Grid -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Total Users</h3>
-                        <div class="value" id="total-users">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>System Balance</h3>
-                        <div class="value">$13,999,999.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Active Today</h3>
-                        <div class="value" id="active-users">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Pending Withdrawals</h3>
-                        <div class="value">$0.00</div>
-                    </div>
-                </div>
-                
-                <!-- Controls -->
-                <div class="controls">
-                    <input type="text" class="search-box" placeholder="Search users by email or name..." id="search-users">
-                    <div>
-                        <button class="btn btn-primary" id="refresh-users">Refresh Users</button>
-                    </div>
-                </div>
-                
-                <!-- Users Table -->
-                <div class="users-table">
-                    <div class="table-header">
-                        <div>User Information</div>
-                        <div>Balance</div>
-                        <div>Profit</div>
-                        <div>Status</div>
-                        <div>Registered</div>
-                        <div>Actions</div>
-                    </div>
-                    
-                    <div id="users-container">
-                        <div class="loading" id="loading-message">
-                            Connecting to your Firebase database...
-                        </div>
-                    </div>
+            <div id="debug-info" style="background: var(--primary); padding: 15px; border-radius: 5px; margin-top: 15px; font-family: monospace; font-size: 12px;">
+                Click "Check Database" to see your current structure
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="value" id="total-users">0</div>
+                <div>Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">$13,999,999</div>
+                <div>System Balance</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="active-users">0</div>
+                <div>Active Users</div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="users-table">
+            <div class="table-header">
+                <div>User Information</div>
+                <div>Balance</div>
+                <div>Status</div>
+                <div>Registered</div>
+                <div>Actions</div>
+            </div>
+            <div id="users-container">
+                <div class="loading">
+                    Click "Create Users Collection" to get started
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ✅ YOUR FIREBASE CONFIG - READY TO USE
+        // Your Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
             authDomain: "x-bet-prod-jd.firebaseapp.com",
@@ -345,128 +226,171 @@
             measurementId: "G-PTV4XMYQ6P"
         };
 
-        // Firebase variables
         let db;
         let realUsers = [];
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeFirebase();
-            setupEventListeners();
-        });
-
         // Initialize Firebase
-        function initializeFirebase() {
+        document.addEventListener('DOMContentLoaded', function() {
             try {
-                // Initialize Firebase with YOUR config
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
+                showNotification('✅ Connected to Firebase successfully!', 'success');
+                checkDatabaseStructure();
+            } catch (error) {
+                showNotification('❌ Firebase connection failed: ' + error.message, 'error');
+            }
+        });
+
+        // Check database structure
+        async function checkDatabaseStructure() {
+            const debugInfo = document.getElementById('debug-info');
+            debugInfo.innerHTML = '🔍 Scanning database collections...';
+            
+            try {
+                // Get all collections
+                const collections = await db.listCollections();
+                let collectionsInfo = '<strong>📁 Found Collections:</strong><br>';
                 
-                showNotification('✅ Successfully connected to X-BET Firebase!', 'success');
-                loadUsersFromFirebase();
+                if (collections.length === 0) {
+                    collectionsInfo += 'No collections found. Database is empty.<br>';
+                } else {
+                    collections.forEach(collection => {
+                        collectionsInfo += `• ${collection.id}<br>`;
+                    });
+                }
+                
+                debugInfo.innerHTML = collectionsInfo;
+                showNotification('✅ Database scan completed', 'success');
                 
             } catch (error) {
-                console.error('Firebase initialization error:', error);
-                showNotification('❌ Firebase connection failed: ' + error.message, 'error');
+                debugInfo.innerHTML = `❌ Error scanning database: ${error.message}`;
+                showNotification('❌ Error scanning database', 'error');
             }
         }
 
-        // Set up event listeners
-        function setupEventListeners() {
-            document.getElementById('refresh-users').addEventListener('click', loadUsersFromFirebase);
-            document.getElementById('search-users').addEventListener('input', filterUsers);
+        // Create users collection
+        async function createUsersCollection() {
+            try {
+                // Create a sample user to initialize the collection
+                const sampleUser = {
+                    email: "admin@xbet.com",
+                    displayName: "Admin User",
+                    balance: 0,
+                    profit: 0,
+                    status: "active",
+                    isAdmin: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection('users').doc('admin-user').set(sampleUser);
+                showNotification('✅ Users collection created successfully!', 'success');
+                checkDatabaseStructure();
+                loadUsersFromFirebase();
+                
+            } catch (error) {
+                showNotification('❌ Error creating collection: ' + error.message, 'error');
+            }
+        }
+
+        // Add sample users
+        async function addSampleUsers() {
+            try {
+                const sampleUsers = [
+                    {
+                        email: "xherbbet@zbet.com",
+                        displayName: "xherbbet",
+                        balance: 1500.00,
+                        profit: 500.00,
+                        status: "active",
+                        isAdmin: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    },
+                    {
+                        email: "player1@example.com",
+                        displayName: "john_doe",
+                        balance: 2500.50,
+                        profit: 1200.75,
+                        status: "active",
+                        isAdmin: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    },
+                    {
+                        email: "player2@example.com",
+                        displayName: "alice_smith",
+                        balance: 500.00,
+                        profit: 150.25,
+                        status: "inactive",
+                        isAdmin: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }
+                ];
+
+                const batch = db.batch();
+                
+                sampleUsers.forEach((user, index) => {
+                    const userRef = db.collection('users').doc('user-' + (index + 1));
+                    batch.set(userRef, user);
+                });
+
+                await batch.commit();
+                showNotification('✅ Sample users added successfully!', 'success');
+                loadUsersFromFirebase();
+                
+            } catch (error) {
+                showNotification('❌ Error adding sample users: ' + error.message, 'error');
+            }
         }
 
         // Load users from Firebase
         async function loadUsersFromFirebase() {
             try {
-                const loadingMessage = document.getElementById('loading-message');
-                loadingMessage.textContent = 'Loading users from your X-BET database...';
+                const usersContainer = document.getElementById('users-container');
+                usersContainer.innerHTML = '<div class="loading">Loading users...</div>';
+
+                const usersSnapshot = await db.collection('users').get();
                 
-                console.log('🔍 Loading users from Firebase...');
-                
-                // Try different collection names
-                const collections = ['users', 'user', 'players', 'accounts', 'members'];
-                let usersFound = false;
-                
-                for (const collectionName of collections) {
-                    try {
-                        console.log(`Trying collection: ${collectionName}`);
-                        const usersSnapshot = await db.collection(collectionName).get();
-                        
-                        if (!usersSnapshot.empty) {
-                            console.log(`✅ Found collection: ${collectionName} with ${usersSnapshot.size} users`);
-                            realUsers = [];
-                            
-                            usersSnapshot.forEach(doc => {
-                                const userData = doc.data();
-                                realUsers.push({
-                                    id: doc.id,
-                                    ...userData
-                                });
-                            });
-                            
-                            renderUsers(realUsers);
-                            showNotification(`✅ Loaded ${realUsers.length} users from ${collectionName}`, 'success');
-                            usersFound = true;
-                            break;
-                        }
-                    } catch (error) {
-                        console.log(`Collection ${collectionName} not accessible:`, error);
-                    }
+                if (usersSnapshot.empty) {
+                    usersContainer.innerHTML = '<div class="loading">No users found. Click "Add Sample Users" to create some.</div>';
+                    updateUserStats(0);
+                    return;
                 }
-                
-                if (!usersFound) {
-                    showNotification('❌ No user collections found. Please check your Firebase database structure.', 'error');
-                }
+
+                realUsers = [];
+                usersSnapshot.forEach(doc => {
+                    realUsers.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+
+                renderUsers(realUsers);
+                showNotification(`✅ Loaded ${realUsers.length} users`, 'success');
                 
             } catch (error) {
-                console.error('Error loading users:', error);
                 showNotification('❌ Error loading users: ' + error.message, 'error');
             }
         }
 
-        // Render users in the table
+        // Render users
         function renderUsers(users) {
             const usersContainer = document.getElementById('users-container');
-            const loadingMessage = document.getElementById('loading-message');
-            
-            loadingMessage.style.display = 'none';
             usersContainer.innerHTML = '';
-            
-            if (users.length === 0) {
-                usersContainer.innerHTML = '<div class="loading">No users found in your database</div>';
-                updateUserStats(0);
-                return;
-            }
-            
-            console.log('👥 Rendering users:', users);
-            
+
             users.forEach(user => {
                 const userRow = document.createElement('div');
                 userRow.className = 'user-row';
                 
-                // Handle different field names
-                const email = user.email || user.userEmail || 'No email';
-                const displayName = user.displayName || user.username || user.name || email.split('@')[0];
-                const balance = user.balance || user.walletBalance || user.currentBalance || 0;
-                const profit = user.profit || user.totalProfit || user.winnings || 0;
-                const status = user.status || (user.isActive !== false ? 'active' : 'inactive');
-                const registered = user.createdAt ? 
-                    new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 
-                    (user.registrationDate || 'N/A');
-
                 userRow.innerHTML = `
-                    <div class="user-info-col">
-                        <div class="user-name">${displayName}</div>
-                        <div class="user-email">${email}</div>
-                    </div>
-                    <div><strong>$${balance.toFixed(2)}</strong></div>
-                    <div>$${profit.toFixed(2)}</div>
-                    <div><span class="status-badge status-${status}">${status}</span></div>
-                    <div>${registered}</div>
                     <div>
-                        <button class="btn btn-primary" onclick="processTransaction('${user.id}', '${email}')">
+                        <strong>${user.displayName || 'No Name'}</strong><br>
+                        <small>${user.email}</small>
+                    </div>
+                    <div>$${(user.balance || 0).toFixed(2)}</div>
+                    <div>${user.status || 'unknown'}</div>
+                    <div>${user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</div>
+                    <div>
+                        <button class="btn btn-primary" onclick="transferToUser('${user.id}', '${user.email}')">
                             Transfer
                         </button>
                     </div>
@@ -478,42 +402,23 @@
             updateUserStats(users.length);
         }
 
-        // Update user statistics
+        // Update stats
         function updateUserStats(total) {
             document.getElementById('total-users').textContent = total;
-            document.getElementById('active-users').textContent = realUsers.filter(user => 
-                user.status === 'active' || user.isActive !== false
-            ).length;
+            document.getElementById('active-users').textContent = realUsers.filter(user => user.status === 'active').length;
         }
 
-        // Filter users based on search
-        function filterUsers() {
-            const searchTerm = this.value.toLowerCase();
-            if (!searchTerm) {
-                renderUsers(realUsers);
-                return;
-            }
-
-            const filteredUsers = realUsers.filter(user => {
-                const email = (user.email || user.userEmail || '').toLowerCase();
-                const displayName = (user.displayName || user.username || user.name || '').toLowerCase();
-                return email.includes(searchTerm) || displayName.includes(searchTerm);
-            });
-
-            renderUsers(filteredUsers);
-        }
-
-        // Process transaction
-        function processTransaction(userId, userEmail) {
+        // Transfer function
+        function transferToUser(userId, userEmail) {
             const amount = prompt(`Enter amount to transfer to ${userEmail}:`);
             if (amount && !isNaN(amount)) {
                 showNotification(`✅ Transferring $${amount} to ${userEmail}`, 'success');
-                // Add your actual transaction logic here
+                // Add your transaction logic here
             }
         }
 
         // Show notification
-        function showNotification(message, type = 'success') {
+        function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.textContent = message;
@@ -523,14 +428,6 @@
                 notification.remove();
             }, 5000);
         }
-
-        // Debug function
-        window.debugFirebase = function() {
-            console.log('Firebase Config:', firebaseConfig);
-            console.log('Firebase App:', firebase.apps);
-            console.log('Firestore DB:', db);
-            console.log('Loaded Users:', realUsers);
-        };
     </script>
 </body>
 </html>
