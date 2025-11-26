@@ -13,24 +13,22 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: white;
             min-height: 100vh;
         }
 
-        /* Navigation */
         .navbar {
             background: rgba(0, 0, 0, 0.9);
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(10px);
             border-bottom: 2px solid #ffd700;
         }
 
         .logo {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #ffd700;
             text-decoration: none;
@@ -38,7 +36,7 @@
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
         .nav-links a {
@@ -51,98 +49,41 @@
 
         .nav-links a:hover {
             background: rgba(255, 215, 0, 0.2);
-            color: #ffd700;
         }
 
-        .user-section {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(45deg, #ff6b6b, #ffd700);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .balance-display {
+            background: rgba(255,215,0,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
             font-weight: bold;
-            font-size: 1.2rem;
         }
 
-        .user-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-email {
-            color: #ffd700;
-            font-size: 0.9rem;
-        }
-
-        .user-balance {
-            color: #4CAF50;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .logout-btn {
-            background: transparent;
-            color: #ffd700;
-            border: 2px solid #ffd700;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: #ffd700;
-            color: #000;
-        }
-
-        /* Games Content */
         .games-container {
             padding: 2rem;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        .page-title {
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #ffd700;
-        }
-
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            margin-bottom: 3rem;
         }
 
         .game-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             padding: 2rem;
-            border-radius: 20px;
+            border-radius: 15px;
             text-align: center;
-            transition: all 0.3s ease;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .game-card:hover {
             transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.15);
+            border-color: #ffd700;
         }
 
         .game-icon {
@@ -167,192 +108,143 @@
             border: none;
             padding: 1rem 2rem;
             border-radius: 25px;
-            cursor: pointer;
             font-weight: bold;
-            font-size: 1.1rem;
+            cursor: pointer;
             transition: transform 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
         }
 
         .play-btn:hover {
-            transform: scale(1.1);
-            color: black;
-            text-decoration: none;
+            transform: scale(1.05);
         }
 
-        .game-stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        /* Footer */
-        footer {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 3rem 2rem;
-            text-align: center;
-            margin-top: 4rem;
-            border-top: 2px solid #ffd700;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .social-icon {
-            color: #ffd700;
-            font-size: 1.5rem;
-            text-decoration: none;
-            transition: transform 0.3s ease;
-        }
-
-        .social-icon:hover {
-            transform: scale(1.2);
-        }
-
-        .copyright {
-            opacity: 0.7;
+        .play-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
-        <a href="dashboard.html" class="logo">X-BET</a>
+        <a href="dashboard.html" class="logo">X-BET Games</a>
         <div class="nav-links">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="games.html" style="background: rgba(255, 215, 0, 0.2); color: #ffd700;">🎮 Games</a>
-            <a href="bits.html">💰 Bits</a>
-            <a href="contact.html">📞 Contact</a>
-            <a href="about.html">ℹ️ About</a>
+            <a href="dashboard.html">📊 Dashboard</a>
+            <a href="#games">🎮 Games</a>
         </div>
-        <div class="user-section">
-            <div class="user-info">
-                <div class="user-avatar" id="userAvatar">U</div>
-                <div class="user-details">
-                    <span class="user-email" id="userEmail">user@example.com</span>
-                    <span class="user-balance" id="headerBalance">$0.00</span>
-                </div>
-            </div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+        <div class="balance-display" id="currentBalance">
+            Balance: $0.00
         </div>
     </nav>
 
-    <!-- Games Content -->
     <div class="games-container">
-        <h1 class="page-title">🎮 X-BET Games Collection</h1>
+        <h1 style="text-align: center; margin-bottom: 2rem; color: #ffd700;">🎮 Choose Your Game</h1>
         
         <div class="games-grid">
-            <!-- Lucky Dice Game -->
-            <div class="game-card">
+            <div class="game-card" onclick="playGame('Lucky Dice')">
                 <div class="game-icon">🎯</div>
-                <h2 class="game-title">Lucky Dice</h2>
-                <p class="game-description">Test your luck with classic dice rolling. Predict the outcome and win big!</p>
-                <div class="game-stats">
-                    <span>🎲 95% RTP</span>
-                    <span>⭐ 4.8/5</span>
-                </div>
-                <button class="play-btn" onclick="playGame('Lucky Dice')">Play Now</button>
+                <div class="game-title">Lucky Dice</div>
+                <div class="game-description">Roll the dice and win big! Predict the number and multiply your bet.</div>
+                <button class="play-btn">Play Now</button>
             </div>
 
-            <!-- Card Master -->
-            <div class="game-card">
+            <div class="game-card" onclick="playGame('Card Master')">
                 <div class="game-icon">🃏</div>
-                <h2 class="game-title">Card Master</h2>
-                <p class="game-description">Strategic card games for smart players. Outplay your opponents and win rewards!</p>
-                <div class="game-stats">
-                    <span>🃏 97% RTP</span>
-                    <span>⭐ 4.9/5</span>
-                </div>
-                <button class="play-btn" onclick="playGame('Card Master')">Play Now</button>
+                <div class="game-title">Card Master</div>
+                <div class="game-description">Test your card skills against the system. Higher card wins!</div>
+                <button class="play-btn">Play Now</button>
             </div>
 
-            <!-- Fortune Slots -->
-            <div class="game-card">
+            <div class="game-card" onclick="playGame('Fortune Slots')">
                 <div class="game-icon">🎰</div>
-                <h2 class="game-title">Fortune Slots</h2>
-                <p class="game-description">Spin to win massive jackpots! Exciting slot machine with huge rewards.</p>
-                <div class="game-stats">
-                    <span>💰 96% RTP</span>
-                    <span>⭐ 4.7/5</span>
-                </div>
-                <button class="play-btn" onclick="playGame('Fortune Slots')">Play Now</button>
+                <div class="game-title">Fortune Slots</div>
+                <div class="game-description">Spin the reels and hit the jackpot! Multiple winning combinations.</div>
+                <button class="play-btn">Play Now</button>
             </div>
 
-            <!-- Sports Predict -->
-            <div class="game-card">
+            <div class="game-card" onclick="playGame('Sports Predict')">
                 <div class="game-icon">⚽</div>
-                <h2 class="game-title">Sports Predict</h2>
-                <p class="game-description">Predict scores and win big! Football, basketball, and more sports available.</p>
-                <div class="game-stats">
-                    <span>🏆 98% RTP</span>
-                    <span>⭐ 5.0/5</span>
-                </div>
-                <button class="play-btn" onclick="playGame('Sports Predict')">Play Now</button>
-            </div>
-
-            <!-- Roulette -->
-            <div class="game-card">
-                <div class="game-icon">🎡</div>
-                <h2 class="game-title">Roulette Pro</h2>
-                <p class="game-description">Classic casino roulette with modern twists. Place your bets and watch the wheel spin!</p>
-                <div class="game-stats">
-                    <span>🎡 94% RTP</span>
-                    <span>⭐ 4.6/5</span>
-                </div>
-                <button class="play-btn" onclick="playGame('Roulette Pro')">Play Now</button>
-            </div>
-
-            <!-- Poker -->
-            <div class="game-card">
-                <div class="game-icon">♠️</div>
-                <h2 class="game-title">Poker King</h2>
-                <p class="game-description">Texas Hold'em poker against AI opponents. Show your skills and win big pots!</p>
-                <div class="game-stats">
-                    <span>♠️ 99% RTP</span>
-                    <span>⭐ 4.9/5</span>
-                </div>
-                <button class="play-btn" onclick="playGame('Poker King')">Play Now</button>
+                <div class="game-title">Sports Predict</div>
+                <div class="game-description">Predict match outcomes and score big rewards.</div>
+                <button class="play-btn">Play Now</button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="social-links">
-            <a href="#" class="social-icon">📘</a>
-            <a href="#" class="social-icon">📷</a>
-            <a href="#" class="social-icon">🐦</a>
-            <a href="#" class="social-icon">💬</a>
-        </div>
-        <div class="copyright">
-            &copy; 2024 Crazy X Bet. All rights reserved.
-        </div>
-    </footer>
-
-    <script src="common-header.js"></script>
     <script>
-        function playGame(gameName) {
-            const currentUser = localStorage.getItem('currentUser');
-            if (currentUser) {
-                const userDataStr = localStorage.getItem('userData_' + currentUser);
-                if (userDataStr) {
-                    const userData = JSON.parse(userDataStr);
-                    if (userData.balance > 0) {
-                        alert(`🎮 Starting ${gameName}...\n\nYour balance: $${userData.balance}\nGood luck!`);
-                        // Here you would normally redirect to the actual game
-                    } else {
-                        alert('💰 Please deposit funds to play games!\n\nContact admins or use the deposit feature in your dashboard.');
-                    }
-                }
-            }
+        // Check authentication and load balance
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
         }
+
+        function loadBalance() {
+            const userData = JSON.parse(localStorage.getItem('userData_' + currentUser) || '{}');
+            document.getElementById('currentBalance').textContent = 'Balance: $' + (userData.balance || 0).toFixed(2);
+        }
+
+        function playGame(gameName) {
+            const userData = JSON.parse(localStorage.getItem('userData_' + currentUser) || '{}');
+            const balance = userData.balance || 0;
+            
+            if (balance <= 0) {
+                alert('Insufficient balance! Please contact admin for deposits.');
+                return;
+            }
+
+            const betAmount = parseFloat(prompt(`Enter bet amount for ${gameName} (Current balance: $${balance}):`));
+            
+            if (!betAmount || betAmount <= 0) {
+                alert('Invalid bet amount!');
+                return;
+            }
+
+            if (betAmount > balance) {
+                alert('Insufficient balance!');
+                return;
+            }
+
+            // Simulate game outcome (50% win chance for demo)
+            const win = Math.random() > 0.5;
+            const winMultiplier = win ? (2 + Math.random() * 3) : 0; // 2x to 5x for wins
+            const winAmount = win ? betAmount * winMultiplier : 0;
+            const netAmount = winAmount - betAmount;
+
+            // Update user data
+            userData.balance = balance + netAmount;
+            userData.totalProfit = (userData.totalProfit || 0) + netAmount;
+            
+            if (!userData.transactions) userData.transactions = [];
+            userData.transactions.push({
+                type: `${gameName} ${win ? 'Win' : 'Loss'}`,
+                amount: netAmount,
+                status: 'completed',
+                date: new Date().toISOString(),
+                details: `Bet: $${betAmount.toFixed(2)}, ${win ? `Win: $${winAmount.toFixed(2)} (${winMultiplier.toFixed(1)}x)` : 'Loss'}`
+            });
+
+            if (!userData.bets) userData.bets = [];
+            userData.bets.push({
+                game: gameName,
+                betAmount: betAmount,
+                winAmount: winAmount,
+                result: win ? 'win' : 'loss',
+                date: new Date().toISOString()
+            });
+
+            localStorage.setItem('userData_' + currentUser, JSON.stringify(userData));
+
+            // Show result
+            if (win) {
+                alert(`🎉 Congratulations! You won $${winAmount.toFixed(2)} (${winMultiplier.toFixed(1)}x multiplier)!`);
+            } else {
+                alert(`😔 Better luck next time! You lost $${betAmount.toFixed(2)}.`);
+            }
+
+            loadBalance();
+        }
+
+        // Initialize games page
+        loadBalance();
     </script>
 </body>
 </html>
