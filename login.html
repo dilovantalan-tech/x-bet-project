@@ -140,6 +140,20 @@
             margin-bottom: 8px;
             color: #e67e22;
         }
+
+        .admin-test-accounts {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f6f3;
+            border-radius: 8px;
+            border-left: 4px solid #1abc9c;
+            font-size: 12px;
+        }
+
+        .admin-test-accounts h4 {
+            margin-bottom: 8px;
+            color: #16a085;
+        }
     </style>
 </head>
 <body>
@@ -171,6 +185,15 @@
             </div>
         </form>
 
+        <div class="admin-test-accounts">
+            <h4>👑 Admin Test Accounts:</h4>
+            <p><strong>admin_master</strong> / MasterAdmin2024!</p>
+            <p><strong>finance_manager</strong> / Finance14M$2024</p>
+            <p><strong>support_admin</strong> / SupportAdmin789!</p>
+            <p><strong>admin_tech</strong> / TechAdmin2024!</p>
+            <p><strong>admin_support2</strong> / Support2Admin2024!</p>
+        </div>
+
         <div class="info-box">
             <h4>💡 How to Start Playing:</h4>
             <p>1. Sign up for free account</p>
@@ -188,7 +211,9 @@
         const adminCredentials = {
             'admin_master': 'MasterAdmin2024!',
             'finance_manager': 'Finance14M$2024',
-            'support_admin': 'SupportAdmin789!'
+            'support_admin': 'SupportAdmin789!',
+            'admin_tech': 'TechAdmin2024!',
+            'admin_support2': 'Support2Admin2024!'
         };
 
         // Initialize user data and load registered users
@@ -196,48 +221,36 @@
             // Load registered users from localStorage
             const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
 
-            // Initialize admin accounts with special manager balance
-            if (!localStorage.getItem('userData_finance_manager')) {
-                const managerData = {
-                    balance: 14000000.00, // $14 Million
-                    pendingWithdrawals: 0.00,
-                    totalProfit: 0.00,
-                    transactions: [{
-                        type: 'System Allocation',
-                        amount: 14000000.00,
-                        status: 'completed',
-                        date: new Date().toISOString(),
-                        details: 'Manager system fund allocation'
-                    }],
-                    bets: [],
-                    isAdmin: true,
-                    role: 'Finance Manager',
-                    registeredAt: new Date().toISOString()
-                };
-                localStorage.setItem('userData_finance_manager', JSON.stringify(managerData));
-            }
+            // Initialize admin accounts with their balances
+            const adminAccounts = {
+                'admin_master': { balance: 50000.00, role: 'Head Administrator' },
+                'finance_manager': { balance: 14000000.00, role: 'Finance Manager' },
+                'support_admin': { balance: 50000.00, role: 'Support Admin' },
+                'admin_tech': { balance: 0.00, role: 'Technical Admin' },
+                'admin_support2': { balance: 0.00, role: 'Support Admin 2' }
+            };
 
-            // Initialize other admins
-            const admins = ['admin_master', 'support_admin'];
-            admins.forEach(admin => {
+            Object.keys(adminAccounts).forEach(admin => {
                 if (!localStorage.getItem('userData_' + admin)) {
-                    const adminData = {
-                        balance: 50000.00,
+                    const adminData = adminAccounts[admin];
+                    const userData = {
+                        balance: adminData.balance,
                         pendingWithdrawals: 0.00,
                         totalProfit: 0.00,
                         transactions: [{
-                            type: 'Admin Allocation',
-                            amount: 50000.00,
+                            type: 'System Allocation',
+                            amount: adminData.balance,
                             status: 'completed',
                             date: new Date().toISOString(),
                             details: 'Admin system fund allocation'
                         }],
                         bets: [],
                         isAdmin: true,
-                        role: admin === 'admin_master' ? 'Head Administrator' : 'Support Admin',
-                        registeredAt: new Date().toISOString()
+                        role: adminData.role,
+                        registeredAt: new Date().toISOString(),
+                        lastLogin: new Date().toISOString()
                     };
-                    localStorage.setItem('userData_' + admin, JSON.stringify(adminData));
+                    localStorage.setItem('userData_' + admin, JSON.stringify(userData));
                 }
             });
         }
@@ -276,6 +289,11 @@
                 localStorage.setItem('currentAdmin', username);
                 localStorage.setItem('loginTime', new Date().toISOString());
                 
+                // Update last login time
+                const adminData = JSON.parse(localStorage.getItem('userData_' + username) || '{}');
+                adminData.lastLogin = new Date().toISOString();
+                localStorage.setItem('userData_' + username, JSON.stringify(adminData));
+                
                 errorMessage.style.display = 'none';
                 successMessage.style.display = 'none';
                 loginBtn.textContent = 'Admin Access Granted!';
@@ -294,6 +312,11 @@
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('currentUser', username);
                 localStorage.setItem('loginTime', new Date().toISOString());
+                
+                // Update last login time
+                const userData = JSON.parse(localStorage.getItem('userData_' + username) || '{}');
+                userData.lastLogin = new Date().toISOString();
+                localStorage.setItem('userData_' + username, JSON.stringify(userData));
                 
                 errorMessage.style.display = 'none';
                 successMessage.style.display = 'none';
@@ -332,6 +355,9 @@
                 document.getElementById('successMessage').style.display = 'block';
                 localStorage.removeItem('registrationSuccess');
             }
+
+            // Initialize admin accounts
+            initializeUserData();
         });
     </script>
 </body>
