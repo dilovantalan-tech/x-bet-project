@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Admin - X-BET</title>
+    <style>
+        :root {
+            --primary: #1a1f36;
+            --secondary: #252b42;
+            --accent: #00d4aa;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --text: #e0e0e0;
+            --border: #2d3748;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f36 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--secondary);
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: var(--accent);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: var(--primary);
+        }
+        
+        .btn-secondary {
+            background: var(--primary);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .notification {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .success { background: var(--success); color: white; }
+        .error { background: var(--danger); color: white; }
+        
+        .hidden { display: none; }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>Create Admin User</h1>
+            <p>X-BET System Setup</p>
+        </div>
+        
+        <div id="setup-form">
+            <div class="form-group">
+                <label for="admin-email">Admin Email</label>
+                <input type="email" class="form-control" id="admin-email" value="admin@xbet.com" placeholder="Admin email address">
+            </div>
+            
+            <div class="form-group">
+                <label for="admin-password">Admin Password</label>
+                <input type="password" class="form-control" id="admin-password" value="admin123" placeholder="Admin password">
+            </div>
+            
+            <div class="form-group">
+                <label for="admin-name">Admin Name</label>
+                <input type="text" class="form-control" id="admin-name" value="Super Admin" placeholder="Admin display name">
+            </div>
+            
+            <div class="form-group">
+                <label for="admin-balance">Initial Balance</label>
+                <input type="number" class="form-control" id="admin-balance" value="100000" placeholder="Initial balance">
+            </div>
+            
+            <button class="btn btn-primary" onclick="createAdminUser()">Create Admin User</button>
+            <button class="btn btn-secondary" onclick="window.location.href='admin.html'">Go to Admin Panel</button>
+        </div>
+        
+        <div id="result" class="hidden"></div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
+            authDomain: "x-bet-prod-jd.firebaseapp.com",
+            projectId: "x-bet-prod-jd",
+            storageBucket: "x-bet-prod-jd.firebasestorage.app",
+            messagingSenderId: "499334334535",
+            appId: "1:499334334535:web:bebc1bf817e24d9e3c4962",
+            measurementId: "G-PTV4XMYQ6P"
+        };
+
+        let auth, db;
+
+        // Initialize Firebase
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                console.log('Firebase initialized for admin creation');
+            } catch (error) {
+                showResult('Firebase initialization error: ' + error.message, 'error');
+            }
+        });
+
+        // Create Admin User
+        async function createAdminUser() {
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            const displayName = document.getElementById('admin-name').value;
+            const balance = parseFloat(document.getElementById('admin-balance').value);
+
+            if (!email || !password || !displayName) {
+                showResult('Please fill all fields', 'error');
+                return;
+            }
+
+            try {
+                showResult('Creating admin user...', 'success');
+
+                // 1. Create user in Firebase Authentication
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // 2. Update user profile
+                await user.updateProfile({
+                    displayName: displayName
+                });
+
+                // 3. Create admin document in Firestore
+                const adminData = {
+                    email: email,
+                    displayName: displayName,
+                    balance: balance,
+                    profit: 0,
+                    status: "active",
+                    isAdmin: true, // THIS IS IMPORTANT - makes them admin
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                    uid: user.uid
+                };
+
+                await db.collection('users').doc(user.uid).set(adminData);
+
+                // 4. Sign out (we don't want to stay logged in)
+                await auth.signOut();
+
+                showResult(`✅ Admin user created successfully!<br>
+                           Email: ${email}<br>
+                           Password: ${password}<br>
+                           <strong>You can now login to admin.html</strong>`, 'success');
+
+            } catch (error) {
+                console.error('Admin creation error:', error);
+                let errorMessage = 'Failed to create admin: ';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage += 'Email already exists. Try a different email.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage += 'Invalid email address.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage += 'Password is too weak.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                
+                showResult(errorMessage, 'error');
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<div class="notification ${type}">${message}</div>`;
+            resultDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
