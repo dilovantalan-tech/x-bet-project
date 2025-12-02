@@ -761,6 +761,9 @@
                 this.loadAllTransactions();
                 this.updateDisplay();
                 this.setupEventListeners();
+                
+                // Auto-save admin data
+                this.saveAdminData();
             }
 
             checkAdminAuth() {
@@ -800,7 +803,6 @@
                 if (!this.adminData.users) this.adminData.users = [];
                 
                 this.adminBalance = this.adminData.balance;
-                this.saveAdminData(); // Save to ensure balance persists
             }
 
             loadAllUsers() {
@@ -1037,7 +1039,7 @@
                 this.updateTransactionsDisplay(type);
             }
 
-            // Transfer functions - FIXED VERSION
+            // Transfer functions - UPDATED TO WORK WITH USER DASHBOARD
             async processAdminTransfer() {
                 const userCode = document.getElementById('userTransactionCode').value.trim();
                 const amount = parseFloat(document.getElementById('transferAmount').value);
@@ -1086,7 +1088,7 @@
                     // Ensure activities array exists
                     if (!userData.activities) userData.activities = [];
                     
-                    // Add transaction to user
+                    // Add transaction to user - USING CORRECT FORMAT FOR USER DASHBOARD
                     userData.activities.push({
                         type: 'deposit',
                         amount: amount,
@@ -1095,7 +1097,8 @@
                         title: 'Admin Deposit',
                         from: this.currentAdmin,
                         description: 'Deposit from admin',
-                        status: 'completed'
+                        status: 'completed',
+                        category: 'received' // Important for user dashboard
                     });
                     
                     // Add transaction to admin
@@ -1110,7 +1113,7 @@
                         status: 'completed'
                     });
                     
-                    alert(`✅ Deposit successful!\nAmount: $${amount.toFixed(2)}\nTo: ${user.username}\nTransaction Code: ${transactionCode}`);
+                    alert(`✅ Deposit successful!\nAmount: $${amount.toFixed(2)}\nTo: ${user.username}\nTransaction Code: ${transactionCode}\n\nUser new balance: $${userData.balance.toFixed(2)}`);
                     
                 } else if (type === 'withdrawal') {
                     // Withdraw from user
@@ -1130,7 +1133,8 @@
                         title: 'Admin Withdrawal',
                         to: this.currentAdmin,
                         description: 'Withdrawal by admin',
-                        status: 'completed'
+                        status: 'completed',
+                        category: 'sent' // Important for user dashboard
                     });
                     
                     // Add transaction to admin
@@ -1160,11 +1164,6 @@
                 this.loadAllUsers();
                 this.loadAllTransactions();
                 this.updateDisplay();
-                
-                // Show success message
-                setTimeout(() => {
-                    alert(`💰 Transaction completed!\nUser ${user.username} balance is now: $${userData.balance.toFixed(2)}`);
-                }, 500);
             }
 
             // Save admin data
@@ -1275,7 +1274,7 @@
             // Ensure activities array exists
             if (!userData.activities) userData.activities = [];
             
-            // Add transaction to user
+            // Add transaction to user - WITH CATEGORY FOR USER DASHBOARD
             userData.activities.push({
                 type: 'deposit',
                 amount: amount,
@@ -1284,7 +1283,8 @@
                 title: 'Admin Deposit',
                 from: admin.currentAdmin,
                 description: description || 'Deposit from admin',
-                status: 'completed'
+                status: 'completed',
+                category: 'received'
             });
             
             // Add transaction to admin
@@ -1383,7 +1383,7 @@
             // Generate transaction code
             const transactionCode = customCode || admin.generateUserTransactionCode(username);
             
-            // Create user data
+            // Create user data - WITH COMPLETE STRUCTURE FOR DASHBOARD
             const userData = {
                 username: username,
                 email: email,
@@ -1406,7 +1406,8 @@
                     title: 'Initial Deposit',
                     from: admin.currentAdmin,
                     description: 'Account creation deposit',
-                    status: 'completed'
+                    status: 'completed',
+                    category: 'received'
                 });
             }
             
