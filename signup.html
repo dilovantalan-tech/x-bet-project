@@ -3,291 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET - Sign Up</title>
+    <title>X-BET | Sign Up</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        :root {
-            --primary: #3b82f6;
-            --secondary: #1d4ed8;
-            --danger: #ef4444;
-            --success: #10b981;
-            --dark: #0f172a;
-            --light: #f8fafc;
-        }
-
-        body {
-            background: linear-gradient(135deg, var(--dark), #1e293b);
-            color: var(--light);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .logo span {
-            color: var(--success);
-        }
-
-        .logo p {
-            color: #94a3b8;
-            margin-top: 0.5rem;
-        }
-
-        .form-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .form-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            color: var(--light);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #94a3b8;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 1rem;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin-top: 1rem;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .message {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-        }
-
-        .success {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .error {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #94a3b8;
-        }
-
-        .login-link a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
+        /* ... your signup styles ... */
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <h1>X<span>-BET</span></h1>
-            <p>Create your account</p>
-        </div>
-
-        <div class="form-card">
-            <h2 class="form-title">Sign Up</h2>
-            
-            <div id="message" class="message"></div>
-            
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter username" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" placeholder="Enter email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password" required>
-            </div>
-            
-            <button class="btn btn-primary" onclick="signup()">Create Account</button>
-            <button class="btn btn-secondary" onclick="autoFill()">Auto Fill Test Account</button>
-            
-            <div class="login-link">
-                Already have an account? <a href="login.html">Login here</a>
-            </div>
-        </div>
-    </div>
-
+    <!-- ... your signup form ... -->
+    
     <script>
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validation
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            // Check if user exists
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+            if (registeredUsers[username]) {
+                alert('Username already exists');
+                return;
+            }
+            
+            // Create user in registeredUsers
+            registeredUsers[username] = email;
+            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+            
+            // Create user data with proper structure
+            const userData = {
+                username: username,
+                email: email,
+                password: password,
+                balance: 0,
+                transactionCode: generateTransactionCode(username),
+                isAdmin: false,
+                status: 'active',
+                registeredAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString(),
+                activities: []
+            };
+            
+            localStorage.setItem('userData_' + username, JSON.stringify(userData));
+            
+            alert('Account created successfully! You can now login.');
+            window.location.href = 'login.html';
+        });
+        
         function generateTransactionCode(username) {
             const prefix = username.substring(0, 3).toUpperCase();
             const timestamp = Date.now().toString(36).toUpperCase().substr(-8);
             const random = Math.random().toString(36).substr(2, 8).toUpperCase();
             return `XBT-${prefix}-${timestamp}-${random}`;
         }
-
-        function showMessage(text, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type}`;
-            messageDiv.style.display = 'block';
-        }
-
-        function autoFill() {
-            document.getElementById('username').value = 'tandore';
-            document.getElementById('email').value = 'tandore@example.com';
-            document.getElementById('password').value = 'password123';
-        }
-
-        function signup() {
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-
-            if (!username || !email || !password) {
-                showMessage('Please fill all fields', 'error');
-                return;
-            }
-
-            // Load existing users
-            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-            
-            // Check if username already exists
-            if (registeredUsers[username]) {
-                showMessage('Username already exists', 'error');
-                return;
-            }
-
-            // Generate transaction code
-            const transactionCode = generateTransactionCode(username);
-
-            // Create user data - MATCHING FORMAT WITH ADMIN
-            const userData = {
-                username: username,
-                email: email,
-                password: password,
-                balance: 0,
-                transactionCode: transactionCode,
-                isAdmin: false,
-                status: 'active',
-                registeredAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
-                activities: []  // Empty array for transactions
-            };
-
-            // Save user
-            registeredUsers[username] = email;
-            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-            localStorage.setItem('userData_' + username, JSON.stringify(userData));
-
-            // Create session
-            const userSession = btoa(JSON.stringify({
-                username: username,
-                loginTime: Date.now()
-            }));
-            
-            sessionStorage.setItem('user_session', userSession);
-            localStorage.setItem('user_session_expiry', Date.now() + 86400000); // 24 hours
-
-            showMessage('Account created successfully! Redirecting...', 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
-        }
-
-        // Allow form submission with Enter key
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                signup();
-            }
-        });
     </script>
 </body>
 </html>
