@@ -3,284 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET - Login</title>
+    <title>X-BET | Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/session.js" defer></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        :root {
-            --primary: #3b82f6;
-            --secondary: #1d4ed8;
-            --danger: #ef4444;
-            --success: #10b981;
-            --dark: #0f172a;
-            --light: #f8fafc;
-        }
-
-        body {
-            background: linear-gradient(135deg, var(--dark), #1e293b);
-            color: var(--light);
+        /* Login specific styles */
+        .login-container {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
         }
-
-        .container {
+        
+        .login-box {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
-
-        .logo {
+        
+        .login-header {
             text-align: center;
             margin-bottom: 2rem;
         }
-
-        .logo h1 {
+        
+        .login-header h1 {
             font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary);
+            background: linear-gradient(135deg, #6366f1, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
         }
-
-        .logo span {
-            color: var(--success);
-        }
-
-        .logo p {
-            color: #94a3b8;
-            margin-top: 0.5rem;
-        }
-
-        .form-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .form-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            color: var(--light);
-        }
-
+        
         .form-group {
             margin-bottom: 1.5rem;
         }
-
-        .form-group label {
+        
+        .form-label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #94a3b8;
-            font-size: 0.9rem;
+            color: var(--light);
             font-weight: 500;
         }
-
-        .form-group input {
+        
+        .form-input {
             width: 100%;
             padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
             color: white;
             font-size: 1rem;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
-
-        .form-group input:focus {
+        
+        .form-input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
-
-        .btn {
+        
+        .login-btn {
             width: 100%;
             padding: 1rem;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
             border: none;
             border-radius: 10px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
         }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--secondary);
+        
+        .login-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
         }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin-top: 1rem;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .message {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 10px;
+        
+        .login-footer {
             text-align: center;
-            display: none;
+            margin-top: 2rem;
+            color: var(--gray);
         }
-
-        .success {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .error {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .signup-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #94a3b8;
-        }
-
-        .signup-link a {
-            color: var(--primary);
+        
+        .login-footer a {
+            color: #6366f1;
             text-decoration: none;
-            font-weight: 600;
         }
-
-        .signup-link a:hover {
-            text-decoration: underline;
-        }
-
-        .admin-link {
-            text-align: center;
+        
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             margin-top: 1rem;
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .admin-link a {
-            color: #ef4444;
+            color: var(--gray);
             text-decoration: none;
-            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <h1>X<span>-BET</span></h1>
-            <p>Welcome back</p>
-        </div>
-
-        <div class="form-card">
-            <h2 class="form-title">Login</h2>
-            
-            <div id="message" class="message"></div>
-            
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter username" required>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1><i class="fas fa-dice"></i> X-BET</h1>
+                <p>Login to your account</p>
             </div>
             
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password" required>
-            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Username or Email</label>
+                    <input type="text" class="form-input" id="username" 
+                           placeholder="Enter your username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="password" 
+                           placeholder="Enter your password" required>
+                </div>
+                
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 8px; color: var(--gray);">
+                        <input type="checkbox" id="remember"> Remember me
+                    </label>
+                    <a href="#" style="color: #6366f1; text-decoration: none;">Forgot Password?</a>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                
+                <!-- DEMO LOGIN BUTTONS -->
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                    <button type="button" class="login-btn" style="background: linear-gradient(135deg, #10b981, #059669);"
+                            onclick="demoLogin('demo_user')">
+                        <i class="fas fa-user"></i> Demo User
+                    </button>
+                    <button type="button" class="login-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706);"
+                            onclick="demoLogin('tokotoko1')">
+                        <i class="fas fa-crown"></i> Premium User
+                    </button>
+                </div>
+            </form>
             
-            <button class="btn btn-primary" onclick="login()">Login</button>
-            <button class="btn btn-secondary" onclick="autoFillTest()">Auto Fill Test User</button>
-            
-            <div class="signup-link">
-                Don't have an account? <a href="signup.html">Sign up here</a>
-            </div>
-            
-            <div class="admin-link">
-                Admin access? <a href="admin.login.html">Login as admin</a>
+            <div class="login-footer">
+                <p>Don't have an account? <a href="register.html">Sign up now</a></p>
+                <a href="index.html" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
             </div>
         </div>
     </div>
 
     <script>
-        function showMessage(text, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type}`;
-            messageDiv.style.display = 'block';
-        }
-
-        function autoFillTest() {
-            document.getElementById('username').value = 'tandore';
-            document.getElementById('password').value = 'password123';
-        }
-
-        function login() {
-            const username = document.getElementById('username').value.trim();
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                showMessage('Please fill all fields', 'error');
-                return;
-            }
-
-            // Load user data
-            const userData = JSON.parse(localStorage.getItem('userData_' + username) || '{}');
             
-            // Check if user exists and password matches
-            if (!userData.username || userData.password !== password) {
-                showMessage('Invalid username or password', 'error');
-                return;
-            }
-
-            // Update last login
-            userData.lastLogin = new Date().toISOString();
-            localStorage.setItem('userData_' + username, JSON.stringify(userData));
-
-            // Create session
-            const userSession = btoa(JSON.stringify({
-                username: username,
-                loginTime: Date.now()
-            }));
-            
-            sessionStorage.setItem('user_session', userSession);
-            localStorage.setItem('user_session_expiry', Date.now() + 86400000); // 24 hours
-
-            showMessage('Login successful! Redirecting...', 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
-        }
-
-        // Allow form submission with Enter key
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                login();
+            // Simple validation
+            if (username && password) {
+                // Simulate login
+                const userData = {
+                    username: username,
+                    user_id: 'user_' + Date.now(),
+                    token: 'token_' + Math.random().toString(36).substr(2),
+                    balance: 1000.00,
+                    email: username + '@example.com'
+                };
+                
+                // Save session
+                SessionManager.login(userData);
+                
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Please fill in all fields');
             }
         });
-
-        // Auto-fill for testing
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('test') === '1') {
-                autoFillTest();
+        
+        // Demo login function
+        function demoLogin(type) {
+            let userData;
+            
+            if (type === 'demo_user') {
+                userData = {
+                    username: 'demo_user',
+                    user_id: 'demo_001',
+                    token: 'demo_token_123',
+                    balance: 500.00,
+                    email: 'demo@xbet.com'
+                };
+            } else if (type === 'tokotoko1') {
+                userData = {
+                    username: 'tokotoko1',
+                    user_id: 'tokotoko1',
+                    token: 'xBT-TOC-RIPL(QUID-2)EXAMPLE',
+                    balance: 10000.00,
+                    email: 'tokotoko1@xbet.com'
+                };
             }
-        };
+            
+            SessionManager.login(userData);
+            window.location.href = 'dashboard.html';
+        }
+        
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            if (SessionManager.isLoggedIn()) {
+                window.location.href = 'dashboard.html';
+            }
+        });
     </script>
 </body>
 </html>
