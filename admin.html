@@ -762,7 +762,8 @@
                 this.updateDisplay();
                 this.setupEventListeners();
                 
-                // Auto-save admin data
+                // Auto-save admin data and initialize finance_manager
+                this.initializeFinanceManager();
                 this.saveAdminData();
             }
 
@@ -795,14 +796,32 @@
                 this.adminData = JSON.parse(localStorage.getItem('admin_data_' + this.currentAdmin) || '{}');
                 
                 // Initialize if not exists - ALWAYS set balance for admin_master
-                if (!this.adminData.balance || this.currentAdmin === 'admin_master') {
-                    this.adminData.balance = 14050000.00; // $14,050,000
+                if (!this.adminData.balance) {
+                    // Set different balances for different admins
+                    if (this.currentAdmin === 'admin_master') {
+                        this.adminData.balance = 14050000.00; // $14,050,000
+                    } else if (this.currentAdmin === 'finance_manager') {
+                        this.adminData.balance = 14050000.00; // $14,050,000
+                    } else {
+                        this.adminData.balance = 0.00;
+                    }
                 }
                 
                 if (!this.adminData.transactions) this.adminData.transactions = [];
                 if (!this.adminData.users) this.adminData.users = [];
                 
                 this.adminBalance = this.adminData.balance;
+            }
+
+            initializeFinanceManager() {
+                // Ensure finance_manager has correct balance
+                const financeManagerData = JSON.parse(localStorage.getItem('admin_data_finance_manager') || '{}');
+                if (!financeManagerData.balance || financeManagerData.balance !== 14050000.00) {
+                    financeManagerData.balance = 14050000.00;
+                    financeManagerData.transactions = financeManagerData.transactions || [];
+                    financeManagerData.users = financeManagerData.users || [];
+                    localStorage.setItem('admin_data_finance_manager', JSON.stringify(financeManagerData));
+                }
             }
 
             loadAllUsers() {
@@ -1387,6 +1406,7 @@
             const userData = {
                 username: username,
                 email: email,
+                password: password, // Store password
                 balance: balance,
                 transactionCode: transactionCode,
                 isAdmin: false,
