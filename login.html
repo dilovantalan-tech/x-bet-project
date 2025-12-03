@@ -5,724 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-BET | Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ===== GLOBAL STYLES ===== */
-        :root {
-            --primary: #FF6B35;
-            --primary-dark: #E55A2B;
-            --secondary: #00C9B7;
-            --accent: #FFD166;
-            --dark: #0A0E17;
-            --darker: #050811;
-            --card-bg: #121826;
-            --light: #F8FAFC;
-            --gray: #94A3B8;
-            --success: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-            --info: #3B82F6;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--dark);
-            color: var(--light);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-        
-        /* ===== LOGIN CONTAINER ===== */
-        .login-container {
-            display: flex;
-            width: 100%;
-            max-width: 1200px;
-            min-height: 700px;
-            background: var(--card-bg);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        /* ===== LEFT SIDE - GRAPHICS ===== */
-        .login-left {
-            flex: 1;
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(0, 201, 183, 0.1));
-            padding: 4rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .login-left::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 107, 53, 0.05) 0%, transparent 70%);
-            animation: float 20s infinite linear;
-        }
-        
-        @keyframes float {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .logo-large {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 3rem;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .logo-large .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            color: white;
-        }
-        
-        .logo-text-large {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--light), var(--primary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .welcome-title {
-            font-size: 3rem;
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .welcome-subtitle {
-            color: var(--gray);
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 3rem;
-            max-width: 500px;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .features-list {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 1.5rem;
-        }
-        
-        .feature-icon {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 1.2rem;
-        }
-        
-        .feature-text h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.25rem;
-            color: white;
-        }
-        
-        .feature-text p {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-        
-        /* ===== RIGHT SIDE - LOGIN FORM ===== */
-        .login-right {
-            flex: 1;
-            padding: 4rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .login-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        
-        .login-header h2 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-        
-        .login-header p {
-            color: var(--gray);
-        }
-        
-        /* ===== FORM STYLES ===== */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--light);
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-        
-        .input-group {
-            position: relative;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 1rem 1rem 1rem 3rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: white;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .input-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-            font-size: 1.1rem;
-        }
-        
-        .password-toggle {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--gray);
-            cursor: pointer;
-            font-size: 1.1rem;
-        }
-        
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-        
-        .remember-me input {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-        }
-        
-        .forgot-password {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-        
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-        
-        /* ===== BUTTONS ===== */
-        .login-btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            margin-bottom: 1.5rem;
-        }
-        
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
-        }
-        
-        .login-btn:active {
-            transform: translateY(0);
-        }
-        
-        /* ===== DIVIDER ===== */
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 2rem 0;
-            color: var(--gray);
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .divider span {
-            padding: 0 1rem;
-            font-size: 0.9rem;
-        }
-        
-        /* ===== REGISTER LINK ===== */
-        .register-link {
-            text-align: center;
-            margin-top: 2rem;
-            color: var(--gray);
-        }
-        
-        .register-link a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            margin-left: 5px;
-        }
-        
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-        
-        /* ===== BACK BUTTON ===== */
-        .back-home {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
-            color: var(--gray);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            z-index: 10;
-        }
-        
-        .back-home:hover {
-            color: var(--primary);
-        }
-        
-        /* ===== ERROR MESSAGE ===== */
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            display: none;
-            font-size: 0.9rem;
-        }
-        
-        .error-message.show {
-            display: block;
-        }
-        
-        /* ===== SUCCESS MESSAGE ===== */
-        .success-message {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #86efac;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            display: none;
-            font-size: 0.9rem;
-        }
-        
-        .success-message.show {
-            display: block;
-        }
-        
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .login-container {
-                flex-direction: column;
-                max-width: 600px;
-            }
-            
-            .login-left {
-                padding: 3rem;
-            }
-            
-            .welcome-title {
-                font-size: 2.5rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-            
-            .login-left,
-            .login-right {
-                padding: 2rem;
-            }
-            
-            .welcome-title {
-                font-size: 2rem;
-            }
-            
-            .back-home {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin-bottom: 1rem;
-            }
-        }
+        /* ... keep your existing login styles ... */
+        /* Just adding the critical JavaScript fix */
     </style>
 </head>
 <body>
-    <!-- Back to Home -->
-    <a href="index.html" class="back-home">
-        <i class="fas fa-arrow-left"></i> Back to Home
-    </a>
-
-    <div class="login-container">
-        <!-- Left Side - Graphics & Info -->
-        <div class="login-left">
-            <div class="logo-large">
-                <div class="logo-icon">
-                    <i class="fas fa-dice"></i>
-                </div>
-                <span class="logo-text-large">X-BET</span>
-            </div>
-            
-            <h1 class="welcome-title">Welcome Back!</h1>
-            <p class="welcome-subtitle">
-                Login to access your account, continue playing your favorite games, and manage your funds securely.
-            </p>
-            
-            <div class="features-list">
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="feature-text">
-                        <h4>Secure Login</h4>
-                        <p>Bank-level encryption keeps your account safe</p>
-                    </div>
-                </div>
-                
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <div class="feature-text">
-                        <h4>Instant Access</h4>
-                        <p>Get back to your games instantly after login</p>
-                    </div>
-                </div>
-                
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <div class="feature-text">
-                        <h4>Start Fresh</h4>
-                        <p>New users start with $0 balance - deposit to play</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Side - Login Form -->
-        <div class="login-right">
-            <div class="login-header">
-                <h2>Login to Account</h2>
-                <p>Enter your credentials to continue</p>
-            </div>
-
-            <!-- Error Message -->
-            <div class="error-message" id="errorMessage">
-                <i class="fas fa-exclamation-circle"></i> Invalid credentials. Please try again.
-            </div>
-
-            <!-- Success Message -->
-            <div class="success-message" id="successMessage">
-                <i class="fas fa-check-circle"></i> Login successful! Redirecting...
-            </div>
-
-            <!-- Login Form -->
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <div class="input-group">
-                        <i class="fas fa-user input-icon"></i>
-                        <input type="text" class="form-input" id="username" 
-                               placeholder="Enter your username" required>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <div class="input-group">
-                        <i class="fas fa-lock input-icon"></i>
-                        <input type="password" class="form-input" id="password" 
-                               placeholder="Enter your password" required>
-                        <button type="button" class="password-toggle" id="togglePassword">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox" id="remember">
-                        Remember me
-                    </label>
-                    <a href="#" class="forgot-password" id="forgotPassword">
-                        Forgot Password?
-                    </a>
-                </div>
-                
-                <button type="submit" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i> Login to Account
-                </button>
-            </form>
-
-            <div class="divider">
-                <span>New to X-BET?</span>
-            </div>
-
-            <!-- Register Link -->
-            <div class="register-link">
-                Don't have an account?
-                <a href="https://github.com/xcrazybet/x-bet-project/blob/main/signup.html" target="_blank">
-                    Register here
-                </a>
-            </div>
-        </div>
-    </div>
-
+    <!-- ... keep your existing HTML structure ... -->
+    
     <script>
-        // ===== PASSWORD VISIBILITY TOGGLE =====
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const icon = this.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-
         // ===== FORM VALIDATION =====
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
-            
-            // Hide messages
-            errorMessage.classList.remove('show');
-            successMessage.classList.remove('show');
             
             // Validation
             if (!username || !password) {
-                errorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please fill in all fields';
-                errorMessage.classList.add('show');
+                alert('Please fill in all fields');
                 return;
             }
             
-            if (password.length < 6) {
-                errorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Password must be at least 6 characters';
-                errorMessage.classList.add('show');
-                return;
-            }
+            // Check if user exists in registeredUsers
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
             
-            // Simulate login process
-            processLogin(username, password);
-        });
-
-        // ===== LOGIN FUNCTION =====
-        function processLogin(username, password) {
-            const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
-            
-            // Show loading
-            const loginBtn = document.querySelector('.login-btn');
-            const originalText = loginBtn.innerHTML;
-            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
-            loginBtn.disabled = true;
-            
-            // Simulate API call delay
-            setTimeout(() => {
-                // ALL USERS START WITH $0 BALANCE
-                const userData = {
-                    username: username,
-                    balance: 0.00, // ZERO BALANCE
-                    user_id: 'user_' + Date.now(),
-                    email: username + '@xbet.com',
-                    token: 'xbet_token_' + Date.now(),
-                    isLoggedIn: true,
-                    last_login: new Date().toISOString(),
-                    created_at: new Date().toISOString(),
-                    total_deposits: 0,
-                    total_withdrawals: 0,
-                    games_played: 0
-                };
+            if (registeredUsers[username]) {
+                // User exists, check password (demo mode - in real system, you'd verify properly)
+                const userData = JSON.parse(localStorage.getItem('userData_' + username) || '{}');
                 
-                // Save to localStorage
-                localStorage.setItem('xbet_user', JSON.stringify(userData));
-                localStorage.setItem('xbet_token', userData.token);
-                
-                // Save remember me
-                const rememberMe = document.getElementById('remember').checked;
-                if (rememberMe) {
-                    localStorage.setItem('xbet_remember', 'true');
-                    localStorage.setItem('xbet_last_user', JSON.stringify({username: username}));
-                }
-                
-                // Show success message
-                successMessage.innerHTML = `<i class="fas fa-check-circle"></i> Welcome ${userData.username}! Your balance is $0.00. Please deposit to start playing.`;
-                successMessage.classList.add('show');
-                
-                // Redirect to dashboard after delay
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 2000);
-                
-            }, 1500);
-        }
-
-        // ===== FORGOT PASSWORD =====
-        document.getElementById('forgotPassword').addEventListener('click', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            
-            if (username) {
-                alert(`Password reset instructions have been sent to the email associated with ${username}. Please check your inbox.`);
-            } else {
-                const email = prompt('Enter your registered email address:');
-                if (email) {
-                    alert(`Password reset instructions have been sent to ${email}. Please check your inbox.`);
-                }
-            }
-        });
-
-        // ===== CHECK IF ALREADY LOGGED IN =====
-        function checkExistingSession() {
-            const token = localStorage.getItem('xbet_token');
-            const userStr = localStorage.getItem('xbet_user');
-            
-            if (token && userStr) {
-                const user = JSON.parse(userStr);
-                if (user.isLoggedIn) {
-                    // Show message
-                    const successMessage = document.getElementById('successMessage');
-                    successMessage.innerHTML = `<i class="fas fa-info-circle"></i> You're already logged in as ${user.username}. Redirecting...`;
-                    successMessage.classList.add('show');
+                // For demo, accept any password if user exists
+                if (userData.password === password || !userData.password) {
+                    // Login successful
+                    localStorage.setItem('xbet_token', 'token_' + Date.now());
+                    localStorage.setItem('currentUser', username);
                     
-                    // Redirect after delay
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 2000);
+                    // Update last login
+                    userData.lastLogin = new Date().toISOString();
+                    localStorage.setItem('userData_' + username, JSON.stringify(userData));
+                    
+                    // Generate transaction code if not exists
+                    if (!userData.transactionCode) {
+                        userData.transactionCode = generateTransactionCode(username);
+                        localStorage.setItem('userData_' + username, JSON.stringify(userData));
+                    }
+                    
+                    alert('Login successful! Redirecting to dashboard...');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Invalid password');
+                }
+            } else {
+                // New user - create account
+                if (confirm('New user detected. Create account with these credentials?')) {
+                    // Create user in registeredUsers
+                    registeredUsers[username] = username + '@xbet.com';
+                    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+                    
+                    // Create user data with proper structure
+                    const userData = {
+                        username: username,
+                        email: username + '@xbet.com',
+                        password: password,
+                        balance: 0,
+                        transactionCode: generateTransactionCode(username),
+                        isAdmin: false,
+                        status: 'active',
+                        registeredAt: new Date().toISOString(),
+                        lastLogin: new Date().toISOString(),
+                        activities: []
+                    };
+                    
+                    localStorage.setItem('userData_' + username, JSON.stringify(userData));
+                    localStorage.setItem('xbet_token', 'token_' + Date.now());
+                    localStorage.setItem('currentUser', username);
+                    
+                    alert('Account created successfully! Your transaction code has been generated. Redirecting to dashboard...');
+                    window.location.href = 'dashboard.html';
                 }
             }
-        }
-
-        // ===== AUTO-FILL REMEMBERED USER =====
-        function checkRememberedUser() {
-            const remembered = localStorage.getItem('xbet_remember');
-            const lastUser = localStorage.getItem('xbet_last_user');
-            
-            if (remembered === 'true' && lastUser) {
-                try {
-                    const user = JSON.parse(lastUser);
-                    document.getElementById('username').value = user.username || '';
-                    document.getElementById('remember').checked = true;
-                } catch (e) {
-                    // Ignore error
-                }
-            }
-        }
-
-        // ===== INITIALIZE =====
-        document.addEventListener('DOMContentLoaded', function() {
-            checkExistingSession();
-            checkRememberedUser();
-            
-            // Focus on username field
-            document.getElementById('username').focus();
         });
-
-        // ===== ENTER KEY SUBMIT =====
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && e.target.type !== 'textarea') {
-                if (e.target.id === 'username' || e.target.id === 'password') {
-                    e.preventDefault();
-                    document.querySelector('.login-btn').click();
-                }
-            }
-        });
+        
+        function generateTransactionCode(username) {
+            const prefix = username.substring(0, 3).toUpperCase();
+            const timestamp = Date.now().toString(36).toUpperCase().substr(-8);
+            const random = Math.random().toString(36).substr(2, 8).toUpperCase();
+            return `XBT-${prefix}-${timestamp}-${random}`;
+        }
     </script>
 </body>
 </html>
