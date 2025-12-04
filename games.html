@@ -3,248 +3,1139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET - Games</title>
+    <title>X-BET | Casino Games</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <script src="firebase-config.js"></script>
+    <script src="auth-check.js" defer></script>
+    
     <style>
+        /* Same header styles as index.html */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
+        :root {
+            --primary: #1a73e8;
+            --secondary: #34a853;
+            --accent: #ea4335;
+            --dark: #1a1d2b;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+        }
+        
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(135deg, #0f2027, #203a43);
             color: white;
             min-height: 100vh;
         }
-
-        .navbar {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 1rem 2rem;
+        
+        /* Header - Same as index.html */
+        .header {
+            background: rgba(26, 29, 43, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #ffd700;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ffd700;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            background: rgba(255, 215, 0, 0.2);
-        }
-
-        .balance-display {
-            background: rgba(255,215,0,0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .games-container {
-            padding: 2rem;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
-
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo span:first-child {
+            color: var(--primary);
+        }
+        
+        .logo span:last-child {
+            color: var(--secondary);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .user-balance {
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .btn-logout {
+            background: var(--accent);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        /* Games Content */
+        .games-container {
+            padding: 40px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .balance-alert {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .balance-alert h3 {
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+        
+        .balance-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 10px 0;
+        }
+        
+        .game-categories {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        
+        .category-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        
+        .category-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .category-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
         }
-
+        
         .game-card {
-            background: rgba(255,255,255,0.1);
-            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
+        
         .game-card:hover {
             transform: translateY(-10px);
-            border-color: #ffd700;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
         }
-
-        .game-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+        
+        .game-image {
+            height: 180px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
         }
-
+        
+        .game-info {
+            padding: 20px;
+        }
+        
         .game-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .game-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .game-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
             color: #ffd700;
         }
-
-        .game-description {
-            margin-bottom: 1.5rem;
-            opacity: 0.8;
-        }
-
-        .play-btn {
-            background: linear-gradient(45deg, #ff6b6b, #ffd700);
-            color: black;
+        
+        .game-play-btn {
+            background: var(--primary);
+            color: white;
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            font-weight: 600;
+            transition: all 0.3s;
         }
-
-        .play-btn:hover {
+        
+        .game-play-btn:hover {
+            background: #0d62d9;
             transform: scale(1.05);
         }
-
-        .play-btn:disabled {
-            background: #95a5a6;
+        
+        .game-play-btn.disabled {
+            background: var(--gray);
             cursor: not-allowed;
-            transform: none;
+        }
+        
+        /* Quick Games Section */
+        .quick-games {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        .quick-games h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .quick-games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .quick-game-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .quick-game-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+        
+        .quick-game-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        /* Game Modal */
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .game-modal-content {
+            background: var(--dark);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            border: 2px solid var(--primary);
+        }
+        
+        .game-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-game-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .bet-form .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .bet-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .bet-amount-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .bet-range {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+        
+        .quick-bet-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .quick-bet-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-bet-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-bet {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn-bet:hover {
+            background: #0d62d9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-bet.disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+        }
+        
+        /* Game Results */
+        .game-result {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result-win {
+            background: rgba(52, 168, 83, 0.2);
+            border: 2px solid var(--secondary);
+        }
+        
+        .result-lose {
+            background: rgba(234, 67, 53, 0.2);
+            border: 2px solid var(--accent);
+        }
+        
+        .result-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .result-amount {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .game-categories {
+                padding-bottom: 15px;
+            }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <nav class="navbar">
-        <a href="dashboard.html" class="logo">X-BET Games</a>
-        <div class="nav-links">
-            <a href="dashboard.html">📊 Dashboard</a>
-            <a href="#games">🎮 Games</a>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span>X</span>-<span>BET</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="games.html" class="nav-link active"><i class="fas fa-gamepad"></i> Games</a>
+                <a href="bets.html" class="nav-link"><i class="fas fa-coins"></i> Bets</a>
+                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="contact.html" class="nav-link"><i class="fas fa-phone"></i> Contact</a>
+                <a href="aboutus.html" class="nav-link"><i class="fas fa-info-circle"></i> About</a>
+            </div>
+            
+            <div class="user-menu" id="userMenu">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <span class="user-name" id="userName">User</span>
+                        <span class="user-balance" id="userBalance">$0.00</span>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
         </div>
-        <div class="balance-display" id="currentBalance">
-            Balance: $0.00
-        </div>
-    </nav>
+    </header>
 
-    <div class="games-container">
-        <h1 style="text-align: center; margin-bottom: 2rem; color: #ffd700;">🎮 Choose Your Game</h1>
+    <!-- Games Content -->
+    <main class="games-container">
+        <div class="page-header">
+            <h1>🎮 Casino Games</h1>
+            <p>Play exciting casino games and win big!</p>
+        </div>
         
-        <div class="games-grid">
-            <div class="game-card" onclick="playGame('Lucky Dice')">
-                <div class="game-icon">🎯</div>
-                <div class="game-title">Lucky Dice</div>
-                <div class="game-description">Roll the dice and win big! Predict the number and multiply your bet.</div>
-                <button class="play-btn">Play Now</button>
+        <!-- Balance Alert -->
+        <div class="balance-alert">
+            <h3>Your Game Balance</h3>
+            <div class="balance-display" id="gameBalance">$0.00</div>
+            <p>Minimum bet: $5 | Maximum win: $10,000 per game</p>
+            <div style="margin-top: 15px;">
+                <a href="dashboard.html" class="game-play-btn">
+                    <i class="fas fa-wallet"></i> Deposit Now
+                </a>
             </div>
-
-            <div class="game-card" onclick="playGame('Card Master')">
-                <div class="game-icon">🃏</div>
-                <div class="game-title">Card Master</div>
-                <div class="game-description">Test your card skills against the system. Higher card wins!</div>
-                <button class="play-btn">Play Now</button>
+        </div>
+        
+        <!-- Game Categories -->
+        <div class="game-categories">
+            <button class="category-btn active" onclick="filterGames('all')">All Games</button>
+            <button class="category-btn" onclick="filterGames('slots')">Slots</button>
+            <button class="category-btn" onclick="filterGames('table')">Table Games</button>
+            <button class="category-btn" onclick="filterGames('live')">Live Casino</button>
+            <button class="category-btn" onclick="filterGames('cards')">Card Games</button>
+            <button class="category-btn" onclick="filterGames('jackpot')">Jackpot</button>
+        </div>
+        
+        <!-- Games Grid -->
+        <div class="games-grid" id="gamesGrid">
+            <!-- Games will be loaded dynamically -->
+        </div>
+        
+        <!-- Quick Games -->
+        <section class="quick-games">
+            <h2>🎯 Quick Games</h2>
+            <div class="quick-games-grid">
+                <div class="quick-game-card" onclick="playQuickGame('coinflip')">
+                    <div class="quick-game-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h3>Coin Flip</h3>
+                    <p>Heads or Tails - 50/50 chance</p>
+                    <div class="game-meta">
+                        <span>Min: $5</span>
+                        <span>Max: $500</span>
+                    </div>
+                </div>
+                
+                <div class="quick-game-card" onclick="playQuickGame('dice')">
+                    <div class="quick-game-icon">
+                        <i class="fas fa-dice"></i>
+                    </div>
+                    <h3>Dice Roll</h3>
+                    <p>Roll dice and win multipliers</p>
+                    <div class="game-meta">
+                        <span>Min: $10</span>
+                        <span>Max: $1000</span>
+                    </div>
+                </div>
+                
+                <div class="quick-game-card" onclick="playQuickGame('roulette')">
+                    <div class="quick-game-icon">
+                        <i class="fas fa-compact-disc"></i>
+                    </div>
+                    <h3>Roulette</h3>
+                    <p>Classic roulette game</p>
+                    <div class="game-meta">
+                        <span>Min: $20</span>
+                        <span>Max: $2000</span>
+                    </div>
+                </div>
+                
+                <div class="quick-game-card" onclick="playQuickGame('crash')">
+                    <div class="quick-game-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Crash Game</h3>
+                    <p>Predict the crash point</p>
+                    <div class="game-meta">
+                        <span>Min: $5</span>
+                        <span>Max: $5000</span>
+                    </div>
+                </div>
             </div>
-
-            <div class="game-card" onclick="playGame('Fortune Slots')">
-                <div class="game-icon">🎰</div>
-                <div class="game-title">Fortune Slots</div>
-                <div class="game-description">Spin the reels and hit the jackpot! Multiple winning combinations.</div>
-                <button class="play-btn">Play Now</button>
+        </section>
+    </main>
+    
+    <!-- Game Bet Modal -->
+    <div id="gameModal" class="game-modal">
+        <div class="game-modal-content">
+            <div class="game-modal-header">
+                <h2 id="modalGameTitle">Place Bet</h2>
+                <button class="close-game-modal" onclick="closeGameModal()">&times;</button>
             </div>
-
-            <div class="game-card" onclick="playGame('Sports Predict')">
-                <div class="game-icon">⚽</div>
-                <div class="game-title">Sports Predict</div>
-                <div class="game-description">Predict match outcomes and score big rewards.</div>
-                <button class="play-btn">Play Now</button>
+            
+            <div id="gameResult" class="game-result">
+                <!-- Result will be shown here -->
             </div>
+            
+            <form id="betForm" class="bet-form">
+                <div class="form-group">
+                    <label>Bet Amount ($)</label>
+                    <input type="number" class="bet-amount-input" id="betAmount" 
+                           min="5" step="0.01" placeholder="Enter bet amount" required>
+                    <div class="bet-range">
+                        <span>Min: $5</span>
+                        <span>Max: $<span id="maxBetAmount">1000</span></span>
+                    </div>
+                    
+                    <div class="quick-bet-buttons">
+                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(5)">$5</button>
+                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(10)">$10</button>
+                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(25)">$25</button>
+                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(50)">$50</button>
+                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(100)">$100</button>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="gameOptions">
+                    <!-- Game specific options will be added here -->
+                </div>
+                
+                <button type="submit" class="btn-bet" id="placeBetBtn">
+                    <i class="fas fa-play"></i> PLACE BET
+                </button>
+            </form>
         </div>
     </div>
 
     <script>
-        // Check authentication and load balance
-        const currentUser = localStorage.getItem('currentUser');
-        if (!currentUser) {
-            window.location.href = 'login.html';
-        }
-
-        function loadBalance() {
-            const userData = JSON.parse(localStorage.getItem('userData_' + currentUser) || '{}');
-            document.getElementById('currentBalance').textContent = 'Balance: $' + (userData.balance || 0).toFixed(2);
-        }
-
-        function playGame(gameName) {
-            const userData = JSON.parse(localStorage.getItem('userData_' + currentUser) || '{}');
-            const balance = userData.balance || 0;
-            
-            if (balance <= 0) {
-                alert('Insufficient balance! Please contact admin for deposits.');
-                return;
+        let currentUserBalance = 0;
+        let currentGame = null;
+        
+        // Sample games data
+        const games = [
+            {
+                id: 1,
+                name: "Mega Fortune",
+                category: "slots",
+                description: "Progressive jackpot slots with huge wins",
+                minBet: 5,
+                maxBet: 1000,
+                icon: "fas fa-crown",
+                multiplier: 5000
+            },
+            {
+                id: 2,
+                name: "Blackjack Pro",
+                category: "table",
+                description: "Classic blackjack with live dealers",
+                minBet: 10,
+                maxBet: 5000,
+                icon: "fas fa-club",
+                multiplier: 2.5
+            },
+            {
+                id: 3,
+                name: "Roulette Royale",
+                category: "table",
+                description: "European roulette with high limits",
+                minBet: 20,
+                maxBet: 10000,
+                icon: "fas fa-compact-disc",
+                multiplier: 36
+            },
+            {
+                id: 4,
+                name: "Poker Masters",
+                category: "cards",
+                description: "Texas Hold'em with tournaments",
+                minBet: 50,
+                maxBet: 5000,
+                icon: "fas fa-spade",
+                multiplier: 10
+            },
+            {
+                id: 5,
+                name: "Baccarat Elite",
+                category: "cards",
+                description: "Premium baccarat experience",
+                minBet: 100,
+                maxBet: 20000,
+                icon: "fas fa-gem",
+                multiplier: 8
+            },
+            {
+                id: 6,
+                name: "Mega Wheel",
+                category: "jackpot",
+                description: "Spin the wheel for massive jackpots",
+                minBet: 5,
+                maxBet: 1000,
+                icon: "fas fa-redo",
+                multiplier: 10000
             }
-
-            const betAmount = parseFloat(prompt(`Enter bet amount for ${gameName} (Current balance: $${balance}):`));
-            
-            if (!betAmount || betAmount <= 0) {
-                alert('Invalid bet amount!');
-                return;
-            }
-
-            if (betAmount > balance) {
-                alert('Insufficient balance!');
-                return;
-            }
-
-            // Simulate game outcome (50% win chance for demo)
-            const win = Math.random() > 0.5;
-            const winMultiplier = win ? (2 + Math.random() * 3) : 0; // 2x to 5x for wins
-            const winAmount = win ? betAmount * winMultiplier : 0;
-            const netAmount = winAmount - betAmount;
-
-            // Update user data
-            userData.balance = balance + netAmount;
-            userData.totalProfit = (userData.totalProfit || 0) + netAmount;
-            
-            if (!userData.transactions) userData.transactions = [];
-            userData.transactions.push({
-                type: `${gameName} ${win ? 'Win' : 'Loss'}`,
-                amount: netAmount,
-                status: 'completed',
-                date: new Date().toISOString(),
-                details: `Bet: $${betAmount.toFixed(2)}, ${win ? `Win: $${winAmount.toFixed(2)} (${winMultiplier.toFixed(1)}x)` : 'Loss'}`
-            });
-
-            if (!userData.bets) userData.bets = [];
-            userData.bets.push({
-                game: gameName,
-                betAmount: betAmount,
-                winAmount: winAmount,
-                result: win ? 'win' : 'loss',
-                date: new Date().toISOString()
-            });
-
-            localStorage.setItem('userData_' + currentUser, JSON.stringify(userData));
-
-            // Show result
-            if (win) {
-                alert(`🎉 Congratulations! You won $${winAmount.toFixed(2)} (${winMultiplier.toFixed(1)}x multiplier)!`);
-            } else {
-                alert(`😔 Better luck next time! You lost $${betAmount.toFixed(2)}.`);
-            }
-
-            loadBalance();
-        }
-
+        ];
+        
         // Initialize games page
-        loadBalance();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGames();
+            checkUserBalance();
+            
+            // Setup bet form
+            document.getElementById('betForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await placeBet();
+            });
+            
+            // Check balance every 5 seconds
+            setInterval(checkUserBalance, 5000);
+        });
+        
+        function loadGames() {
+            const gamesGrid = document.getElementById('gamesGrid');
+            gamesGrid.innerHTML = '';
+            
+            games.forEach(game => {
+                const gameCard = document.createElement('div');
+                gameCard.className = 'game-card';
+                gameCard.dataset.category = game.category;
+                
+                gameCard.innerHTML = `
+                    <div class="game-image">
+                        <i class="${game.icon}"></i>
+                    </div>
+                    <div class="game-info">
+                        <h3 class="game-title">${game.name}</h3>
+                        <p class="game-description">${game.description}</p>
+                        <div class="game-meta">
+                            <div class="game-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.8</span>
+                            </div>
+                            <button class="game-play-btn" onclick="openGameModal(${game.id})">
+                                <i class="fas fa-play"></i> Play Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                gamesGrid.appendChild(gameCard);
+            });
+        }
+        
+        function filterGames(category) {
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const games = document.querySelectorAll('.game-card');
+            games.forEach(game => {
+                if (category === 'all' || game.dataset.category === category) {
+                    game.style.display = 'block';
+                } else {
+                    game.style.display = 'none';
+                }
+            });
+        }
+        
+        async function checkUserBalance() {
+            const user = firebaseAuth.currentUser;
+            if (!user) return;
+            
+            try {
+                const userDoc = await firebaseDb.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    currentUserBalance = userDoc.data().balance || 0;
+                    document.getElementById('gameBalance').textContent = `$${currentUserBalance.toFixed(2)}`;
+                    
+                    // Update play buttons based on balance
+                    const minBet = 5;
+                    const playButtons = document.querySelectorAll('.game-play-btn');
+                    playButtons.forEach(btn => {
+                        if (currentUserBalance < minBet) {
+                            btn.classList.add('disabled');
+                            btn.innerHTML = '<i class="fas fa-lock"></i> Need $5+';
+                        } else {
+                            btn.classList.remove('disabled');
+                            btn.innerHTML = '<i class="fas fa-play"></i> Play Now';
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error checking balance:', error);
+            }
+        }
+        
+        function openGameModal(gameId) {
+            const user = firebaseAuth.currentUser;
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Check minimum balance
+            if (currentUserBalance < 5) {
+                alert('You need at least $5 to play games. Please deposit first.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            const game = games.find(g => g.id === gameId);
+            if (!game) return;
+            
+            currentGame = game;
+            
+            document.getElementById('modalGameTitle').textContent = game.name;
+            document.getElementById('betAmount').value = game.minBet;
+            document.getElementById('maxBetAmount').textContent = game.maxBet;
+            document.getElementById('betAmount').max = Math.min(game.maxBet, currentUserBalance);
+            
+            // Set game-specific options
+            const gameOptions = document.getElementById('gameOptions');
+            let optionsHTML = '';
+            
+            switch(game.category) {
+                case 'slots':
+                    optionsHTML = `
+                        <label>Select Line Bet</label>
+                        <select class="bet-amount-input">
+                            <option value="1">1 Line - 1x</option>
+                            <option value="5">5 Lines - 2x</option>
+                            <option value="10">10 Lines - 5x</option>
+                            <option value="20">20 Lines - 10x</option>
+                        </select>
+                    `;
+                    break;
+                case 'table':
+                    optionsHTML = `
+                        <label>Bet Type</label>
+                        <select class="bet-amount-input">
+                            <option value="player">Player - 1:1</option>
+                            <option value="banker">Banker - 0.95:1</option>
+                            <option value="tie">Tie - 8:1</option>
+                        </select>
+                    `;
+                    break;
+                case 'cards':
+                    optionsHTML = `
+                        <label>Hand Selection</label>
+                        <select class="bet-amount-input">
+                            <option value="pair">Pair - 11:1</option>
+                            <option value="flush">Flush - 6:1</option>
+                            <option value="straight">Straight - 4:1</option>
+                        </select>
+                    `;
+                    break;
+                default:
+                    optionsHTML = `
+                        <label>Risk Level</label>
+                        <select class="bet-amount-input">
+                            <option value="low">Low Risk - 1.5x</option>
+                            <option value="medium">Medium Risk - 3x</option>
+                            <option value="high">High Risk - 10x</option>
+                        </select>
+                    `;
+            }
+            
+            gameOptions.innerHTML = optionsHTML;
+            
+            // Reset result display
+            document.getElementById('gameResult').style.display = 'none';
+            document.getElementById('betForm').style.display = 'block';
+            
+            document.getElementById('gameModal').style.display = 'flex';
+        }
+        
+        function playQuickGame(gameType) {
+            const quickGames = {
+                coinflip: { name: 'Coin Flip', min: 5, max: 500, multiplier: 2 },
+                dice: { name: 'Dice Roll', min: 10, max: 1000, multiplier: 6 },
+                roulette: { name: 'Roulette', min: 20, max: 2000, multiplier: 36 },
+                crash: { name: 'Crash Game', min: 5, max: 5000, multiplier: 100 }
+            };
+            
+            const game = quickGames[gameType];
+            if (!game) return;
+            
+            currentGame = {
+                id: gameType,
+                name: game.name,
+                minBet: game.min,
+                maxBet: game.max,
+                multiplier: game.multiplier
+            };
+            
+            document.getElementById('modalGameTitle').textContent = game.name;
+            document.getElementById('betAmount').value = game.min;
+            document.getElementById('maxBetAmount').textContent = game.max;
+            document.getElementById('betAmount').max = Math.min(game.max, currentUserBalance);
+            
+            // Set quick game options
+            const gameOptions = document.getElementById('gameOptions');
+            let optionsHTML = '';
+            
+            if (gameType === 'coinflip') {
+                optionsHTML = `
+                    <label>Choose Side</label>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="button" class="quick-bet-btn" onclick="selectCoinSide('heads')" style="flex: 1;">
+                            <i class="fas fa-head-side-virus"></i> Heads
+                        </button>
+                        <button type="button" class="quick-bet-btn" onclick="selectCoinSide('tails')" style="flex: 1;">
+                            <i class="fas fa-feather-alt"></i> Tails
+                        </button>
+                    </div>
+                `;
+            } else if (gameType === 'dice') {
+                optionsHTML = `
+                    <label>Predict Number (1-6)</label>
+                    <div style="display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap;">
+                        ${[1,2,3,4,5,6].map(num => `
+                            <button type="button" class="quick-bet-btn" onclick="selectDiceNumber(${num})" style="flex: 1; min-width: 50px;">
+                                ${num}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            gameOptions.innerHTML = optionsHTML;
+            
+            // Reset result display
+            document.getElementById('gameResult').style.display = 'none';
+            document.getElementById('betForm').style.display = 'block';
+            
+            document.getElementById('gameModal').style.display = 'flex';
+        }
+        
+        function setBetAmount(amount) {
+            document.getElementById('betAmount').value = amount;
+        }
+        
+        function selectCoinSide(side) {
+            // Store selection
+            window.selectedCoinSide = side;
+            
+            // Update button styles
+            const buttons = document.querySelectorAll('.quick-bet-btn');
+            buttons.forEach(btn => btn.style.background = 'rgba(255, 255, 255, 0.1)');
+            event.target.style.background = 'var(--primary)';
+        }
+        
+        function selectDiceNumber(number) {
+            // Store selection
+            window.selectedDiceNumber = number;
+            
+            // Update button styles
+            const buttons = document.querySelectorAll('.quick-bet-btn');
+            buttons.forEach(btn => btn.style.background = 'rgba(255, 255, 255, 0.1)');
+            event.target.style.background = 'var(--primary)';
+        }
+        
+        function closeGameModal() {
+            document.getElementById('gameModal').style.display = 'none';
+            currentGame = null;
+        }
+        
+        async function placeBet() {
+            const user = firebaseAuth.currentUser;
+            if (!user || !currentGame) return;
+            
+            const betAmount = parseFloat(document.getElementById('betAmount').value);
+            
+            // Validate bet amount
+            if (!betAmount || betAmount < currentGame.minBet) {
+                alert(`Minimum bet is $${currentGame.minBet}`);
+                return;
+            }
+            
+            if (betAmount > currentUserBalance) {
+                alert('Insufficient balance');
+                return;
+            }
+            
+            if (betAmount > currentGame.maxBet) {
+                alert(`Maximum bet is $${currentGame.maxBet}`);
+                return;
+            }
+            
+            const placeBetBtn = document.getElementById('placeBetBtn');
+            placeBetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
+            placeBetBtn.disabled = true;
+            
+            try {
+                // Generate game result
+                const isWin = Math.random() > 0.45; // 55% win chance
+                const winMultiplier = isWin ? (currentGame.multiplier || 2) * Math.random() : 0;
+                const winAmount = isWin ? betAmount * winMultiplier : 0;
+                const netAmount = winAmount - betAmount;
+                
+                // Generate transaction ID
+                const transactionId = 'GAME' + Date.now() + Math.random().toString(36).substr(2, 6);
+                
+                // Update user balance
+                const userRef = firebaseDb.collection('users').doc(user.uid);
+                await firebaseDb.runTransaction(async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    const currentBalance = userDoc.data().balance || 0;
+                    const newBalance = currentBalance + netAmount;
+                    
+                    transaction.update(userRef, {
+                        balance: newBalance,
+                        lastGame: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+                
+                // Create bet record
+                await firebaseDb.collection('bets').add({
+                    userId: user.uid,
+                    gameId: currentGame.id || currentGame.name,
+                    gameName: currentGame.name,
+                    betAmount: betAmount,
+                    winAmount: winAmount,
+                    netAmount: netAmount,
+                    result: isWin ? 'win' : 'loss',
+                    transactionId: transactionId,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    multiplier: winMultiplier.toFixed(2)
+                });
+                
+                // Create transaction record
+                await firebaseDb.collection('transactions').add({
+                    userId: user.uid,
+                    type: isWin ? 'game_win' : 'game_bet',
+                    amount: netAmount,
+                    description: `${currentGame.name} - ${isWin ? 'WIN' : 'LOSS'}`,
+                    status: 'completed',
+                    transactionId: transactionId,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Show result
+                showGameResult(isWin, betAmount, winAmount, netAmount, transactionId);
+                
+                // Update balance display
+                currentUserBalance += netAmount;
+                checkUserBalance();
+                
+            } catch (error) {
+                console.error('Game error:', error);
+                alert('❌ Game error. Please try again.');
+            } finally {
+                placeBetBtn.innerHTML = '<i class="fas fa-play"></i> PLACE BET';
+                placeBetBtn.disabled = false;
+            }
+        }
+        
+        function showGameResult(isWin, betAmount, winAmount, netAmount, transactionId) {
+            const resultDiv = document.getElementById('gameResult');
+            const betForm = document.getElementById('betForm');
+            
+            let resultHTML = '';
+            
+            if (isWin) {
+                resultHTML = `
+                    <div class="result-icon" style="color: var(--secondary);">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 style="color: var(--secondary);">🎉 YOU WIN! 🎉</h3>
+                    <div class="result-amount" style="color: var(--secondary);">
+                        +$${winAmount.toFixed(2)}
+                    </div>
+                    <p>Bet: $${betAmount.toFixed(2)} | Win: $${winAmount.toFixed(2)}</p>
+                    <p style="font-size: 14px; opacity: 0.8;">Transaction ID: ${transactionId}</p>
+                    <button onclick="closeGameModal()" style="margin-top: 15px; padding: 10px 20px; background: var(--secondary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-play"></i> Play Again
+                    </button>
+                `;
+                resultDiv.className = 'game-result result-win';
+            } else {
+                resultHTML = `
+                    <div class="result-icon" style="color: var(--accent);">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <h3 style="color: var(--accent);">😔 BETTER LUCK NEXT TIME</h3>
+                    <div class="result-amount" style="color: var(--accent);">
+                        -$${betAmount.toFixed(2)}
+                    </div>
+                    <p>Your bet didn't win this time</p>
+                    <p style="font-size: 14px; opacity: 0.8;">Transaction ID: ${transactionId}</p>
+                    <button onclick="closeGameModal()" style="margin-top: 15px; padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                `;
+                resultDiv.className = 'game-result result-lose';
+            }
+            
+            resultDiv.innerHTML = resultHTML;
+            resultDiv.style.display = 'block';
+            betForm.style.display = 'none';
+        }
     </script>
 </body>
 </html>
