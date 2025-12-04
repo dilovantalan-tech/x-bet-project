@@ -3,389 +3,719 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET - Contact</title>
+    <title>X-BET | Contact Us</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <script src="firebase-config.js"></script>
+    <script src="auth-check.js" defer></script>
+    
     <style>
+        /* Same header styles as index.html */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
+        :root {
+            --primary: #1a73e8;
+            --secondary: #34a853;
+            --accent: #ea4335;
+            --dark: #1a1d2b;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+        }
+        
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: white;
+            background: #f5f7fa;
+            color: #333;
             min-height: 100vh;
         }
-
-        /* Navigation */
-        .navbar {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 1rem 2rem;
+        
+        /* Header - Same as index.html */
+        .header {
+            background: var(--dark);
+            padding: 15px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid #ffd700;
+            max-width: 1400px;
+            margin: 0 auto;
         }
-
+        
         .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #ffd700;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            background: rgba(255, 215, 0, 0.2);
-            color: #ffd700;
-        }
-
-        .user-section {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
         }
-
+        
+        .logo span:first-child {
+            color: var(--primary);
+        }
+        
+        .logo span:last-child {
+            color: var(--secondary);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
         .user-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
         }
-
+        
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(45deg, #ff6b6b, #ffd700);
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.2rem;
+            color: white;
         }
-
+        
         .user-details {
             display: flex;
             flex-direction: column;
         }
-
-        .user-email {
-            color: #ffd700;
-            font-size: 0.9rem;
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
         }
-
+        
         .user-balance {
-            color: #4CAF50;
+            color: var(--secondary);
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 16px;
         }
-
-        .logout-btn {
-            background: transparent;
-            color: #ffd700;
-            border: 2px solid #ffd700;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
+        
+        .btn-logout {
+            background: var(--accent);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
+            font-weight: 500;
         }
-
-        .logout-btn:hover {
-            background: #ffd700;
-            color: #000;
-        }
-
+        
         /* Contact Content */
         .contact-container {
-            padding: 2rem;
+            padding: 50px 5%;
             max-width: 1200px;
             margin: 0 auto;
         }
-
-        .page-title {
-            font-size: 3rem;
+        
+        .page-header {
             text-align: center;
-            margin-bottom: 2rem;
-            color: #ffd700;
+            margin-bottom: 50px;
         }
-
+        
+        .page-header h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .page-header p {
+            font-size: 18px;
+            color: var(--gray);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Contact Grid */
         .contact-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
+            gap: 40px;
+            margin-bottom: 60px;
         }
-
+        
+        /* Contact Info Cards */
         .contact-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
+            background: white;
             border-radius: 20px;
+            padding: 40px 30px;
             text-align: center;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
         }
-
+        
         .contact-card:hover {
             transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.15);
         }
-
+        
         .contact-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), #6c5ce7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: white;
         }
-
-        .contact-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #ffd700;
+        
+        .contact-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--dark);
         }
-
-        .contact-info {
-            margin-bottom: 1.5rem;
-            opacity: 0.8;
+        
+        .contact-card p {
+            color: var(--gray);
+            margin-bottom: 10px;
+            line-height: 1.6;
         }
-
-        .contact-btn {
-            background: linear-gradient(45deg, #ff6b6b, #ffd700);
-            color: black;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: transform 0.3s ease;
+        
+        .contact-link {
+            color: var(--primary);
             text-decoration: none;
+            font-weight: 600;
             display: inline-block;
+            margin-top: 10px;
         }
-
-        .contact-btn:hover {
-            transform: scale(1.1);
-            color: black;
-            text-decoration: none;
+        
+        .contact-link:hover {
+            text-decoration: underline;
         }
-
-        /* Support Form */
-        .support-form {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
+        
+        /* Contact Form */
+        .contact-form-section {
+            background: white;
             border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 600px;
-            margin: 0 auto;
+            padding: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-
+        
+        .section-title {
+            font-size: 36px;
+            margin-bottom: 30px;
+            color: var(--primary);
+            text-align: center;
+        }
+        
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 25px;
         }
-
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #ffd700;
-            font-weight: bold;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
         }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
+        
+        .form-control {
             width: 100%;
-            padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
+            font-size: 16px;
+            transition: all 0.3s;
         }
-
-        .form-group textarea {
-            height: 120px;
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
             resize: vertical;
         }
-
-        .submit-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
+        
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary), #6c5ce7);
             color: white;
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
+            padding: 18px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: transform 0.3s ease;
-            width: 100%;
+            transition: all 0.3s;
+            display: block;
+            margin: 30px auto 0;
+            min-width: 200px;
         }
-
-        .submit-btn:hover {
-            transform: scale(1.05);
+        
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26, 115, 232, 0.2);
         }
-
-        /* Footer */
-        footer {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 3rem 2rem;
-            text-align: center;
-            margin-top: 4rem;
-            border-top: 2px solid #ffd700;
+        
+        /* FAQ Section */
+        .faq-section {
+            margin-top: 80px;
         }
-
-        .social-links {
+        
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .faq-item {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .faq-item:hover {
+            border-left: 4px solid var(--primary);
+        }
+        
+        .faq-question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
             display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .faq-answer {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+        
+        /* Live Chat */
+        .live-chat {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        
+        .chat-button {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--secondary), #00b894);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            border: none;
         }
-
-        .social-icon {
-            color: #ffd700;
-            font-size: 1.5rem;
-            text-decoration: none;
-            transition: transform 0.3s ease;
+        
+        .chat-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
-
-        .social-icon:hover {
-            transform: scale(1.2);
+        
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: none;
         }
-
-        .copyright {
-            opacity: 0.7;
+        
+        .alert-success {
+            background: rgba(52, 168, 83, 0.1);
+            color: var(--secondary);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .alert-error {
+            background: rgba(234, 67, 53, 0.1);
+            color: var(--accent);
+            border-left: 4px solid var(--accent);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .contact-form-section {
+                padding: 30px 20px;
+            }
+            
+            .page-header h1 {
+                font-size: 36px;
+            }
+            
+            .live-chat {
+                bottom: 20px;
+                right: 20px;
+            }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <a href="dashboard.html" class="logo">X-BET</a>
-        <div class="nav-links">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="games.html">🎮 Games</a>
-            <a href="bits.html">💰 Bits</a>
-            <a href="contact.html" style="background: rgba(255, 215, 0, 0.2); color: #ffd700;">📞 Contact</a>
-            <a href="about.html">ℹ️ About</a>
-        </div>
-        <div class="user-section">
-            <div class="user-info">
-                <div class="user-avatar" id="userAvatar">U</div>
-                <div class="user-details">
-                    <span class="user-email" id="userEmail">user@example.com</span>
-                    <span class="user-balance" id="headerBalance">$0.00</span>
-                </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span>X</span>-<span>BET</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="games.html" class="nav-link"><i class="fas fa-gamepad"></i> Games</a>
+                <a href="bets.html" class="nav-link"><i class="fas fa-coins"></i> Bets</a>
+                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="contact.html" class="nav-link active"><i class="fas fa-phone"></i> Contact</a>
+                <a href="aboutus.html" class="nav-link"><i class="fas fa-info-circle"></i> About</a>
             </div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+            
+            <div class="user-menu" id="userMenu">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <span class="user-name" id="userName">User</span>
+                        <span class="user-balance" id="userBalance">$0.00</span>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
         </div>
-    </nav>
+    </header>
 
     <!-- Contact Content -->
-    <div class="contact-container">
-        <h1 class="page-title">📞 Contact X-BET Support</h1>
+    <main class="contact-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Contact Us</h1>
+            <p>We're here to help! Get in touch with our support team 24/7</p>
+        </div>
         
+        <!-- Contact Methods -->
         <div class="contact-grid">
-            <!-- Telegram Support -->
             <div class="contact-card">
-                <div class="contact-icon">💬</div>
-                <h2 class="contact-title">Telegram Support</h2>
-                <p class="contact-info">24/7 instant support via Telegram. Get quick responses for any issues.</p>
-                <button class="contact-btn" onclick="contactTelegram()">Message on Telegram</button>
+                <div class="contact-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>Live Chat</h3>
+                <p>Instant support available 24/7</p>
+                <p>Average response time: 2 minutes</p>
+                <button class="contact-link" onclick="openLiveChat()">
+                    Start Chat <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
-
-            <!-- Email Support -->
+            
             <div class="contact-card">
-                <div class="contact-icon">📧</div>
-                <h2 class="contact-title">Email Support</h2>
-                <p class="contact-info">Send us an email for detailed inquiries and official communications.</p>
-                <button class="contact-btn" onclick="contactEmail()">Send Email</button>
+                <div class="contact-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3>Email Support</h3>
+                <p>For detailed inquiries</p>
+                <p>support@x-bet.com</p>
+                <a href="mailto:support@x-bet.com" class="contact-link">
+                    Send Email <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-
-            <!-- WhatsApp Support -->
+            
             <div class="contact-card">
-                <div class="contact-icon">📱</div>
-                <h2 class="contact-title">WhatsApp Support</h2>
-                <p class="contact-info">Chat with our support team directly on WhatsApp for instant help.</p>
-                <button class="contact-btn" onclick="contactWhatsApp()">Chat on WhatsApp</button>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <h3>Phone Support</h3>
+                <p>Call us anytime</p>
+                <p>+1 (800) 123-4567</p>
+                <a href="tel:+18001234567" class="contact-link">
+                    Call Now <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
         </div>
-
-        <!-- Support Form -->
-        <div class="support-form">
-            <h2 style="text-align: center; margin-bottom: 2rem; color: #ffd700;">📝 Contact Form</h2>
-            <form id="supportForm">
-                <div class="form-group">
-                    <label for="name">Your Name</label>
-                    <input type="text" id="name" required placeholder="Enter your name">
+        
+        <!-- Contact Form -->
+        <section class="contact-form-section">
+            <h2 class="section-title">Send Us a Message</h2>
+            
+            <div id="formAlert" class="alert" style="display: none;"></div>
+            
+            <form id="contactForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
                 </div>
+                
                 <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" required placeholder="Enter your email">
-                </div>
-                <div class="form-group">
-                    <label for="subject">Subject</label>
-                    <select id="subject" required>
-                        <option value="">Select subject</option>
-                        <option value="deposit">Deposit Issue</option>
-                        <option value="withdrawal">Withdrawal Issue</option>
-                        <option value="game">Game Problem</option>
-                        <option value="account">Account Issue</option>
-                        <option value="other">Other</option>
+                    <label for="subject">Subject *</label>
+                    <select id="subject" class="form-control" required>
+                        <option value="">Select a subject</option>
+                        <option value="account">Account Issues</option>
+                        <option value="deposit">Deposit/Withdrawal</option>
+                        <option value="betting">Betting Questions</option>
+                        <option value="technical">Technical Support</option>
+                        <option value="security">Security Concerns</option>
+                        <option value="other">Other Inquiry</option>
                     </select>
                 </div>
+                
                 <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" required placeholder="Describe your issue in detail..."></textarea>
+                    <label for="message">Message *</label>
+                    <textarea id="message" class="form-control" placeholder="Please describe your issue or question in detail..." required></textarea>
                 </div>
-                <button type="submit" class="submit-btn">Send Message</button>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="priority" style="margin-right: 10px;">
+                        Mark as urgent (24/7 support will prioritize)
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> Send Message
+                </button>
             </form>
-        </div>
+        </section>
+        
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        How do I verify my account?
+                    </div>
+                    <div class="faq-answer">
+                        Upload a government-issued ID and proof of address in your account settings. Verification usually takes 1-2 hours.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        What are the withdrawal processing times?
+                    </div>
+                    <div class="faq-answer">
+                        E-wallets: 0-24 hours, Bank cards: 1-5 business days, Bank transfer: 3-7 business days.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        Are there any deposit fees?
+                    </div>
+                    <div class="faq-answer">
+                        No deposit fees for most methods. Some credit card providers may charge fees.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        How do I claim my welcome bonus?
+                    </div>
+                    <div class="faq-answer">
+                        Make your first deposit and the bonus will be credited automatically. Check promotions page for terms.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        Is my personal information secure?
+                    </div>
+                    <div class="faq-answer">
+                        Yes, we use bank-level SSL encryption and never share your data with third parties.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        Can I set deposit limits?
+                    </div>
+                    <div class="faq-answer">
+                        Yes, go to Account Settings → Responsible Gaming to set daily, weekly, or monthly limits.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Live Chat Button -->
+    <div class="live-chat">
+        <button class="chat-button" onclick="openLiveChat()">
+            <i class="fas fa-comment-alt"></i>
+        </button>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="social-links">
-            <a href="#" class="social-icon">📘</a>
-            <a href="#" class="social-icon">📷</a>
-            <a href="#" class="social-icon">🐦</a>
-            <a href="#" class="social-icon">💬</a>
-        </div>
-        <div class="copyright">
-            &copy; 2024 Crazy X Bet. All rights reserved.
-        </div>
-    </footer>
-
-    <script src="common-header.js"></script>
     <script>
-        function contactTelegram() {
-            alert(`💬 Telegram Support:\n\n@XBetSupport\n\nOur support team is available 24/7 on Telegram for instant assistance with any issues.`);
-        }
-
-        function contactEmail() {
-            alert(`📧 Email Support:\n\nsupport@xbet.com\n\nFor detailed inquiries and official communications, please email us. We typically respond within 1-2 hours.`);
-        }
-
-        function contactWhatsApp() {
-            alert(`📱 WhatsApp Support:\n\n+1-555-XBET-SUPPORT\n\nChat directly with our support team on WhatsApp for quick resolution of your issues.`);
-        }
-
-        document.getElementById('supportForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('✅ Message sent successfully!\n\nOur support team will contact you within 1 hour. Thank you for reaching out to X-BET support.');
-            this.reset();
+        // Update user avatar
+        document.addEventListener('DOMContentLoaded', function() {
+            const userAvatar = document.getElementById('userAvatar');
+            if (userAvatar) {
+                firebaseAuth.onAuthStateChanged(user => {
+                    if (user && user.email) {
+                        userAvatar.textContent = user.email[0].toUpperCase();
+                        
+                        // Pre-fill form with user data
+                        document.getElementById('name').value = user.displayName || '';
+                        document.getElementById('email').value = user.email;
+                    }
+                });
+            }
+            
+            // Setup contact form
+            document.getElementById('contactForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await submitContactForm();
+            });
         });
+        
+        function openLiveChat() {
+            alert('Live chat would open here. This is a demo feature.');
+        }
+        
+        async function submitContactForm() {
+            const user = firebaseAuth.currentUser;
+            const form = document.getElementById('contactForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const alertDiv = document.getElementById('formAlert');
+            
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value.trim();
+            const priority = document.getElementById('priority').checked;
+            
+            // Validation
+            if (!name || !email || !subject || !message) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Save contact message to Firestore
+                await firebaseDb.collection('contact_messages').add({
+                    userId: user ? user.uid : 'anonymous',
+                    userName: name,
+                    userEmail: email,
+                    subject: subject,
+                    message: message,
+                    priority: priority,
+                    status: 'new',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showAlert('Message sent successfully! We\'ll get back to you within 24 hours.', 'success');
+                form.reset();
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showAlert('Failed to send message. Please try again.', 'error');
+            } finally {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+                submitBtn.disabled = false;
+            }
+        }
+        
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('formAlert');
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
     </script>
 </body>
 </html>
