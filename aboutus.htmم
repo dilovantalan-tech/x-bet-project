@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-BET | About Us</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <script src="firebase-config.js"></script>
+    <script src="auth-check.js" defer></script>
+    
+    <style>
+        /* Same header styles as index.html */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #1a73e8;
+            --secondary: #34a853;
+            --accent: #ea4335;
+            --dark: #1a1d2b;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+        }
+        
+        body {
+            background: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        /* Header - Same as index.html */
+        .header {
+            background: var(--dark);
+            padding: 15px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo span:first-child {
+            color: var(--primary);
+        }
+        
+        .logo span:last-child {
+            color: var(--secondary);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .user-balance {
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .btn-logout {
+            background: var(--accent);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        /* About Content */
+        .about-container {
+            padding: 50px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .page-header h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .page-header p {
+            font-size: 18px;
+            color: var(--gray);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Sections */
+        .about-section {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .about-section h2 {
+            font-size: 36px;
+            margin-bottom: 25px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .about-content {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .about-content p {
+            margin-bottom: 20px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), #6c5ce7);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .team-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .team-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .team-image {
+            height: 200px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+        }
+        
+        .team-info {
+            padding: 30px;
+        }
+        
+        .team-name {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .team-role {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        /* Values Grid */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .value-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+        
+        .value-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+        
+        .value-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 25px;
+        }
+        
+        /* Licenses */
+        .licenses {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 40px;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+        
+        .license-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .license-card img {
+            height: 80px;
+            margin-bottom: 15px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .about-section {
+                padding: 30px 20px;
+            }
+            
+            .page-header h1 {
+                font-size: 36px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span>X</span>-<span>BET</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="games.html" class="nav-link"><i class="fas fa-gamepad"></i> Games</a>
+                <a href="bets.html" class="nav-link"><i class="fas fa-coins"></i> Bets</a>
+                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="contact.html" class="nav-link"><i class="fas fa-phone"></i> Contact</a>
+                <a href="aboutus.html" class="nav-link active"><i class="fas fa-info-circle"></i> About</a>
+            </div>
+            
+            <div class="user-menu" id="userMenu">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <span class="user-name" id="userName">User</span>
+                        <span class="user-balance" id="userBalance">$0.00</span>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Content -->
+    <main class="about-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>About X-BET</h1>
+            <p>Premium online betting platform established in 2018, serving millions of satisfied customers worldwide</p>
+        </div>
+        
+        <!-- Mission Section -->
+        <section class="about-section">
+            <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+            <div class="about-content">
+                <p>At X-BET, our mission is to provide the most exciting, secure, and fair online betting experience for our customers. We combine cutting-edge technology with exceptional customer service to create a platform that sets new standards in the industry.</p>
+                <p>We believe in responsible gambling and are committed to providing a safe environment for all our users. Our platform is designed to be transparent, reliable, and user-friendly, ensuring that every bet placed with us is handled with the utmost integrity.</p>
+            </div>
+        </section>
+        
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">5M+</div>
+                <div class="stat-label">Registered Users</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">$2.5B+</div>
+                <div class="stat-label">Total Bets Placed</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">99.8%</div>
+                <div class="stat-label">Uptime Reliability</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Customer Support</div>
+            </div>
+        </div>
+        
+        <!-- Values Section -->
+        <section class="about-section">
+            <h2><i class="fas fa-handshake"></i> Our Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Security First</h3>
+                    <p>Bank-level encryption and secure transactions to protect your data and funds.</p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <h3>Fair Play</h3>
+                    <p>Provably fair algorithms and transparent gaming processes for all users.</p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Innovation</h3>
+                    <p>Constantly evolving platform with new features and betting options.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Team Section -->
+        <section class="about-section">
+            <h2><i class="fas fa-users"></i> Leadership Team</h2>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Alex Johnson</h3>
+                        <div class="team-role">CEO & Founder</div>
+                        <p>Former professional trader with 15+ years in fintech and gaming industries.</p>
+                    </div>
+                </div>
+                
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Sarah Miller</h3>
+                        <div class="team-role">Chief Technology Officer</div>
+                        <p>Expert in blockchain technology and secure payment systems.</p>
+                    </div>
+                </div>
+                
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Michael Chen</h3>
+                        <div class="team-role">Head of Gaming</div>
+                        <p>Game development veteran with expertise in casino and sports betting.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Licenses Section -->
+        <section class="about-section">
+            <h2><i class="fas fa-certificate"></i> Licenses & Regulations</h2>
+            <div class="about-content">
+                <p>X-BET operates under strict regulatory supervision and holds multiple international gaming licenses:</p>
+                <div class="licenses">
+                    <div class="license-card">
+                        <div style="font-size: 48px; color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-globe-europe"></i>
+                        </div>
+                        <h3>Malta Gaming Authority</h3>
+                        <p>License: MGA/B2C/123/2001</p>
+                    </div>
+                    
+                    <div class="license-card">
+                        <div style="font-size: 48px; color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <h3>UK Gambling Commission</h3>
+                        <p>License: 39485</p>
+                    </div>
+                    
+                    <div class="license-card">
+                        <div style="font-size: 48px; color: var(--primary); margin-bottom: 15px;">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Curacao eGaming</h3>
+                        <p>License: 8048/JAZ</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Responsible Gaming -->
+        <section class="about-section">
+            <h2><i class="fas fa-heart"></i> Responsible Gaming</h2>
+            <div class="about-content">
+                <p>We take responsible gambling seriously and provide multiple tools to help our users stay in control:</p>
+                <ul style="margin-left: 20px; margin-top: 15px;">
+                    <li><strong>Deposit Limits:</strong> Set daily, weekly, or monthly deposit limits</li>
+                    <li><strong>Self-Exclusion:</strong> Take a break from betting for a chosen period</li>
+                    <li><strong>Reality Checks:</strong> Regular reminders of time and money spent</li>
+                    <li><strong>Cooling Off Period:</strong> Temporarily suspend your account</li>
+                    <li><strong>24/7 Support:</strong> Professional help for problem gambling</li>
+                </ul>
+                <p style="margin-top: 20px;">Remember: Gambling should be entertaining, not a way to make money. Only bet what you can afford to lose.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Update user avatar
+        document.addEventListener('DOMContentLoaded', function() {
+            const userAvatar = document.getElementById('userAvatar');
+            if (userAvatar) {
+                firebaseAuth.onAuthStateChanged(user => {
+                    if (user && user.email) {
+                        userAvatar.textContent = user.email[0].toUpperCase();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
