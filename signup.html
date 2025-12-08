@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-BET - Sign Up</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
         * {
             margin: 0;
@@ -121,6 +125,12 @@
             transform: translateY(-2px);
         }
 
+        .btn-primary:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
             color: white;
@@ -166,6 +176,20 @@
         .login-link a:hover {
             text-decoration: underline;
         }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -191,11 +215,11 @@
             </div>
             
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password" required>
+                <label for="password">Password (min 6 characters)</label>
+                <input type="password" id="password" placeholder="Enter password" minlength="6" required>
             </div>
             
-            <button class="btn btn-primary" onclick="signup()">Create Account</button>
+            <button class="btn btn-primary" id="signupBtn" onclick="signup()">Create Account</button>
             <button class="btn btn-secondary" onclick="autoFill()">Auto Fill Test Account</button>
             
             <div class="login-link">
@@ -205,6 +229,22 @@
     </div>
 
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
+            authDomain: "x-bet-prod-jd.firebaseapp.com",
+            projectId: "x-bet-prod-jd",
+            storageBucket: "x-bet-prod-jd.firebasestorage.app",
+            messagingSenderId: "499334334535",
+            appId: "1:499334334535:web:bebc1bf817e24d9e3c4962",
+            measurementId: "G-PTV4XMYQ6P"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
         function generateTransactionCode(username) {
             const prefix = username.substring(0, 3).toUpperCase();
             const timestamp = Date.now().toString(36).toUpperCase().substr(-8);
@@ -225,67 +265,116 @@
             document.getElementById('password').value = 'password123';
         }
 
-        function signup() {
+        async function signup() {
             const username = document.getElementById('username').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
+            const signupBtn = document.getElementById('signupBtn');
 
+            // Validation
             if (!username || !email || !password) {
                 showMessage('Please fill all fields', 'error');
                 return;
             }
 
-            // Load existing users
-            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-            
-            // Check if username already exists
-            if (registeredUsers[username]) {
-                showMessage('Username already exists', 'error');
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
                 return;
             }
 
-            // Generate transaction code
-            const transactionCode = generateTransactionCode(username);
+            // Disable button and show loading
+            signupBtn.disabled = true;
+            signupBtn.innerHTML = '<div class="loader"></div> Creating Account...';
 
-            // Create user data - MATCHING FORMAT WITH ADMIN
-            const userData = {
-                username: username,
-                email: email,
-                password: password,
-                balance: 0,
-                transactionCode: transactionCode,
-                isAdmin: false,
-                status: 'active',
-                registeredAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
-                activities: []  // Empty array for transactions
-            };
+            try {
+                // 1. Create Firebase Auth User
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
 
-            // Save user
-            registeredUsers[username] = email;
-            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-            localStorage.setItem('userData_' + username, JSON.stringify(userData));
+                // Generate transaction code
+                const transactionCode = generateTransactionCode(username);
 
-            // Create session
-            const userSession = btoa(JSON.stringify({
-                username: username,
-                loginTime: Date.now()
-            }));
-            
-            sessionStorage.setItem('user_session', userSession);
-            localStorage.setItem('user_session_expiry', Date.now() + 86400000); // 24 hours
+                // 2. Save user data to Firestore
+                const userData = {
+                    uid: user.uid,
+                    username: username,
+                    email: email,
+                    balance: 0,
+                    transactionCode: transactionCode,
+                    isAdmin: false,
+                    status: 'active',
+                    registeredAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                    activities: []
+                };
 
-            showMessage('Account created successfully! Redirecting...', 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
+                await db.collection('users').doc(user.uid).set(userData);
+
+                // 3. Also save to localStorage for backward compatibility
+                const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                registeredUsers[username] = email;
+                localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+                localStorage.setItem('userData_' + username, JSON.stringify(userData));
+
+                // 4. Store session
+                const sessionData = {
+                    uid: user.uid,
+                    username: username,
+                    email: email,
+                    isAdmin: false,
+                    transactionCode: transactionCode,
+                    loginTime: Date.now()
+                };
+                
+                sessionStorage.setItem('user_session', btoa(JSON.stringify(sessionData)));
+                localStorage.setItem('user_session_expiry', Date.now() + 86400000);
+
+                // 5. Show success and redirect
+                showMessage('✅ Account created successfully! Redirecting...', 'success');
+                
+                // Send verification email (optional)
+                await user.sendEmailVerification();
+
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error('Signup error:', error);
+                
+                // User-friendly error messages
+                let errorMessage = 'Registration failed. Please try again.';
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'Email already registered. Try logging in instead.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid email address.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'Password is too weak. Use at least 6 characters.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage = 'Network error. Check your connection.';
+                }
+                
+                showMessage('✗ ' + errorMessage, 'error');
+                
+                // Re-enable button
+                signupBtn.disabled = false;
+                signupBtn.innerHTML = 'Create Account';
+            }
         }
 
         // Allow form submission with Enter key
         document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 signup();
+            }
+        });
+
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is already logged in, redirect to home
+                window.location.href = 'index.html';
             }
         });
     </script>
