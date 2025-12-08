@@ -1,504 +1,1027 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET | Premium Online Betting Platform</title>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    
-    <script src="firebase-config.js"></script>
-    <script src="auth-check.js" defer></script>
-    
+    <title>X-BET - Home</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        
+
         :root {
-            --primary: #1a73e8;
-            --secondary: #34a853;
-            --accent: #ea4335;
-            --dark: #1a1d2b;
-            --light: #f8f9fa;
-            --gray: #6c757d;
+            --primary: #1a2a6c;
+            --secondary: #b21f1f;
+            --accent: #fdbb2d;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        
+
         body {
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: white;
+            background: linear-gradient(135deg, var(--dark), #1e293b);
+            color: var(--light);
             min-height: 100vh;
         }
-        
+
         /* Header & Navigation */
         .header {
-            background: rgba(26, 29, 43, 0.95);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
-            padding: 15px 5%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-bottom: 2px solid var(--primary);
         }
-        
+
         .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
         }
-        
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+        }
+
         .logo {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 28px;
-            font-weight: bold;
-            color: white;
-            text-decoration: none;
         }
-        
-        .logo span:first-child {
-            color: var(--primary);
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .logo span:last-child {
-            color: var(--secondary);
+
+        .logo span {
+            color: var(--accent);
         }
-        
+
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 25px;
             align-items: center;
         }
-        
-        .nav-link {
-            color: white;
+
+        .nav-links a {
+            color: var(--light);
             text-decoration: none;
             font-weight: 500;
             padding: 8px 16px;
-            border-radius: 5px;
+            border-radius: 8px;
             transition: all 0.3s;
+            font-size: 14px;
         }
-        
-        .nav-link:hover {
+
+        .nav-links a:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: var(--primary);
-        }
-        
-        .nav-link.active {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .auth-buttons {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .btn {
-            padding: 10px 24px;
-            border-radius: 5px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-        
-        .btn-login {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-        }
-        
-        .btn-login:hover {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-signup {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-signup:hover {
-            background: #0d62d9;
             transform: translateY(-2px);
         }
-        
-        /* User Menu */
-        .user-menu {
-            display: none;
-            align-items: center;
-            gap: 20px;
+
+        .nav-links a.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
         }
-        
-        .user-info {
+
+        /* Balance Display */
+        .balance-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             background: rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 50px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            background: var(--primary);
-            border-radius: 50%;
+
+        .balance-label {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-amount {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .currency {
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(26, 42, 108, 0.3), rgba(178, 31, 31, 0.3));
+            border-radius: 20px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero h2 {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: clamp(16px, 3vw, 20px);
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(26, 42, 108, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 60px 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-        }
-        
-        .user-details {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .user-balance {
-            color: var(--secondary);
-            font-weight: bold;
-            font-size: 16px;
-        }
-        
-        .btn-logout {
-            background: var(--accent);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        
-        .btn-logout:hover {
-            background: #d32f2f;
-        }
-        
-        /* Hero Section */
-        .hero {
-            padding: 100px 5%;
-            text-align: center;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .hero h1 {
-            font-size: 48px;
             margin-bottom: 20px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
-        
-        .hero p {
+
+        .feature-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
+        .feature-card h3 {
             font-size: 20px;
-            margin-bottom: 40px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            opacity: 0.9;
+            margin-bottom: 15px;
+            color: white;
         }
-        
-        /* Features Grid */
-        .features {
-            padding: 80px 5%;
-            max-width: 1400px;
-            margin: 0 auto;
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.6;
+            font-size: 15px;
         }
-        
-        .features h2 {
-            text-align: center;
-            font-size: 36px;
-            margin-bottom: 50px;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+
+        /* Quick Actions */
+        .quick-actions {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
             padding: 30px;
-            text-align: center;
-            transition: transform 0.3s;
+            margin: 40px 0;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.1);
+
+        .quick-actions h3 {
+            font-size: 22px;
+            margin-bottom: 25px;
+            color: white;
         }
-        
-        .feature-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: var(--primary);
-        }
-        
-        .feature-card h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-        
-        /* Quick Links */
-        .quick-links {
-            padding: 60px 5%;
-            background: rgba(26, 29, 43, 0.8);
-        }
-        
-        .links-grid {
+
+        .action-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 15px;
         }
-        
-        .link-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 10px;
-            text-align: center;
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 20px;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
             transition: all 0.3s;
         }
-        
-        .link-card:hover {
-            background: var(--primary);
-            transform: scale(1.05);
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+            border-color: var(--accent);
         }
-        
-        .link-card a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: 500;
-            display: block;
+
+        .action-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
-        .link-icon {
-            font-size: 32px;
-            margin-bottom: 15px;
-            color: var(--secondary);
+
+        .action-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
         }
-        
-        /* Footer */
-        .footer {
-            background: var(--dark);
-            padding: 40px 5%;
-            text-align: center;
-            margin-top: 50px;
-            border-top: 2px solid var(--primary);
+
+        .action-text h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
         }
-        
-        .admin-link {
-            margin-top: 20px;
-            font-size: 14px;
+
+        .action-text span {
+            font-size: 12px;
             color: var(--gray);
         }
-        
-        .admin-link a {
-            color: var(--primary);
-            text-decoration: none;
+
+        /* Recent Activity */
+        .recent-activity {
+            margin: 60px 0;
         }
-        
-        /* Responsive */
+
+        .recent-activity h3 {
+            font-size: 22px;
+            margin-bottom: 25px;
+            color: white;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .activity-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .activity-icon.deposit {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .activity-icon.withdraw {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .activity-icon.bet {
+            background: rgba(253, 187, 45, 0.2);
+        }
+
+        .activity-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .activity-details h4 {
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .activity-details span {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .activity-amount {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .activity-amount.positive {
+            color: var(--success);
+        }
+
+        .activity-amount.negative {
+            color: var(--danger);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.3);
+            margin-top: 60px;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h4 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 20px;
-            }
-            
             .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--dark);
+                flex-direction: column;
+                padding: 20px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
             }
-            
-            .hero h1 {
-                font-size: 36px;
+
+            .nav-links.active {
+                display: flex;
             }
-            
-            .hero p {
-                font-size: 16px;
+
+            .mobile-menu-btn {
+                display: block;
             }
+
+            .balance-container {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+
+            .balance-amount {
+                font-size: 18px;
+            }
+
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero h2 {
+                font-size: 28px;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .feature-card {
+                padding: 20px;
+            }
+
+            .quick-actions {
+                padding: 20px;
+            }
+
+            .activity-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .activity-amount {
+                align-self: flex-end;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Header & Navigation -->
+    <!-- Header with Navigation -->
     <header class="header">
         <div class="nav-container">
-            <a href="index.html" class="logo">
-                <span>X</span>-<span>BET</span>
-            </a>
-            
-            <div class="nav-links">
-                <a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Home</a>
-                <a href="games.html" class="nav-link"><i class="fas fa-gamepad"></i> Games</a>
-                <a href="bets.html" class="nav-link"><i class="fas fa-coins"></i> Bets</a>
-                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
-                <a href="contact.html" class="nav-link"><i class="fas fa-phone"></i> Contact</a>
-                <a href="aboutus.html" class="nav-link"><i class="fas fa-info-circle"></i> About</a>
-            </div>
-            
-            <div class="auth-buttons">
-                <div id="guestButtons">
-                    <a href="login.html" class="btn btn-login" id="loginBtn">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </a>
-                    <a href="signup.html" class="btn btn-signup" id="signupBtn">
-                        <i class="fas fa-user-plus"></i> Sign Up
-                    </a>
+            <nav class="nav">
+                <div class="logo">
+                    <h1>X<span>-BET</span></h1>
                 </div>
-                
-                <div class="user-menu" id="userMenu" style="display: none;">
-                    <div class="user-info">
-                        <div class="user-avatar" id="userAvatar">U</div>
-                        <div class="user-details">
-                            <span class="user-name" id="userName">User</span>
-                            <span class="user-balance" id="userBalance">$0.00</span>
-                        </div>
+
+                <!-- Desktop Navigation -->
+                <div class="nav-links" id="navLinks">
+                    <a href="index.html" class="active">Home</a>
+                    <a href="games.html">Games</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="bits.html">Bits</a>
+                    <a href="about.html">About</a>
+                    <a href="contact.html">Contact</a>
+                    
+                    <!-- Balance Display -->
+                    <div class="balance-container">
+                        <span class="balance-label">Balance</span>
+                        <span class="balance-amount" id="userBalance">$0.00</span>
+                        <span class="currency">USD</span>
                     </div>
-                    <button class="btn-logout" onclick="logoutUser()">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
+
+                    <a href="deposit.html" class="btn-secondary" style="padding: 8px 16px; font-size: 14px;">
+                        Deposit
+                    </a>
+                    <a href="withdraw.html" class="btn-secondary" style="padding: 8px 16px; font-size: 14px;">
+                        Withdraw
+                    </a>
+                    <a href="login.html" class="btn-primary" style="padding: 8px 16px; font-size: 14px;">
+                        Logout
+                    </a>
                 </div>
-            </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    ☰
+                </button>
+            </nav>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <h1>Welcome to X-BET</h1>
-        <p>The ultimate online betting platform with the best odds, live betting, casino games, and esports. Join thousands of players worldwide!</p>
-        <div style="margin-top: 30px;">
-            <a href="signup.html" class="btn btn-signup" style="font-size: 18px; padding: 15px 30px;">
-                <i class="fas fa-play-circle"></i> START BETTING NOW
-            </a>
-        </div>
-    </section>
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2>Welcome to X-BET Gaming Platform</h2>
+            <p>Experience the thrill of premium gaming with instant withdrawals, secure transactions, and exclusive rewards.</p>
+            <div class="cta-buttons">
+                <a href="games.html" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    Explore Games
+                </a>
+                <a href="dashboard.html" class="btn btn-secondary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                    </svg>
+                    Go to Dashboard
+                </a>
+            </div>
+        </section>
 
-    <!-- Features -->
-    <section class="features">
-        <h2>Why Choose X-BET?</h2>
-        <div class="features-grid">
+        <!-- Features Section -->
+        <section class="features">
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-shield-alt"></i>
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+                    </svg>
                 </div>
-                <h3>Secure & Licensed</h3>
-                <p>Fully licensed and regulated platform with SSL encryption and secure transactions.</p>
+                <h3>Secure Gaming</h3>
+                <p>Advanced encryption and secure protocols ensure your gaming experience is safe and protected at all times.</p>
             </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <h3>Live Betting</h3>
-                <p>Bet in real-time with live odds and instant updates on all major sports events.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-gift"></i>
-                </div>
-                <h3>Welcome Bonus</h3>
-                <p>Get up to $1000 bonus on your first deposit. T&Cs apply.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3>Mobile Friendly</h3>
-                <p>Play on any device with our responsive design and mobile apps.</p>
-            </div>
-        </div>
-    </section>
 
-    <!-- Quick Links -->
-    <section class="quick-links">
-        <div class="links-grid">
-            <div class="link-card">
-                <div class="link-icon">
-                    <i class="fas fa-dice"></i>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
                 </div>
-                <a href="games.html">Casino Games</a>
-                <p>Slots, Roulette, Blackjack & more</p>
+                <h3>Instant Withdrawals</h3>
+                <p>Get your winnings instantly with our fast withdrawal system. No delays, just pure convenience.</p>
             </div>
-            
-            <div class="link-card">
-                <div class="link-icon">
-                    <i class="fas fa-futbol"></i>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
                 </div>
-                <a href="bets.html">Sports Betting</a>
-                <p>Football, Basketball, Tennis</p>
+                <h3>24/7 Support</h3>
+                <p>Our dedicated support team is available around the clock to assist you with any questions or concerns.</p>
             </div>
-            
-            <div class="link-card">
-                <div class="link-icon">
-                    <i class="fas fa-gamepad"></i>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="action-grid">
+                <a href="deposit.html" class="action-btn">
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div class="action-text">
+                        <h4>Deposit Funds</h4>
+                        <span>Add money to your account</span>
+                    </div>
+                </a>
+
+                <a href="withdraw.html" class="action-btn">
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17 10H7v2h10v-2zm2-7h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm-5-5H7v2h7v-2z"/>
+                        </svg>
+                    </div>
+                    <div class="action-text">
+                        <h4>Withdraw Winnings</h4>
+                        <span>Cash out your earnings</span>
+                    </div>
+                </a>
+
+                <a href="games.html" class="action-btn">
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z"/>
+                        </svg>
+                    </div>
+                    <div class="action-text">
+                        <h4>Play Games</h4>
+                        <span>Explore our game collection</span>
+                    </div>
+                </a>
+
+                <a href="profile.html" class="action-btn">
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                        </svg>
+                    </div>
+                    <div class="action-text">
+                        <h4>Profile Settings</h4>
+                        <span>Manage your account</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="recent-activity">
+            <h3>Recent Activity</h3>
+            <div class="activity-list" id="activityList">
+                <!-- Activities will be loaded here -->
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-icon deposit">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                            </svg>
+                        </div>
+                        <div class="activity-details">
+                            <h4>Initial Deposit</h4>
+                            <span>Today, 10:30 AM</span>
+                        </div>
+                    </div>
+                    <div class="activity-amount positive">
+                        +$100.00
+                    </div>
                 </div>
-                <a href="games.html">Esports</a>
-                <p>CS:GO, Dota 2, League of Legends</p>
             </div>
-            
-            <div class="link-card">
-                <div class="link-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <a href="dashboard.html">My Dashboard</a>
-                <p>Track bets & transactions</p>
-            </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2024 X-BET. All rights reserved. | Licensed and Regulated</p>
-        <p>Must be 18+ to play. Please gamble responsibly.</p>
-        <div class="admin-link">
-            <a href="admin-login.html" id="adminLink" style="display: none;">
-                <i class="fas fa-cog"></i> Admin Panel
-            </a>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>X-BET</h4>
+                <ul class="footer-links">
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="responsible.html">Responsible Gaming</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Games</h4>
+                <ul class="footer-links">
+                    <li><a href="slots.html">Slots</a></li>
+                    <li><a href="roulette.html">Roulette</a></li>
+                    <li><a href="blackjack.html">Blackjack</a></li>
+                    <li><a href="poker.html">Poker</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="support.html">Live Support</a></li>
+                    <li><a href="guides.html">Game Guides</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul class="footer-links">
+                    <li><a href="licensing.html">Licensing</a></li>
+                    <li><a href="compliance.html">Compliance</a></li>
+                    <li><a href="security.html">Security</a></li>
+                    <li><a href="complaints.html">Complaints</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>© 2024 X-BET Gaming Platform. All rights reserved. Must be 18+ to participate.</p>
         </div>
     </footer>
 
     <script>
-        // Update user avatar with first letter
-        document.addEventListener('DOMContentLoaded', function() {
-            const userAvatar = document.getElementById('userAvatar');
-            if (userAvatar) {
-                firebaseAuth.onAuthStateChanged(user => {
-                    if (user && user.email) {
-                        userAvatar.textContent = user.email[0].toUpperCase();
+        // Security and User Management
+        class UserManager {
+            constructor() {
+                this.userData = null;
+                this.session = null;
+            }
+
+            async loadUserData() {
+                try {
+                    // Check for session
+                    const sessionData = sessionStorage.getItem('xbet_session');
+                    if (!sessionData) {
+                        this.redirectToLogin();
+                        return;
+                    }
+
+                    // Decrypt session
+                    const session = JSON.parse(atob(sessionData));
+                    this.session = session;
+
+                    // Get user data from localStorage or initialize
+                    let userData = localStorage.getItem('userData_' + session.email);
+                    
+                    if (!userData) {
+                        // Create new user data if not exists
+                        userData = {
+                            balance: 0.00,
+                            transactions: [],
+                            bets: [],
+                            lastLogin: new Date().toISOString(),
+                            isAdmin: false
+                        };
+                        localStorage.setItem('userData_' + session.email, JSON.stringify(userData));
+                    }
+
+                    this.userData = JSON.parse(userData);
+                    this.updateBalanceDisplay();
+                    this.loadRecentActivity();
+                } catch (error) {
+                    console.error('Error loading user data:', error);
+                    this.redirectToLogin();
+                }
+            }
+
+            updateBalanceDisplay() {
+                if (this.userData && this.userData.balance !== undefined) {
+                    const balanceElement = document.getElementById('userBalance');
+                    if (balanceElement) {
+                        balanceElement.textContent = `$${this.userData.balance.toFixed(2)}`;
+                    }
+                }
+            }
+
+            loadRecentActivity() {
+                const activityList = document.getElementById('activityList');
+                if (!activityList || !this.userData || !this.userData.transactions) return;
+
+                // Clear existing activities
+                activityList.innerHTML = '';
+
+                // Show recent transactions (last 5)
+                const recentTransactions = this.userData.transactions.slice(-5).reverse();
+                
+                if (recentTransactions.length === 0) {
+                    // Show empty state
+                    activityList.innerHTML = `
+                        <div class="activity-item">
+                            <div class="activity-info">
+                                <div class="activity-icon deposit">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                                    </svg>
+                                </div>
+                                <div class="activity-details">
+                                    <h4>No Recent Activity</h4>
+                                    <span>Start playing to see your activity here</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                recentTransactions.forEach(transaction => {
+                    const isDeposit = transaction.type === 'deposit' || transaction.amount > 0;
+                    const iconType = isDeposit ? 'deposit' : 'withdraw';
+                    const amountClass = isDeposit ? 'positive' : 'negative';
+                    const amountPrefix = isDeposit ? '+' : '-';
+                    
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    activityItem.innerHTML = `
+                        <div class="activity-info">
+                            <div class="activity-icon ${iconType}">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    ${isDeposit ? 
+                                        '<path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>' :
+                                        '<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>'
+                                    }
+                                </svg>
+                            </div>
+                            <div class="activity-details">
+                                <h4>${transaction.type || 'Transaction'}</h4>
+                                <span>${new Date(transaction.date || Date.now()).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        <div class="activity-amount ${amountClass}">
+                            ${amountPrefix}$${Math.abs(transaction.amount).toFixed(2)}
+                        </div>
+                    `;
+                    
+                    activityList.appendChild(activityItem);
+                });
+            }
+
+            redirectToLogin() {
+                // Clear invalid session
+                sessionStorage.removeItem('xbet_session');
+                localStorage.removeItem('session_expiry');
+                
+                // Redirect to login
+                window.location.href = 'login.html';
+            }
+
+            logout() {
+                // Clear all session data
+                sessionStorage.removeItem('xbet_session');
+                localStorage.removeItem('session_expiry');
+                
+                // Redirect to login
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Mobile Menu Toggle
+        function initMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navLinks = document.getElementById('navLinks');
+
+            if (mobileMenuBtn && navLinks) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (event) => {
+                    if (!navLinks.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                        navLinks.classList.remove('active');
                     }
                 });
             }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize mobile menu
+            initMobileMenu();
+
+            // Initialize user manager
+            const userManager = new UserManager();
+            
+            // Load user data
+            await userManager.loadUserData();
+
+            // Update balance periodically (simulate real-time updates)
+            setInterval(() => {
+                userManager.updateBalanceDisplay();
+            }, 30000); // Every 30 seconds
+
+            // Add logout functionality
+            const logoutLinks = document.querySelectorAll('a[href="login.html"]');
+            logoutLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    userManager.logout();
+                });
+            });
+
+            // Add deposit/withdraw button handlers
+            const depositBtn = document.querySelector('a[href="deposit.html"]');
+            const withdrawBtn = document.querySelector('a[href="withdraw.html"]');
+
+            if (depositBtn) {
+                depositBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // In production, this would open deposit modal or page
+                    alert('Deposit functionality will be implemented in the next update');
+                });
+            }
+
+            if (withdrawBtn) {
+                withdrawBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // In production, this would open withdraw modal or page
+                    alert('Withdraw functionality will be implemented in the next update');
+                });
+            }
         });
+
+        // Security: Prevent unauthorized access
+        window.addEventListener('beforeunload', () => {
+            // Clear sensitive data from memory
+            document.getElementById('password')?.value = '';
+        });
+
+        // Security: Auto-logout on inactivity
+        let inactivityTimer;
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                const userManager = new UserManager();
+                userManager.logout();
+            }, 30 * 60 * 1000); // 30 minutes
+        }
+
+        // Reset timer on user activity
+        ['mousemove', 'keydown', 'click', 'scroll'].forEach(event => {
+            window.addEventListener(event, resetInactivityTimer);
+        });
+
+        // Start the inactivity timer
+        resetInactivityTimer();
     </script>
 </body>
 </html>
