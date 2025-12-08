@@ -4,120 +4,268 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-BET - Sign Up</title>
-    <!-- Use the same CSS from index.html -->
     <style>
-        /* [COPY THE SAME CSS FROM INDEX.HTML] */
+        :root {
+            --primary: #1a2a6c;
+            --secondary: #b21f1f;
+            --accent: #f7b500;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark), #1e293b);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* HEADER */
+        .header {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0 15px;
+        }
+        
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .nav-links a.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* SIGNUP FORM */
+        .signup-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .signup-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .signup-title {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            text-align: center;
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .signup-card {
+                padding: 20px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- HEADER -->
     <header class="header">
-        <div class="nav-container">
-            <nav class="nav">
-                <div class="logo">
-                    <h1>X<span>-BET</span></h1>
-                </div>
-
-                <div class="nav-links" id="navLinks">
-                    <a href="index.html">Home</a>
-                    <a href="games.html">Games</a>
-                    <a href="dashboard.html">Dashboard</a>
-                    <a href="bets.html">Bets</a>
-                    <a href="bits.html">Bits</a>
-                    <a href="aboutus.html">About</a>
-                    <a href="contact.html">Contact</a>
-                    
-                    <div id="guestActions">
-                        <a href="login.html" class="btn-secondary">Login</a>
-                        <a href="signup.html" class="btn-primary active">Sign Up</a>
-                    </div>
-                </div>
-
-                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-            </nav>
-        </div>
+        <nav class="nav">
+            <div class="logo">
+                <h1>X<span>-BET</span></h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="games.html">Games</a>
+                <a href="login.html" class="btn-secondary">Login</a>
+            </div>
+        </nav>
     </header>
 
-    <main class="main-container">
-        <div style="max-width: 400px; margin: 60px auto;">
-            <div class="feature-card">
-                <h2 style="text-align: center; margin-bottom: 20px;">Create Account</h2>
+    <!-- SIGNUP FORM -->
+    <div class="signup-container">
+        <div class="signup-card">
+            <h2 class="signup-title">Create Account</h2>
+            
+            <div id="message" class="message"></div>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Choose a username" required>
+                </div>
                 
-                <div id="message" class="message" style="display: none; margin-bottom: 20px;"></div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
                 
-                <form id="signupForm">
-                    <div class="form-group" style="margin-bottom: 20px; text-align: left;">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" placeholder="Choose a username" required
-                               style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--card-border); border-radius: 10px; color: white;">
-                    </div>
-                    
-                    <div class="form-group" style="margin-bottom: 20px; text-align: left;">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" placeholder="Enter your email" required
-                               style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--card-border); border-radius: 10px; color: white;">
-                    </div>
-                    
-                    <div class="form-group" style="margin-bottom: 20px; text-align: left;">
-                        <label for="password">Password (min 6 characters)</label>
-                        <input type="password" id="password" placeholder="Create a password" minlength="6" required
-                               style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--card-border); border-radius: 10px; color: white;">
-                    </div>
-                    
-                    <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 16px; margin-bottom: 15px;">
-                        Create Account
-                    </button>
-                    
-                    <div style="text-align: center; margin-top: 20px;">
-                        <a href="login.html" style="color: var(--accent); text-decoration: none;">
-                            Already have an account? Login here
-                        </a>
-                    </div>
-                </form>
-            </div>
+                <div class="form-group">
+                    <label for="password">Password (min 6 characters)</label>
+                    <input type="password" id="password" placeholder="Create a password" minlength="6" required>
+                </div>
+                
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 16px;">
+                    Create Account
+                </button>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="login.html" style="color: var(--accent); text-decoration: none;">
+                        Already have an account? Login here
+                    </a>
+                </div>
+            </form>
         </div>
-    </main>
+    </div>
 
+    <!-- FOOTER -->
     <footer class="footer">
-        <div class="main-container">
-            <p style="text-align: center; color: var(--gray); font-size: 14px;">
-                © 2024 X-BET Gaming Platform. All rights reserved.
-            </p>
-        </div>
+        <p>© 2024 X-BET Gaming Platform. All rights reserved.</p>
     </footer>
 
     <script>
+        // SIMPLE SIGNUP SYSTEM
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile Menu
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const navLinks = document.getElementById('navLinks');
-            
-            if (mobileMenuBtn && navLinks) {
-                mobileMenuBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    navLinks.classList.toggle('active');
-                });
-                
-                document.addEventListener('click', (e) => {
-                    if (!navLinks.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                        navLinks.classList.remove('active');
-                    }
-                });
+            // Check if already logged in
+            const session = sessionStorage.getItem('xbet_session');
+            if (session) {
+                window.location.href = 'index.html';
+                return;
             }
             
-            // Signup Form
+            // Signup form handler
             const signupForm = document.getElementById('signupForm');
             const messageDiv = document.getElementById('message');
             
             function showMessage(text, type) {
                 messageDiv.textContent = text;
-                messageDiv.className = `message ${type}-message`;
+                messageDiv.className = `message ${type}`;
                 messageDiv.style.display = 'block';
             }
             
             function generateTransactionCode(username) {
                 const prefix = username.substring(0, 3).toUpperCase();
-                const timestamp = Date.now().toString(36).toUpperCase().substr(-8);
-                const random = Math.random().toString(36).substr(2, 8).toUpperCase();
+                const timestamp = Date.now().toString(36).toUpperCase().slice(-8);
+                const random = Math.random().toString(36).slice(2, 10).toUpperCase();
                 return `XBT-${prefix}-${timestamp}-${random}`;
             }
             
@@ -128,6 +276,7 @@
                 const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value;
                 
+                // Validation
                 if (!username || !email || !password) {
                     showMessage('Please fill all fields', 'error');
                     return;
@@ -138,7 +287,7 @@
                     return;
                 }
                 
-                // Check if user already exists
+                // Check if user exists
                 const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
                 
                 if (registeredUsers[username]) {
@@ -146,7 +295,7 @@
                     return;
                 }
                 
-                // Check if email already registered
+                // Check email
                 for (const existingEmail of Object.values(registeredUsers)) {
                     if (existingEmail === email) {
                         showMessage('Email already registered', 'error');
@@ -169,7 +318,7 @@
                     transactions: []
                 };
                 
-                // Save user
+                // Save to localStorage
                 registeredUsers[username] = email;
                 localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
                 localStorage.setItem('userData_' + username, JSON.stringify(userData));
@@ -186,12 +335,17 @@
                 sessionStorage.setItem('xbet_session', btoa(JSON.stringify(sessionData)));
                 localStorage.setItem('currentUser', username);
                 
-                showMessage('Account created successfully! Redirecting...', 'success');
+                // Show success
+                showMessage('✅ Account created successfully! Redirecting...', 'success');
                 
+                // Redirect to home
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1500);
             });
+            
+            // Auto-focus username field
+            document.getElementById('username').focus();
         });
     </script>
 </body>
