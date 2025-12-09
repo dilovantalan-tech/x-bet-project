@@ -289,7 +289,7 @@
     </footer>
 
     <script>
-        // ENHANCED SIGNUP SYSTEM - COMPATIBLE WITH ADMIN PANEL
+        // FIXED SIGNUP SYSTEM - PROPERLY SAVES FOR ADMIN PANEL
         document.addEventListener('DOMContentLoaded', function() {
             // Check if already logged in
             const session = sessionStorage.getItem('xbet_session');
@@ -350,7 +350,7 @@
                 return usernameRegex.test(username);
             }
             
-            // Save user data in COMPATIBLE format with admin panel
+            // 🔥 FIXED: Save user data in ADMIN-COMPATIBLE format
             function saveUserToDatabase(username, email, password, transactionCode) {
                 try {
                     // 1. Save to registeredUsers (for login system)
@@ -376,9 +376,13 @@
                         lost: 0
                     };
                     
+                    // Save as userData_username (MAIN FORMAT for admin panel)
                     localStorage.setItem('userData_' + username, JSON.stringify(userData));
                     
-                    // 3. Create initial activity log
+                    // 3. 🔥 CRITICAL FIX: Also save to admin users list
+                    updateAdminUserList(username, email, transactionCode);
+                    
+                    // 4. Create initial activity log
                     const initialActivity = {
                         id: 'TXN-' + Date.now(),
                         type: 'account_created',
@@ -393,8 +397,9 @@
                     userData.activities.push(initialActivity);
                     localStorage.setItem('userData_' + username, JSON.stringify(userData));
                     
-                    // 4. Update admin panel user list (if admin exists)
-                    updateAdminUserList(username, email, transactionCode);
+                    console.log('✅ User saved successfully:', username);
+                    console.log('Transaction Code:', transactionCode);
+                    console.log('User data key:', 'userData_' + username);
                     
                     return true;
                 } catch (error) {
@@ -403,18 +408,53 @@
                 }
             }
             
-            // Update admin panel user list
+            // 🔥 FIXED: Update admin panel user list PROPERLY
             function updateAdminUserList(username, email, transactionCode) {
                 try {
-                    // Check if admin data exists
-                    const adminKeys = Object.keys(localStorage).filter(key => 
-                        key.startsWith('admin_data_')
-                    );
+                    console.log('Updating admin list for user:', username);
                     
-                    if (adminKeys.length > 0) {
-                        adminKeys.forEach(adminKey => {
+                    // Get ALL admin keys (admin_data_adminname)
+                    const adminKeys = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith('admin_data_')) {
+                            adminKeys.push(key);
+                        }
+                    }
+                    
+                    console.log('Found admin keys:', adminKeys);
+                    
+                    if (adminKeys.length === 0) {
+                        // If no admin exists yet, create a default admin list
+                        console.log('No admin found, creating default admin list...');
+                        const defaultAdminData = {
+                            username: 'admin_master',
+                            users: [], // Will be populated later
+                            balance: 14050000.00,
+                            transactions: []
+                        };
+                        
+                        // Add new user to default admin
+                        defaultAdminData.users.push({
+                            username: username,
+                            email: email,
+                            transactionCode: transactionCode,
+                            status: 'active',
+                            registeredAt: new Date().toISOString(),
+                            balance: 0
+                        });
+                        
+                        localStorage.setItem('admin_data_admin_master', JSON.stringify(defaultAdminData));
+                        console.log('Created default admin with user:', username);
+                        return;
+                    }
+                    
+                    // Update each admin's user list
+                    adminKeys.forEach(adminKey => {
+                        try {
                             let adminData = JSON.parse(localStorage.getItem(adminKey) || '{}');
                             
+                            // Initialize users array if not exists
                             if (!adminData.users) {
                                 adminData.users = [];
                             }
@@ -425,6 +465,7 @@
                             );
                             
                             if (!userExists) {
+                                // Add user to admin's list
                                 adminData.users.push({
                                     username: username,
                                     email: email,
@@ -435,11 +476,44 @@
                                 });
                                 
                                 localStorage.setItem(adminKey, JSON.stringify(adminData));
+                                console.log('✅ Added user to admin:', adminKey, username);
+                            } else {
+                                console.log('User already in admin list:', username);
                             }
-                        });
-                    }
+                        } catch (error) {
+                            console.error('Error updating admin:', adminKey, error);
+                        }
+                    });
+                    
                 } catch (error) {
                     console.error('Error updating admin user list:', error);
+                }
+            }
+            
+            // 🔥 FIXED: Also save to centralized user list
+            function saveToGlobalUserList(username, email, transactionCode) {
+                try {
+                    // Get or create global users list
+                    let allUsersList = JSON.parse(localStorage.getItem('all_xbet_users') || '[]');
+                    
+                    // Check if user exists
+                    const exists = allUsersList.some(user => user.username === username);
+                    
+                    if (!exists) {
+                        allUsersList.push({
+                            username: username,
+                            email: email,
+                            transactionCode: transactionCode,
+                            balance: 0,
+                            status: 'active',
+                            registeredAt: new Date().toISOString()
+                        });
+                        
+                        localStorage.setItem('all_xbet_users', JSON.stringify(allUsersList));
+                        console.log('✅ Saved to global user list:', username);
+                    }
+                } catch (error) {
+                    console.error('Error saving to global list:', error);
                 }
             }
             
@@ -518,6 +592,9 @@
                 // Save user to database
                 const saveSuccess = saveUserToDatabase(username, email, password, transactionCode);
                 
+                // Also save to global list
+                saveToGlobalUserList(username, email, transactionCode);
+                
                 if (!saveSuccess) {
                     showMessage('❌ Error creating account. Please try again.', 'error');
                     return;
@@ -536,6 +613,13 @@
                     <small>Save this code! You'll need it to send/receive money.</small><br>
                     <small>Redirecting to dashboard...</small>
                 `, 'success');
+                
+                // Debug: Show what was saved
+                console.log('=== SIGNUP COMPLETE ===');
+                console.log('Username:', username);
+                console.log('Transaction Code:', transactionCode);
+                console.log('Check localStorage for: userData_' + username);
+                console.log('Check localStorage for: all_xbet_users');
                 
                 // Disable form during redirect
                 signupForm.querySelectorAll('input, button').forEach(element => {
@@ -600,6 +684,7 @@
                     const testCode = generateTransactionCode(testUsername);
                     
                     saveUserToDatabase(testUsername, testEmail, 'demo123', testCode);
+                    saveToGlobalUserList(testUsername, testEmail, testCode);
                 }
             }
             
@@ -620,6 +705,32 @@
             } else {
                 document.getElementById('username').style.borderColor = 'var(--success)';
             }
+        }
+        
+        // Debug function to check localStorage
+        window.debugStorage = function() {
+            console.log('=== LOCALSTORAGE DEBUG ===');
+            console.log('Total items:', localStorage.length);
+            
+            let users = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                console.log(`${i}: ${key}`);
+                
+                if (key.startsWith('userData_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data.username) {
+                            users.push(data.username);
+                        }
+                    } catch (e) {}
+                }
+            }
+            
+            console.log('Users in userData_* format:', users);
+            console.log('all_xbet_users:', JSON.parse(localStorage.getItem('all_xbet_users') || '[]'));
+            
+            alert(`Debug Info:\n\nTotal users found: ${users.length}\nUsers: ${users.join(', ')}`);
         }
     </script>
 </body>
