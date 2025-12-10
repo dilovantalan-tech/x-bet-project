@@ -4,779 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-BET - Admin Control Panel</title>
+    <!-- Include Sync System -->
+    <script src="sync.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        :root {
-            --admin-primary: #3b82f6;
-            --admin-secondary: #1d4ed8;
-            --admin-danger: #ef4444;
-            --admin-success: #10b981;
-            --admin-warning: #f59e0b;
-            --admin-dark: #0f172a;
-            --admin-light: #f8fafc;
-            --admin-gray: #64748b;
-        }
-
-        body {
-            background: linear-gradient(135deg, var(--admin-dark), #1e293b);
-            color: var(--admin-light);
-            min-height: 100vh;
-        }
-
-        /* Admin Header */
-        .admin-header {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem 2rem;
-            border-bottom: 3px solid var(--admin-primary);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .admin-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .admin-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .admin-logo h1 {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--admin-primary);
-        }
-
-        .admin-logo span {
-            color: var(--admin-success);
-        }
-
-        .admin-badge {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            border: 1px solid rgba(239, 68, 68, 0.4);
-        }
-
-        .admin-user-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .admin-balance {
-            background: rgba(16, 185, 129, 0.15);
-            padding: 10px 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .balance-label {
-            font-size: 11px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .balance-amount {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #10b981;
-            margin-top: 4px;
-        }
-
-        .admin-logout-btn {
-            background: var(--admin-danger);
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .admin-logout-btn:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-        }
-
-        /* Main Container */
-        .admin-container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Admin Stats Grid */
-        .admin-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .admin-stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .admin-stat-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--admin-primary);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .stat-title {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .stat-value {
-            font-size: 2.25rem;
-            font-weight: 800;
-            margin: 0.5rem 0;
-        }
-
-        .stat-positive { color: var(--admin-success); }
-        .stat-negative { color: var(--admin-danger); }
-        .stat-primary { color: var(--admin-primary); }
-
-        /* Admin Actions */
-        .admin-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .admin-action-btn {
-            background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
-            color: white;
-            border: none;
-            padding: 1.5rem;
-            border-radius: 14px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-weight: 600;
-        }
-
-        .admin-action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
-        }
-
-        .admin-action-btn.danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-        }
-
-        .admin-action-btn.success {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-
-        .admin-action-btn.warning {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-
-        .admin-action-btn.sync {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-        }
-
-        /* Admin Sections */
-        .admin-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--admin-light);
-        }
-
-        .search-box {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.75rem 1rem;
-            border-radius: 10px;
-            color: white;
-            width: 300px;
-            font-size: 0.9rem;
-        }
-
-        .search-box:focus {
-            outline: none;
-            border-color: var(--admin-primary);
-        }
-
-        /* Transfer Section */
-        .transfer-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 1rem;
-            align-items: end;
-            margin-bottom: 2rem;
-        }
-
-        .admin-form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .admin-form-group label {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .admin-form-group input, .admin-form-group select {
-            padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-        }
-
-        .admin-form-group input:focus, .admin-form-group select:focus {
-            outline: none;
-            border-color: var(--admin-primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        .admin-transfer-btn {
-            background: var(--admin-success);
-            color: white;
-            border: none;
-            padding: 1rem 2.5rem;
-            border-radius: 10px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-weight: 600;
-            height: fit-content;
-        }
-
-        .admin-transfer-btn:hover {
-            background: #059669;
-        }
-
-        /* Users Table */
-        .users-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        .users-table th {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: #94a3b8;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .users-table td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .users-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .user-action-btn {
-            background: rgba(59, 130, 246, 0.2);
-            color: var(--admin-primary);
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            padding: 6px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-            margin: 2px;
-        }
-
-        .user-action-btn:hover {
-            background: rgba(59, 130, 246, 0.3);
-        }
-
-        .user-action-btn.danger {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--admin-danger);
-            border-color: rgba(239, 68, 68, 0.4);
-        }
-
-        /* Transactions Log */
-        .transactions-log {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .transaction-item {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 1rem;
-            margin: 0.5rem 0;
-            border-radius: 10px;
-            border-left: 4px solid;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .transaction-deposit { border-left-color: var(--admin-success); }
-        .transaction-withdrawal { border-left-color: var(--admin-danger); }
-        .transaction-transfer { border-left-color: var(--admin-primary); }
-        .transaction-game { border-left-color: var(--admin-warning); }
-        .transaction-admin { border-left-color: #8b5cf6; }
-
-        .transaction-code {
-            background: rgba(59, 130, 246, 0.1);
-            padding: 0.25rem 0.75rem;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 0.85rem;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-
-        /* Modal */
-        .admin-modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-        }
-
-        .admin-modal-content {
-            background: rgba(15, 23, 42, 0.95);
-            margin: 5% auto;
-            padding: 2.5rem;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 600px;
-            border: 2px solid var(--admin-primary);
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            right: 1.5rem;
-            top: 1.5rem;
-            color: #94a3b8;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .modal-close:hover {
-            color: white;
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .admin-container {
-                padding: 1.5rem;
-            }
-            
-            .transfer-controls {
-                grid-template-columns: 1fr;
-            }
-            
-            .search-box {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .admin-nav {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .admin-user-info {
-                flex-direction: column;
-                width: 100%;
-            }
-            
-            .admin-balance {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .users-table {
-                display: block;
-                overflow-x: auto;
-            }
-            
-            .admin-actions {
-                grid-template-columns: 1fr;
-            }
-            
-            .stat-value {
-                font-size: 1.75rem;
-            }
-        }
+        /* [Keep all your existing CSS styles] */
+        /* ... existing CSS ... */
     </style>
 </head>
 <body>
-    <!-- Admin Header -->
-    <header class="admin-header">
-        <nav class="admin-nav">
-            <div class="admin-logo">
-                <h1>X<span>-BET</span> ADMIN</h1>
-                <div class="admin-badge">CONTROL PANEL</div>
-            </div>
-            
-            <div class="admin-user-info">
-                <div class="admin-balance">
-                    <div class="balance-label">Admin Balance</div>
-                    <div class="balance-amount" id="adminBalance">$14,050,000.00</div>
-                </div>
-                <div style="color: #94a3b8;">Logged in as: <strong id="adminUsername">admin_master</strong></div>
-                <button class="admin-logout-btn" onclick="adminLogout()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-                    </svg>
-                    Logout
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Main Container -->
-    <main class="admin-container">
-        <!-- Admin Stats -->
-        <div class="admin-stats-grid">
-            <div class="admin-stat-card">
-                <div class="stat-header">
-                    <div class="stat-title">Total Admin Balance</div>
-                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2);">💰</div>
-                </div>
-                <div class="stat-value stat-positive" id="totalBalance">$14,050,000.00</div>
-                <div style="color: #94a3b8; font-size: 0.9rem;">Available funds for management</div>
-            </div>
-
-            <div class="admin-stat-card">
-                <div class="stat-header">
-                    <div class="stat-title">Total Users</div>
-                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2);">👥</div>
-                </div>
-                <div class="stat-value stat-primary" id="totalUsers">0</div>
-                <div style="color: #94a3b8; font-size: 0.9rem;">Registered platform users</div>
-            </div>
-
-            <div class="admin-stat-card">
-                <div class="stat-header">
-                    <div class="stat-title">Total Transactions</div>
-                    <div class="stat-icon" style="background: rgba(139, 92, 246, 0.2);">📊</div>
-                </div>
-                <div class="stat-value stat-primary" id="totalTransactions">0</div>
-                <div style="color: #94a3b8; font-size: 0.9rem;">All platform transactions</div>
-            </div>
-
-            <div class="admin-stat-card">
-                <div class="stat-header">
-                    <div class="stat-title">Total Game Balance</div>
-                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.2);">🎮</div>
-                </div>
-                <div class="stat-value stat-warning" id="totalGameBalance">$0.00</div>
-                <div style="color: #94a3b8; font-size: 0.9rem;">Users' game funds</div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="admin-actions">
-            <button class="admin-action-btn" onclick="openDepositModal()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-                Deposit to User
-            </button>
-            <button class="admin-action-btn" onclick="openWithdrawModal()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                </svg>
-                Process Withdrawal
-            </button>
-            <button class="admin-action-btn success" onclick="openCreateUserModal()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                </svg>
-                Create New User
-            </button>
-            <button class="admin-action-btn sync" onclick="syncAllUsers()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
-                </svg>
-                Sync All Users
-            </button>
-            <button class="admin-action-btn danger" onclick="openResetModal()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-                </svg>
-                System Reset
-            </button>
-        </div>
-
-        <!-- Transfer Section -->
-        <div class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">💸 Admin Fund Transfer</h2>
-            </div>
-            
-            <div class="transfer-controls">
-                <div class="admin-form-group">
-                    <label for="userTransactionCode">User Transaction Code</label>
-                    <input type="text" id="userTransactionCode" placeholder="Enter user's transaction code" list="userCodes">
-                    <datalist id="userCodes">
-                        <!-- User codes will be populated here -->
-                    </datalist>
-                </div>
-                
-                <div class="admin-form-group">
-                    <label for="transferAmount">Amount ($)</label>
-                    <input type="number" id="transferAmount" min="0.01" step="0.01" placeholder="0.00">
-                </div>
-                
-                <div class="admin-form-group">
-                    <label for="transferType">Transaction Type</label>
-                    <select id="transferType">
-                        <option value="deposit">Deposit to User</option>
-                        <option value="withdrawal">Withdrawal from User</option>
-                        <option value="game_credit">Game Credit</option>
-                        <option value="game_debit">Game Debit</option>
-                    </select>
-                </div>
-                
-                <button class="admin-transfer-btn" onclick="processAdminTransfer()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                    </svg>
-                    Execute Transfer
-                </button>
-            </div>
-            
-            <div style="margin-top: 1rem; color: #94a3b8; font-size: 0.9rem;">
-                💡 Admin Privilege: Manage user balances for games, deposits, and withdrawals.
-            </div>
-        </div>
-
-        <!-- Users Management -->
-        <div class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">👥 Users Management <span id="userCountBadge" style="background: var(--admin-primary); color: white; padding: 4px 8px; border-radius: 12px; font-size: 14px; margin-left: 10px;">0 users</span></h2>
-                <input type="text" class="search-box" placeholder="Search users..." oninput="searchUsers(this.value)">
-            </div>
-            
-            <div style="overflow-x: auto;">
-                <table class="users-table">
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Balance</th>
-                            <th>Game Balance</th>
-                            <th>Transaction Code</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody">
-                        <tr>
-                            <td colspan="7" style="text-align: center; padding: 3rem; color: #94a3b8;">
-                                Loading users data...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Transactions Log -->
-        <div class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">📋 All Transactions Log</h2>
-                <select class="search-box" onchange="filterTransactions(this.value)">
-                    <option value="all">All Transactions</option>
-                    <option value="deposit">Deposits</option>
-                    <option value="withdrawal">Withdrawals</option>
-                    <option value="game">Game Transactions</option>
-                    <option value="transfer">Transfers</option>
-                </select>
-            </div>
-            
-            <div class="transactions-log" id="transactionsLog">
-                <div style="text-align: center; padding: 3rem; color: #94a3b8;">
-                    Loading transactions...
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Deposit Modal -->
-    <div id="depositModal" class="admin-modal">
-        <div class="admin-modal-content">
-            <span class="modal-close" onclick="closeDepositModal()">&times;</span>
-            <h2 style="margin-bottom: 1.5rem; color: var(--admin-success);">💰 Deposit to User</h2>
-            
-            <div class="admin-form-group">
-                <label>User Transaction Code</label>
-                <input type="text" id="depositUserCode" placeholder="Enter user transaction code">
-            </div>
-            
-            <div class="admin-form-group">
-                <label>Amount ($)</label>
-                <input type="number" id="depositAmount" min="0.01" step="0.01" placeholder="0.00">
-            </div>
-            
-            <div class="admin-form-group">
-                <label>Description</label>
-                <input type="text" id="depositDescription" placeholder="Reason for deposit">
-            </div>
-            
-            <button class="admin-transfer-btn" onclick="processUserDeposit()" style="width: 100%; margin-top: 1.5rem;">
-                Deposit Funds
-            </button>
-        </div>
-    </div>
-
-    <!-- Withdrawal Modal -->
-    <div id="withdrawModal" class="admin-modal">
-        <div class="admin-modal-content">
-            <span class="modal-close" onclick="closeWithdrawModal()">&times;</span>
-            <h2 style="margin-bottom: 1.5rem; color: var(--admin-danger);">💰 Process Withdrawal</h2>
-            
-            <div style="background: rgba(239, 68, 68, 0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
-                <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Pending Withdrawals</h4>
-                <div id="pendingWithdrawalsList">
-                    <!-- Pending withdrawals will be loaded here -->
-                </div>
-            </div>
-            
-            <div class="admin-form-group">
-                <label>Withdrawal Transaction Code</label>
-                <input type="text" id="withdrawalCode" placeholder="Enter withdrawal transaction code">
-            </div>
-            
-            <div class="admin-form-group">
-                <label>Status Update</label>
-                <select id="withdrawalStatus">
-                    <option value="completed">✅ Complete</option>
-                    <option value="rejected">❌ Reject</option>
-                    <option value="processing">⏳ Processing</option>
-                </select>
-            </div>
-            
-            <button class="admin-transfer-btn" onclick="processWithdrawalStatus()" style="width: 100%; margin-top: 1.5rem; background: var(--admin-danger);">
-                Update Status
-            </button>
-        </div>
-    </div>
-
-    <!-- Create User Modal -->
-    <div id="createUserModal" class="admin-modal">
-        <div class="admin-modal-content">
-            <span class="modal-close" onclick="closeCreateUserModal()">&times;</span>
-            <h2 style="margin-bottom: 1.5rem; color: var(--admin-success);">👤 Create New User</h2>
-            
-            <div class="admin-form-group">
-                <label>Username</label>
-                <input type="text" id="newUsername" placeholder="Enter username">
-            </div>
-            
-            <div class="admin-form-group">
-                <label>Email</label>
-                <input type="email" id="newUserEmail" placeholder="Enter email">
-            </div>
-            
-            <div class="admin-form-group">
-                <label>Initial Balance ($)</label>
-                <input type="number" id="initialBalance" min="0" step="0.01" placeholder="0.00">
-            </div>
-            
-            <div class="admin-form-group">
-                <label>Initial Game Balance ($)</label>
-                <input type="number" id="initialGameBalance" min="0" step="0.01" placeholder="0.00">
-            </div>
-            
-            <div class="admin-form-group">
-                <label>Password</label>
-                <input type="password" id="newUserPassword" placeholder="Enter password">
-            </div>
-            
-            <button class="admin-transfer-btn" onclick="createNewUser()" style="width: 100%; margin-top: 1.5rem;">
-                Create User Account
-            </button>
-        </div>
-    </div>
+    <!-- [Keep all your existing HTML structure] -->
+    <!-- ... existing HTML ... -->
 
     <script>
-        // 🔥 ADMIN PANEL SYSTEM - FULLY SYNCHRONIZED
+        // 🔥 UPDATED ADMIN PANEL - Uses Universal Sync
         class AdminPanel {
             constructor() {
                 this.currentAdmin = null;
@@ -784,14 +24,14 @@
                 this.allUsers = [];
                 this.allTransactions = [];
                 this.adminBalance = 14050000.00;
-                this.syncInterval = null;
+                this.syncCheckInterval = null;
             }
 
             init() {
-                console.log("=== ADMIN PANEL INITIALIZED ===");
+                console.log("=== ADMIN PANEL (Universal Sync) ===");
                 this.checkAdminAuth();
                 this.loadAdminData();
-                this.initializeCrossBrowserSync();
+                this.initializeSyncSystem();
                 this.loadAllUsers();
                 this.loadAllTransactions();
                 this.updateDisplay();
@@ -829,103 +69,96 @@
                 
                 this.adminBalance = this.adminData.balance;
             }
-
-            // 🔥 CROSS-BROWSER SYNC INITIALIZATION
-            initializeCrossBrowserSync() {
-                console.log("Initializing cross-browser sync for admin...");
-                
-                // Listen for user registrations from other browsers
-                window.addEventListener('storage', (event) => {
-                    if (event.key && event.key.startsWith('XBET_SYNC_')) {
-                        try {
-                            const syncData = JSON.parse(event.newValue);
-                            if (syncData && syncData.action === 'user_registered') {
-                                console.log('🔄 Received user registration from other browser:', syncData.username);
-                                this.addUserFromSync(syncData.userData);
-                            }
-                        } catch (e) {
-                            console.error('Sync error:', e);
-                        }
-                    }
-                    
-                    // Check for shared users
-                    if (event.key === 'XBET_SHARED_USERS') {
-                        this.loadUsersFromSharedStorage();
-                    }
-                });
-                
-                // Load any shared users on startup
-                this.loadUsersFromSharedStorage();
-                
-                // Setup periodic sync
-                this.syncInterval = setInterval(() => {
-                    this.syncWithOtherBrowsers();
-                }, 10000); // Sync every 10 seconds
-            }
             
-            // 🔥 LOAD USERS FROM SHARED STORAGE
-            loadUsersFromSharedStorage() {
-                try {
-                    const sharedUsers = JSON.parse(localStorage.getItem('XBET_SHARED_USERS') || '[]');
-                    console.log(`Found ${sharedUsers.length} users in shared storage`);
-                    
-                    sharedUsers.forEach(user => {
-                        this.addUserIfNotExists(user);
-                    });
-                    
-                    this.updateUsersTable();
-                } catch (e) {
-                    console.error('Error loading shared users:', e);
+            // 🔥 INITIALIZE SYNC SYSTEM
+            initializeSyncSystem() {
+                console.log('Initializing admin sync system...');
+                
+                if (!window.xbetSync) {
+                    console.error('Sync system not loaded!');
+                    alert('⚠️ Sync system not loaded. Users may not appear.');
+                    return;
                 }
+                
+                // Force immediate sync on startup
+                window.xbetSync.syncNow();
+                
+                // Setup sync check every 3 seconds
+                this.syncCheckInterval = setInterval(() => {
+                    this.checkForNewUsers();
+                }, 3000);
+                
+                // Add sync status display
+                this.addSyncStatusDisplay();
             }
             
-            // 🔥 ADD USER FROM SYNC
-            addUserFromSync(userData) {
-                // Check if user already exists
-                const exists = this.allUsers.find(u => u.username === userData.username);
-                if (!exists) {
-                    this.allUsers.push(userData);
-                    console.log('✅ Added user from sync:', userData.username);
-                    this.updateUsersTable();
+            // 🔥 CHECK FOR NEW USERS FROM SYNC
+            checkForNewUsers() {
+                const oldCount = this.allUsers.length;
+                this.loadAllUsers(); // This now uses sync system
+                
+                if (this.allUsers.length > oldCount) {
+                    console.log(`🆕 New users detected! ${oldCount} → ${this.allUsers.length}`);
                     this.updateDisplay();
+                    
+                    // Show notification
+                    this.showNotification(`New user registered! Total: ${this.allUsers.length}`);
                 }
             }
             
-            // 🔥 ADD USER IF NOT EXISTS
-            addUserIfNotExists(userData) {
-                const exists = this.allUsers.find(u => u.username === userData.username);
-                if (!exists) {
-                    this.allUsers.push(userData);
-                    return true;
-                }
-                return false;
+            // 🔥 ADD SYNC STATUS DISPLAY
+            addSyncStatusDisplay() {
+                setTimeout(() => {
+                    const statsGrid = document.querySelector('.admin-stats-grid');
+                    if (statsGrid && window.xbetSync) {
+                        const status = window.xbetSync.getSyncStatus();
+                        
+                        const syncCard = document.createElement('div');
+                        syncCard.className = 'admin-stat-card';
+                        syncCard.innerHTML = `
+                            <div class="stat-header">
+                                <div class="stat-title">Sync Status</div>
+                                <div class="stat-icon" style="background: rgba(139, 92, 246, 0.2);">🔄</div>
+                            </div>
+                            <div class="stat-value stat-primary" id="syncStatus">Active</div>
+                            <div style="color: #94a3b8; font-size: 0.9rem;">
+                                Browser: ${status.browser}<br>
+                                Users: ${status.universalUsers}
+                            </div>
+                        `;
+                        statsGrid.appendChild(syncCard);
+                    }
+                }, 1000);
             }
             
-            // 🔥 SYNC WITH OTHER BROWSERS
-            syncWithOtherBrowsers() {
-                // Broadcast current user list to shared storage
-                localStorage.setItem('XBET_SHARED_USERS', JSON.stringify(this.allUsers));
-                
-                // Also save to a sync key for real-time updates
-                const syncData = {
-                    action: 'admin_sync',
-                    users: this.allUsers.length,
-                    timestamp: Date.now(),
-                    admin: this.currentAdmin
-                };
-                localStorage.setItem('ADMIN_SYNC_' + Date.now(), JSON.stringify(syncData));
-            }
-
-            // 🔥 LOAD ALL USERS FROM ALL SOURCES
+            // 🔥 LOAD ALL USERS FROM SYNC SYSTEM
             loadAllUsers() {
-                console.log("=== LOADING ALL USERS ===");
-                this.allUsers = [];
+                console.log("Loading users from sync system...");
                 
-                // SOURCE 1: ALL_XBET_USERS (from signup)
-                const allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
-                console.log("From ALL_XBET_USERS:", allXbetUsers.length);
-                allXbetUsers.forEach(user => {
-                    this.addUserIfNotExists({
+                if (window.xbetSync) {
+                    // Get users from universal sync system
+                    const syncedUsers = window.xbetSync.getAllUsers();
+                    
+                    // Convert to admin format
+                    this.allUsers = syncedUsers.map(user => ({
+                        username: user.username,
+                        email: user.email,
+                        balance: user.balance || 0,
+                        gameBalance: user.gameBalance || 0,
+                        transactionCode: user.transactionCode || window.xbetSync.generateTransactionCode(user.username),
+                        status: user.status || 'active',
+                        registeredAt: user.registeredAt || new Date().toISOString(),
+                        lastLogin: user.lastLogin || new Date().toISOString(),
+                        isAdmin: false,
+                        source: user.source || 'universal_sync'
+                    }));
+                    
+                    console.log(`✅ Loaded ${this.allUsers.length} users from sync system`);
+                } else {
+                    // Fallback to local storage
+                    console.warn('Sync system not available, using local storage');
+                    const localUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+                    this.allUsers = localUsers.map(user => ({
                         username: user.username,
                         email: user.email,
                         balance: user.balance || 0,
@@ -933,59 +166,10 @@
                         transactionCode: user.transactionCode,
                         status: user.status || 'active',
                         registeredAt: user.registeredAt || new Date().toISOString(),
-                        isAdmin: false
-                    });
-                });
-                
-                // SOURCE 2: Admin's user list
-                if (this.adminData.users) {
-                    console.log("From admin_data:", this.adminData.users.length);
-                    this.adminData.users.forEach(user => {
-                        this.addUserIfNotExists(user);
-                    });
+                        isAdmin: false,
+                        source: 'local_storage'
+                    }));
                 }
-                
-                // SOURCE 3: Check all userData_* keys
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('userData_')) {
-                        try {
-                            const userData = JSON.parse(localStorage.getItem(key));
-                            if (userData.username && !userData.isAdmin) {
-                                this.addUserIfNotExists({
-                                    username: userData.username,
-                                    email: userData.email,
-                                    balance: userData.balance || 0,
-                                    gameBalance: userData.gameBalance || 0,
-                                    transactionCode: userData.transactionCode,
-                                    status: userData.status || 'active',
-                                    registeredAt: userData.registeredAt || new Date().toISOString(),
-                                    isAdmin: false
-                                });
-                            }
-                        } catch (e) {}
-                    }
-                }
-                
-                // SOURCE 4: Check registeredUsers
-                const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-                console.log("From registeredUsers:", Object.keys(registeredUsers).length);
-                Object.entries(registeredUsers).forEach(([username, email]) => {
-                    if (!username.includes('admin') && !this.allUsers.find(u => u.username === username)) {
-                        this.addUserIfNotExists({
-                            username: username,
-                            email: email,
-                            balance: 0,
-                            gameBalance: 0,
-                            transactionCode: this.generateUserTransactionCode(username),
-                            status: 'active',
-                            registeredAt: new Date().toISOString(),
-                            isAdmin: false
-                        });
-                    }
-                });
-                
-                console.log("TOTAL USERS LOADED:", this.allUsers.length);
                 
                 // Update UI
                 this.updateUsersTable();
@@ -994,15 +178,17 @@
             
             updateUserCodesDatalist() {
                 const datalist = document.getElementById('userCodes');
-                datalist.innerHTML = this.allUsers.map(user => 
-                    `<option value="${user.transactionCode}">${user.username} ($${user.balance.toFixed(2)})</option>`
-                ).join('');
+                if (datalist) {
+                    datalist.innerHTML = this.allUsers.map(user => 
+                        `<option value="${user.transactionCode}">${user.username} (${user.email}) - $${user.balance.toFixed(2)}</option>`
+                    ).join('');
+                }
             }
 
             loadAllTransactions() {
                 this.allTransactions = [];
                 
-                // Load user transactions
+                // Load from all users
                 for (const user of this.allUsers) {
                     const userData = JSON.parse(localStorage.getItem('userData_' + user.username) || '{}');
                     if (userData.activities) {
@@ -1028,21 +214,10 @@
                     });
                 }
                 
-                // Sort by date (newest first)
+                // Sort by date
                 this.allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
                 
                 this.updateTransactionsDisplay();
-            }
-
-            generateUserTransactionCode(username) {
-                const prefix = username.substring(0, 3).toUpperCase();
-                const timestamp = Date.now().toString(36).toUpperCase().substr(-8);
-                const random = Math.random().toString(36).substr(2, 8).toUpperCase();
-                return `XBT-${prefix}-${timestamp}-${random}`;
-            }
-
-            generateTransactionCode() {
-                return 'TXN-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
             }
 
             updateDisplay() {
@@ -1054,28 +229,48 @@
                 document.getElementById('adminBalance').textContent = `$${formattedBalance}`;
                 document.getElementById('totalBalance').textContent = `$${formattedBalance}`;
                 document.getElementById('totalUsers').textContent = this.allUsers.length;
-                document.getElementById('userCountBadge').textContent = `${this.allUsers.length} users`;
                 document.getElementById('totalTransactions').textContent = this.allTransactions.length;
                 
-                // Calculate total game balance
-                const totalGameBalance = this.allUsers.reduce((sum, user) => sum + (user.gameBalance || 0), 0);
-                document.getElementById('totalGameBalance').textContent = `$${totalGameBalance.toFixed(2)}`;
+                // Update user count badge
+                const badge = document.getElementById('userCountBadge');
+                if (badge) {
+                    badge.textContent = `${this.allUsers.length} users`;
+                }
                 
-                const pendingWithdrawals = this.allTransactions
-                    .filter(t => t.type === 'withdrawal' && t.status === 'pending')
-                    .reduce((sum, t) => sum + Math.abs(t.amount || 0), 0);
-                document.getElementById('pendingWithdrawals').textContent = `$${pendingWithdrawals.toFixed(2)}`;
+                // Calculate game balance
+                const totalGameBalance = this.allUsers.reduce((sum, user) => sum + (user.gameBalance || 0), 0);
+                const gameBalanceEl = document.getElementById('totalGameBalance');
+                if (gameBalanceEl) {
+                    gameBalanceEl.textContent = `$${totalGameBalance.toFixed(2)}`;
+                }
+                
+                // Update sync status
+                const syncStatusEl = document.getElementById('syncStatus');
+                if (syncStatusEl && window.xbetSync) {
+                    const status = window.xbetSync.getSyncStatus();
+                    syncStatusEl.textContent = status.syncActive ? 'Active' : 'Inactive';
+                    syncStatusEl.style.color = status.syncActive ? '#10b981' : '#ef4444';
+                }
             }
 
             updateUsersTable() {
                 const tbody = document.getElementById('usersTableBody');
+                if (!tbody) return;
+                
                 tbody.innerHTML = '';
                 
                 if (this.allUsers.length === 0) {
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="7" style="text-align: center; padding: 3rem; color: #94a3b8;">
-                                No users found. Users from signup will appear here automatically.
+                                <div style="margin-bottom: 1rem;">No users found yet.</div>
+                                <div style="font-size: 0.9rem;">
+                                    ⚠️ <strong>Note:</strong> Users from ALL browsers will appear here automatically.<br>
+                                    Make sure sync.js is loaded and working.
+                                </div>
+                                <button onclick="admin.forceSync()" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; margin-top: 1rem; cursor: pointer;">
+                                    🔄 Force Sync Now
+                                </button>
                             </td>
                         </tr>
                     `;
@@ -1085,7 +280,10 @@
                 this.allUsers.forEach(user => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${user.username}</td>
+                        <td>
+                            ${user.username}
+                            ${user.source === 'universal_sync' ? '<span style="font-size: 0.7em; color: #8b5cf6; margin-left: 5px;">🔄</span>' : ''}
+                        </td>
                         <td>${user.email}</td>
                         <td>$${(user.balance || 0).toFixed(2)}</td>
                         <td>$${(user.gameBalance || 0).toFixed(2)}</td>
@@ -1095,7 +293,6 @@
                             <button class="user-action-btn" onclick="admin.viewUser('${user.username}')">View</button>
                             <button class="user-action-btn" onclick="admin.depositToUser('${user.username}')">Deposit</button>
                             <button class="user-action-btn" onclick="admin.withdrawFromUser('${user.username}')">Withdraw</button>
-                            <button class="user-action-btn" onclick="admin.creditGame('${user.username}')" style="background: rgba(245,158,11,0.2); color: #f59e0b; border-color: rgba(245,158,11,0.4);">Game +</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -1104,6 +301,8 @@
 
             updateTransactionsDisplay(filter = 'all') {
                 const container = document.getElementById('transactionsLog');
+                if (!container) return;
+                
                 let transactions = this.allTransactions;
                 
                 if (filter !== 'all') {
@@ -1172,6 +371,7 @@
                     info += `Transaction Code: ${user.transactionCode}\n`;
                     info += `Status: ${user.status}\n`;
                     info += `Registered: ${new Date(user.registeredAt).toLocaleString()}\n`;
+                    info += `Source: ${user.source || 'local'}\n`;
                     info += `Total Transactions: ${activities.length}\n\n`;
                     
                     if (activities.length > 0) {
@@ -1208,110 +408,6 @@
                 }
             }
             
-            creditGame(username) {
-                const user = this.allUsers.find(u => u.username === username);
-                if (user) {
-                    const amount = prompt(`Enter game credit amount for ${username} (Current game balance: $${(user.gameBalance || 0).toFixed(2)}):`, "10");
-                    if (amount && parseFloat(amount) > 0) {
-                        this.processGameTransaction(username, parseFloat(amount), 'game_credit');
-                    }
-                }
-            }
-            
-            processGameTransaction(username, amount, type) {
-                const user = this.allUsers.find(u => u.username === username);
-                if (!user) return;
-                
-                let userData = JSON.parse(localStorage.getItem('userData_' + username) || '{}');
-                if (!userData.activities) userData.activities = [];
-                
-                const transactionCode = this.generateTransactionCode();
-                const oldGameBalance = user.gameBalance || 0;
-                
-                if (type === 'game_credit') {
-                    // Credit game balance (admin adds money to game balance)
-                    user.gameBalance = (user.gameBalance || 0) + amount;
-                    userData.gameBalance = user.gameBalance;
-                    
-                    // Create transaction
-                    userData.activities.push({
-                        id: 'TXN-' + Date.now(),
-                        type: 'game_credit',
-                        amount: amount,
-                        date: new Date().toISOString(),
-                        code: transactionCode,
-                        title: 'Game Credit',
-                        description: 'Admin added game funds',
-                        status: 'completed',
-                        category: 'game'
-                    });
-                    
-                    // Add to admin transactions
-                    this.adminData.transactions.push({
-                        id: 'TXN-' + Date.now(),
-                        type: 'game_credit',
-                        amount: -amount,
-                        date: new Date().toISOString(),
-                        code: transactionCode,
-                        title: 'Game Credit to User',
-                        description: `Added $${amount.toFixed(2)} to ${username}'s game balance`,
-                        status: 'completed'
-                    });
-                    
-                    alert(`✅ Game credit successful!\n\nAdded $${amount.toFixed(2)} to ${username}'s game balance\nNew game balance: $${user.gameBalance.toFixed(2)}`);
-                    
-                } else if (type === 'game_debit') {
-                    // Debit game balance (user uses money in games)
-                    if ((user.gameBalance || 0) < amount) {
-                        alert('Insufficient game balance');
-                        return;
-                    }
-                    
-                    user.gameBalance = (user.gameBalance || 0) - amount;
-                    userData.gameBalance = user.gameBalance;
-                    
-                    userData.activities.push({
-                        id: 'TXN-' + Date.now(),
-                        type: 'game_debit',
-                        amount: -amount,
-                        date: new Date().toISOString(),
-                        code: transactionCode,
-                        title: 'Game Play',
-                        description: 'Used funds in game',
-                        status: 'completed',
-                        category: 'game'
-                    });
-                }
-                
-                // Save user data
-                localStorage.setItem('userData_' + username, JSON.stringify(userData));
-                
-                // Update user in all lists
-                this.updateUserInAllLists(username, user);
-                
-                // Refresh display
-                this.loadAllUsers();
-                this.loadAllTransactions();
-                this.updateDisplay();
-            }
-            
-            updateUserInAllLists(username, updatedUser) {
-                // Update in ALL_XBET_USERS
-                let allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
-                const xbetIndex = allXbetUsers.findIndex(u => u.username === username);
-                if (xbetIndex !== -1) {
-                    allXbetUsers[xbetIndex] = updatedUser;
-                    localStorage.setItem('ALL_XBET_USERS', JSON.stringify(allXbetUsers));
-                }
-                
-                // Update in admin user list
-                const adminIndex = this.adminData.users.findIndex(u => u.username === username);
-                if (adminIndex !== -1) {
-                    this.adminData.users[adminIndex] = updatedUser;
-                    this.saveAdminData();
-                }
-            }
-
             searchUsers(query) {
                 if (!query) {
                     this.updateUsersTable();
@@ -1325,6 +421,8 @@
                 );
                 
                 const tbody = document.getElementById('usersTableBody');
+                if (!tbody) return;
+                
                 tbody.innerHTML = '';
                 
                 filteredUsers.forEach(user => {
@@ -1340,7 +438,6 @@
                             <button class="user-action-btn" onclick="admin.viewUser('${user.username}')">View</button>
                             <button class="user-action-btn" onclick="admin.depositToUser('${user.username}')">Deposit</button>
                             <button class="user-action-btn" onclick="admin.withdrawFromUser('${user.username}')">Withdraw</button>
-                            <button class="user-action-btn" onclick="admin.creditGame('${user.username}')" style="background: rgba(245,158,11,0.2); color: #f59e0b; border-color: rgba(245,158,11,0.4);">Game +</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -1349,6 +446,67 @@
 
             filterTransactions(type) {
                 this.updateTransactionsDisplay(type);
+            }
+
+            // 🔥 FORCE SYNC FUNCTION
+            forceSync() {
+                if (window.xbetSync) {
+                    const result = window.xbetSync.syncNow();
+                    if (result.success) {
+                        this.loadAllUsers();
+                        this.updateDisplay();
+                        this.showNotification(`Force sync completed! ${result.message}`);
+                    } else {
+                        alert(`Sync failed: ${result.error}`);
+                    }
+                } else {
+                    alert('Sync system not loaded!');
+                }
+            }
+            
+            // 🔥 SHOW NOTIFICATION
+            showNotification(message) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #10b981;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    z-index: 9999;
+                    animation: slideIn 0.3s ease;
+                `;
+                
+                // Add animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">🔔</span>
+                        <div>${message}</div>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'slideIn 0.3s ease reverse';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
             }
 
             // Process admin transfer
@@ -1367,7 +525,7 @@
                     return;
                 }
                 
-                // Find user by transaction code
+                // Find user
                 const user = this.allUsers.find(u => 
                     u.transactionCode.toUpperCase() === userCode.toUpperCase()
                 );
@@ -1380,10 +538,9 @@
                 let userData = JSON.parse(localStorage.getItem('userData_' + user.username) || '{}');
                 if (!userData.activities) userData.activities = [];
                 
-                const transactionCode = this.generateTransactionCode();
+                const transactionCode = 'TXN-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
                 
                 if (type === 'deposit') {
-                    // Deposit to user
                     if (this.adminBalance < amount) {
                         alert('Admin has insufficient balance');
                         return;
@@ -1421,7 +578,6 @@
                     alert(`✅ Deposit successful!\n\nAmount: $${amount.toFixed(2)}\nTo: ${user.username}\nUser new balance: $${user.balance.toFixed(2)}`);
                     
                 } else if (type === 'withdrawal') {
-                    // Withdraw from user
                     if (user.balance < amount) {
                         alert('User has insufficient balance');
                         return;
@@ -1462,7 +618,18 @@
                 // Save data
                 localStorage.setItem('userData_' + user.username, JSON.stringify(userData));
                 this.saveAdminData();
-                this.updateUserInAllLists(user.username, user);
+                
+                // Update sync system
+                if (window.xbetSync) {
+                    window.xbetSync.registerUser({
+                        username: user.username,
+                        email: user.email,
+                        balance: user.balance,
+                        gameBalance: user.gameBalance,
+                        transactionCode: user.transactionCode,
+                        status: user.status
+                    });
+                }
                 
                 // Clear form
                 document.getElementById('userTransactionCode').value = '';
@@ -1492,250 +659,37 @@
         const admin = new AdminPanel();
         admin.init();
 
-        // Modal Functions
-        function openDepositModal() {
-            document.getElementById('depositModal').style.display = 'block';
-        }
-
-        function closeDepositModal() {
-            document.getElementById('depositModal').style.display = 'none';
-        }
-
-        function openWithdrawModal() {
-            const pendingList = document.getElementById('pendingWithdrawalsList');
-            const pendingWithdrawals = admin.allTransactions
-                .filter(t => t.type === 'withdrawal' && t.status === 'pending');
-            
-            if (pendingWithdrawals.length === 0) {
-                pendingList.innerHTML = '<div style="color: #94a3b8;">No pending withdrawals</div>';
-            } else {
-                pendingList.innerHTML = pendingWithdrawals.map(t => `
-                    <div style="margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;">
-                        <div><strong>${t.user}</strong> • $${Math.abs(t.amount).toFixed(2)}</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">Code: ${t.code}</div>
-                    </div>
-                `).join('');
-            }
-            
-            document.getElementById('withdrawModal').style.display = 'block';
-        }
-
-        function closeWithdrawModal() {
-            document.getElementById('withdrawModal').style.display = 'none';
-        }
-
-        function openCreateUserModal() {
-            document.getElementById('createUserModal').style.display = 'block';
-        }
-
-        function closeCreateUserModal() {
-            document.getElementById('createUserModal').style.display = 'none';
-        }
-
-        function openResetModal() {
-            if (confirm('⚠️ WARNING: This will reset all system data. Are you sure?')) {
-                if (confirm('⚠️ FINAL WARNING: This action cannot be undone. Type "RESET" to confirm:')) {
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    alert('System reset complete. Redirecting to admin login...');
-                    window.location.href = 'admin.login.html';
-                }
-            }
-        }
-
-        // 🔥 SYNC ALL USERS FUNCTION
-        function syncAllUsers() {
-            alert('Syncing users from all sources...');
-            admin.loadAllUsers();
-            admin.loadAllTransactions();
-            admin.updateDisplay();
-        }
-
-        function processUserDeposit() {
-            const userCode = document.getElementById('depositUserCode').value.trim();
-            const amount = parseFloat(document.getElementById('depositAmount').value);
-            const description = document.getElementById('depositDescription').value.trim();
-            
-            if (!userCode || !amount || amount <= 0) {
-                alert('Please fill all fields correctly');
-                return;
-            }
-            
-            const user = admin.allUsers.find(u => 
-                u.transactionCode.toUpperCase() === userCode.toUpperCase()
-            );
-            
-            if (!user) {
-                alert('User not found with this transaction code');
-                return;
-            }
-            
-            if (admin.adminBalance < amount) {
-                alert('Admin has insufficient balance');
-                return;
-            }
-            
-            document.getElementById('userTransactionCode').value = userCode;
-            document.getElementById('transferAmount').value = amount;
-            document.getElementById('transferType').value = 'deposit';
-            admin.processAdminTransfer();
-            
-            closeDepositModal();
-        }
-
-        function processWithdrawalStatus() {
-            const withdrawalCode = document.getElementById('withdrawalCode').value.trim();
-            const status = document.getElementById('withdrawalStatus').value;
-            
-            if (!withdrawalCode) {
-                alert('Please enter withdrawal transaction code');
-                return;
-            }
-            
-            let found = false;
-            
-            for (const user of admin.allUsers) {
-                const userData = JSON.parse(localStorage.getItem('userData_' + user.username) || '{}');
-                if (userData.activities) {
-                    const transaction = userData.activities.find(t => 
-                        t.code && t.code.toUpperCase() === withdrawalCode.toUpperCase() && 
-                        t.type === 'withdrawal'
-                    );
-                    if (transaction) {
-                        transaction.status = status;
-                        
-                        if (status === 'completed') {
-                            transaction.completedAt = new Date().toISOString();
-                        } else if (status === 'rejected') {
-                            userData.balance = (userData.balance || 0) + Math.abs(transaction.amount || 0);
-                        }
-                        
-                        localStorage.setItem('userData_' + user.username, JSON.stringify(userData));
-                        found = true;
-                        break;
+        // Add Force Sync button to admin actions
+        setTimeout(() => {
+            const actionsDiv = document.querySelector('.admin-actions');
+            if (actionsDiv) {
+                const forceSyncBtn = document.createElement('button');
+                forceSyncBtn.className = 'admin-action-btn sync';
+                forceSyncBtn.innerHTML = '🔄 Force Sync All Browsers';
+                forceSyncBtn.onclick = () => {
+                    admin.forceSync();
+                };
+                actionsDiv.appendChild(forceSyncBtn);
+                
+                // Add sync status button
+                const syncStatusBtn = document.createElement('button');
+                syncStatusBtn.className = 'admin-action-btn';
+                syncStatusBtn.style.background = 'linear-gradient(135deg, #8b5cf6, #7c3aed)';
+                syncStatusBtn.innerHTML = '📊 Sync Status';
+                syncStatusBtn.onclick = () => {
+                    if (window.xbetSync) {
+                        const status = window.xbetSync.getSyncStatus();
+                        alert(`Sync System Status:\n\nBrowser: ${status.browser}\nUniversal Users: ${status.universalUsers}\nLocal Users: ${status.localUsers}\nLast Sync: ${status.lastSync}\nSync Active: ${status.syncActive ? 'Yes' : 'No'}`);
+                    } else {
+                        alert('Sync system not loaded!');
                     }
-                }
+                };
+                actionsDiv.appendChild(syncStatusBtn);
             }
-            
-            if (found) {
-                alert(`✅ Withdrawal ${status} successfully!`);
-                closeWithdrawModal();
-                admin.loadAllUsers();
-                admin.loadAllTransactions();
-                admin.updateDisplay();
-            } else {
-                alert('Withdrawal transaction not found');
-            }
-        }
+        }, 1500);
 
-        // Create new user
-        function createNewUser() {
-            const username = document.getElementById('newUsername').value.trim();
-            const email = document.getElementById('newUserEmail').value.trim();
-            const balance = parseFloat(document.getElementById('initialBalance').value) || 0;
-            const gameBalance = parseFloat(document.getElementById('initialGameBalance').value) || 0;
-            const password = document.getElementById('newUserPassword').value;
-            
-            if (!username || !email || !password) {
-                alert('Please fill all required fields');
-                return;
-            }
-            
-            if (username.length < 3) {
-                alert('Username must be at least 3 characters long');
-                return;
-            }
-            
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters long');
-                return;
-            }
-            
-            // Check if user exists
-            const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-            if (existingUsers[username]) {
-                alert('Username already exists');
-                return;
-            }
-            
-            // Check in admin user list
-            if (admin.allUsers.find(u => u.username === username)) {
-                alert('Username already exists in system');
-                return;
-            }
-            
-            const transactionCode = admin.generateUserTransactionCode(username);
-            
-            // Save to registeredUsers
-            existingUsers[username] = email;
-            localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
-            
-            // Save user data
-            const userData = {
-                username: username,
-                email: email,
-                password: password,
-                balance: balance,
-                gameBalance: gameBalance,
-                transactionCode: transactionCode,
-                isAdmin: false,
-                status: 'active',
-                registeredAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
-                activities: []
-            };
-            
-            localStorage.setItem('userData_' + username, JSON.stringify(userData));
-            
-            // Save to ALL_XBET_USERS
-            let allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
-            allXbetUsers.push({
-                username: username,
-                email: email,
-                balance: balance,
-                gameBalance: gameBalance,
-                transactionCode: transactionCode,
-                status: 'active',
-                registeredAt: new Date().toISOString()
-            });
-            localStorage.setItem('ALL_XBET_USERS', JSON.stringify(allXbetUsers));
-            
-            // Save to shared storage for cross-browser sync
-            localStorage.setItem('XBET_SHARED_USERS', JSON.stringify(allXbetUsers));
-            
-            alert(`✅ User created successfully!\n\nUsername: ${username}\nEmail: ${email}\nTransaction Code: ${transactionCode}\nBalance: $${balance.toFixed(2)}\nGame Balance: $${gameBalance.toFixed(2)}`);
-            
-            closeCreateUserModal();
-            admin.loadAllUsers();
-            admin.loadAllTransactions();
-            admin.updateDisplay();
-        }
-
-        function adminLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('admin_session');
-                localStorage.removeItem('admin_user');
-                window.location.href = 'admin.login.html';
-            }
-        }
-
-        window.onclick = function(event) {
-            const modals = ['depositModal', 'withdrawModal', 'createUserModal'];
-            modals.forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        };
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeDepositModal();
-                closeWithdrawModal();
-                closeCreateUserModal();
-            }
-        });
+        // [Keep all your existing modal functions]
+        // ... existing modal functions ...
     </script>
 </body>
 </html>
