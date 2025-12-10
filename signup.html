@@ -289,7 +289,7 @@
     </footer>
 
     <script>
-        // FIXED SIGNUP SYSTEM - PROPERLY SAVES FOR ADMIN PANEL
+        // SIMPLE FIX: Save users in ONE format that admin panel can find
         document.addEventListener('DOMContentLoaded', function() {
             // Check if already logged in
             const session = sessionStorage.getItem('xbet_session');
@@ -298,7 +298,6 @@
                 return;
             }
             
-            // Signup form elements
             const signupForm = document.getElementById('signupForm');
             const messageDiv = document.getElementById('message');
             
@@ -315,7 +314,6 @@
                 messageDiv.className = `message ${type}`;
                 messageDiv.style.display = 'block';
                 
-                // Auto-hide success messages
                 if (type === 'success') {
                     setTimeout(() => {
                         messageDiv.style.display = 'none';
@@ -323,19 +321,12 @@
                 }
             }
             
-            // Generate transaction code (matches admin panel format)
+            // Generate transaction code (SIMPLE FORMAT)
             function generateTransactionCode(username) {
                 const prefix = username.substring(0, 3).toUpperCase();
                 const timestamp = Date.now().toString(36).toUpperCase().slice(-8);
                 const random = Math.random().toString(36).slice(2, 10).toUpperCase();
                 return `XBT-${prefix}-${timestamp}-${random}`;
-            }
-            
-            // Generate activity code
-            function generateActivityCode() {
-                const timestamp = Date.now().toString(36).slice(-4);
-                const random = Math.random().toString(36).slice(2, 6);
-                return `ACT-${timestamp}-${random}`.toUpperCase();
             }
             
             // Validate email format
@@ -350,170 +341,75 @@
                 return usernameRegex.test(username);
             }
             
-            // 🔥 FIXED: Save user data in ADMIN-COMPATIBLE format
+            // 🔥 SIMPLE FIX: Save user in ONE consistent format
             function saveUserToDatabase(username, email, password, transactionCode) {
                 try {
-                    // 1. Save to registeredUsers (for login system)
+                    console.log('Saving user:', username);
+                    
+                    // 1. Save basic login info
                     let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
                     registeredUsers[username] = email;
                     localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
                     
-                    // 2. Save detailed user data (for dashboard and admin panel)
+                    // 2. Save FULL user data (this is what admin panel looks for)
                     const userData = {
                         username: username,
                         email: email,
-                        password: password, // Store for demo (in real app, hash this)
+                        password: password,
                         balance: 0.00,
                         transactionCode: transactionCode,
                         isAdmin: false,
                         status: 'active',
                         registeredAt: new Date().toISOString(),
                         lastLogin: new Date().toISOString(),
-                        activities: [],
-                        received: 0,
-                        sent: 0,
-                        won: 0,
-                        lost: 0
+                        activities: []
                     };
                     
-                    // Save as userData_username (MAIN FORMAT for admin panel)
+                    // Save with consistent key: userData_username
                     localStorage.setItem('userData_' + username, JSON.stringify(userData));
                     
-                    // 3. 🔥 CRITICAL FIX: Also save to admin users list
-                    updateAdminUserList(username, email, transactionCode);
+                    // 3. 🔥 CRITICAL: Save to GLOBAL user list (admin panel finds this)
+                    let allUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
                     
-                    // 4. Create initial activity log
-                    const initialActivity = {
+                    // Check if user already in list
+                    const userExists = allUsers.some(user => user.username === username);
+                    
+                    if (!userExists) {
+                        allUsers.push({
+                            username: username,
+                            email: email,
+                            balance: 0.00,
+                            transactionCode: transactionCode,
+                            status: 'active',
+                            registeredAt: new Date().toISOString()
+                        });
+                        
+                        localStorage.setItem('ALL_XBET_USERS', JSON.stringify(allUsers));
+                        console.log('Saved to ALL_XBET_USERS:', username);
+                    }
+                    
+                    // 4. Create initial activity
+                    userData.activities.push({
                         id: 'TXN-' + Date.now(),
                         type: 'account_created',
                         amount: 0,
                         date: new Date().toISOString(),
-                        code: generateActivityCode(),
+                        code: 'ACT-' + Date.now().toString(36).toUpperCase(),
                         title: 'Account Created',
-                        description: 'Welcome to X-BET Gaming Platform',
+                        description: 'Welcome to X-BET',
                         status: 'completed'
-                    };
+                    });
                     
-                    userData.activities.push(initialActivity);
                     localStorage.setItem('userData_' + username, JSON.stringify(userData));
                     
-                    console.log('✅ User saved successfully:', username);
-                    console.log('Transaction Code:', transactionCode);
-                    console.log('User data key:', 'userData_' + username);
+                    console.log('✅ User saved successfully in ALL formats');
+                    console.log('Key: userData_' + username);
+                    console.log('ALL_XBET_USERS has', allUsers.length, 'users');
                     
                     return true;
                 } catch (error) {
                     console.error('Error saving user:', error);
                     return false;
-                }
-            }
-            
-            // 🔥 FIXED: Update admin panel user list PROPERLY
-            function updateAdminUserList(username, email, transactionCode) {
-                try {
-                    console.log('Updating admin list for user:', username);
-                    
-                    // Get ALL admin keys (admin_data_adminname)
-                    const adminKeys = [];
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        if (key.startsWith('admin_data_')) {
-                            adminKeys.push(key);
-                        }
-                    }
-                    
-                    console.log('Found admin keys:', adminKeys);
-                    
-                    if (adminKeys.length === 0) {
-                        // If no admin exists yet, create a default admin list
-                        console.log('No admin found, creating default admin list...');
-                        const defaultAdminData = {
-                            username: 'admin_master',
-                            users: [], // Will be populated later
-                            balance: 14050000.00,
-                            transactions: []
-                        };
-                        
-                        // Add new user to default admin
-                        defaultAdminData.users.push({
-                            username: username,
-                            email: email,
-                            transactionCode: transactionCode,
-                            status: 'active',
-                            registeredAt: new Date().toISOString(),
-                            balance: 0
-                        });
-                        
-                        localStorage.setItem('admin_data_admin_master', JSON.stringify(defaultAdminData));
-                        console.log('Created default admin with user:', username);
-                        return;
-                    }
-                    
-                    // Update each admin's user list
-                    adminKeys.forEach(adminKey => {
-                        try {
-                            let adminData = JSON.parse(localStorage.getItem(adminKey) || '{}');
-                            
-                            // Initialize users array if not exists
-                            if (!adminData.users) {
-                                adminData.users = [];
-                            }
-                            
-                            // Check if user already exists in admin's user list
-                            const userExists = adminData.users.some(user => 
-                                user.username === username
-                            );
-                            
-                            if (!userExists) {
-                                // Add user to admin's list
-                                adminData.users.push({
-                                    username: username,
-                                    email: email,
-                                    transactionCode: transactionCode,
-                                    status: 'active',
-                                    registeredAt: new Date().toISOString(),
-                                    balance: 0
-                                });
-                                
-                                localStorage.setItem(adminKey, JSON.stringify(adminData));
-                                console.log('✅ Added user to admin:', adminKey, username);
-                            } else {
-                                console.log('User already in admin list:', username);
-                            }
-                        } catch (error) {
-                            console.error('Error updating admin:', adminKey, error);
-                        }
-                    });
-                    
-                } catch (error) {
-                    console.error('Error updating admin user list:', error);
-                }
-            }
-            
-            // 🔥 FIXED: Also save to centralized user list
-            function saveToGlobalUserList(username, email, transactionCode) {
-                try {
-                    // Get or create global users list
-                    let allUsersList = JSON.parse(localStorage.getItem('all_xbet_users') || '[]');
-                    
-                    // Check if user exists
-                    const exists = allUsersList.some(user => user.username === username);
-                    
-                    if (!exists) {
-                        allUsersList.push({
-                            username: username,
-                            email: email,
-                            transactionCode: transactionCode,
-                            balance: 0,
-                            status: 'active',
-                            registeredAt: new Date().toISOString()
-                        });
-                        
-                        localStorage.setItem('all_xbet_users', JSON.stringify(allUsersList));
-                        console.log('✅ Saved to global user list:', username);
-                    }
-                } catch (error) {
-                    console.error('Error saving to global list:', error);
                 }
             }
             
@@ -530,8 +426,6 @@
                 
                 sessionStorage.setItem('xbet_session', btoa(JSON.stringify(sessionData)));
                 localStorage.setItem('currentUser', username);
-                
-                // Set session expiry (24 hours)
                 localStorage.setItem('session_expiry', Date.now() + 86400000);
             }
             
@@ -592,9 +486,6 @@
                 // Save user to database
                 const saveSuccess = saveUserToDatabase(username, email, password, transactionCode);
                 
-                // Also save to global list
-                saveToGlobalUserList(username, email, transactionCode);
-                
                 if (!saveSuccess) {
                     showMessage('❌ Error creating account. Please try again.', 'error');
                     return;
@@ -603,7 +494,7 @@
                 // Create session
                 createUserSession(username, email, transactionCode);
                 
-                // Show success message with transaction code
+                // Show success message
                 showMessage(`
                     ✅ <strong>Account Created Successfully!</strong><br><br>
                     <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin: 10px 0;">
@@ -614,12 +505,18 @@
                     <small>Redirecting to dashboard...</small>
                 `, 'success');
                 
-                // Debug: Show what was saved
-                console.log('=== SIGNUP COMPLETE ===');
-                console.log('Username:', username);
-                console.log('Transaction Code:', transactionCode);
-                console.log('Check localStorage for: userData_' + username);
-                console.log('Check localStorage for: all_xbet_users');
+                // DEBUG: Show what was saved
+                console.log('=== DEBUG INFO ===');
+                console.log('User saved as: userData_' + username);
+                console.log('Check localStorage for:');
+                console.log('1. userData_' + username);
+                console.log('2. ALL_XBET_USERS');
+                console.log('3. registeredUsers');
+                
+                // Open debug window
+                setTimeout(() => {
+                    showDebugInfo(username, transactionCode);
+                }, 1000);
                 
                 // Disable form during redirect
                 signupForm.querySelectorAll('input, button').forEach(element => {
@@ -629,13 +526,40 @@
                 // Redirect to dashboard
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
-                }, 3000);
+                }, 4000);
             });
             
-            // Auto-focus username field
+            // Debug function
+            function showDebugInfo(username, transactionCode) {
+                const allUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+                const userData = JSON.parse(localStorage.getItem('userData_' + username) || '{}');
+                
+                let debugHTML = `
+                    <div style="background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; margin-top: 10px;">
+                        <strong style="color: var(--accent);">🔍 Debug Info:</strong><br>
+                        User saved successfully!<br>
+                        Username: ${username}<br>
+                        Transaction Code: ${transactionCode}<br>
+                        Total users in system: ${allUsers.length}<br>
+                        <button onclick="checkAdminPanel()" style="background: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 5px; cursor: pointer;">
+                            Check Admin Panel Now
+                        </button>
+                    </div>
+                `;
+                
+                messageDiv.innerHTML += debugHTML;
+            }
+            
+            // Add debug function to window
+            window.checkAdminPanel = function() {
+                // Check what admin can see
+                const allUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+                alert(`Admin Panel View:\n\nTotal Users: ${allUsers.length}\nUsers: ${allUsers.map(u => u.username).join(', ')}`);
+            };
+            
+            // Form validation
             document.getElementById('username').focus();
             
-            // Form validation on input
             const inputs = signupForm.querySelectorAll('input[required]');
             inputs.forEach(input => {
                 input.addEventListener('blur', function() {
@@ -666,72 +590,20 @@
             passwordField.addEventListener('input', checkPasswordMatch);
             confirmField.addEventListener('input', checkPasswordMatch);
             
-            // Enter key to submit
-            signupForm.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    signupForm.dispatchEvent(new Event('submit'));
-                }
-            });
-            
             // Check for existing test data
             function checkForTestData() {
                 const testUsers = Object.keys(JSON.parse(localStorage.getItem('registeredUsers') || '{}'));
                 if (testUsers.length === 0) {
-                    // Create default test user
                     const testUsername = 'demo_user';
                     const testEmail = 'demo@xbet.com';
                     const testCode = generateTransactionCode(testUsername);
                     
                     saveUserToDatabase(testUsername, testEmail, 'demo123', testCode);
-                    saveToGlobalUserList(testUsername, testEmail, testCode);
                 }
             }
             
-            // Initialize test data
             checkForTestData();
         });
-        
-        // Function to check username availability (can be expanded for live check)
-        window.checkUsername = function() {
-            const username = document.getElementById('username').value.trim();
-            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-            
-            if (username.length < 3) return;
-            
-            if (registeredUsers[username]) {
-                showMessage('❌ Username already taken', 'error');
-                document.getElementById('username').style.borderColor = 'var(--danger)';
-            } else {
-                document.getElementById('username').style.borderColor = 'var(--success)';
-            }
-        }
-        
-        // Debug function to check localStorage
-        window.debugStorage = function() {
-            console.log('=== LOCALSTORAGE DEBUG ===');
-            console.log('Total items:', localStorage.length);
-            
-            let users = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                console.log(`${i}: ${key}`);
-                
-                if (key.startsWith('userData_')) {
-                    try {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        if (data.username) {
-                            users.push(data.username);
-                        }
-                    } catch (e) {}
-                }
-            }
-            
-            console.log('Users in userData_* format:', users);
-            console.log('all_xbet_users:', JSON.parse(localStorage.getItem('all_xbet_users') || '[]'));
-            
-            alert(`Debug Info:\n\nTotal users found: ${users.length}\nUsers: ${users.join(', ')}`);
-        }
     </script>
 </body>
 </html>
