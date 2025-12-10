@@ -744,7 +744,7 @@
     </div>
 
     <script>
-        // 🔐 ADMIN PANEL SYSTEM - FIXED VERSION
+        // 🔐 ADMIN PANEL SYSTEM - FIXED VERSION (Compatible with signup.html)
         class AdminPanel {
             constructor() {
                 this.currentAdmin = null;
@@ -803,71 +803,54 @@
                 this.adminBalance = this.adminData.balance;
             }
 
+            // 🔥 FIXED: Load users from ALL_XBET_USERS (where signup.html saves users)
             loadAllUsers() {
-                // Load all registered users from multiple sources to ensure compatibility
                 this.allUsers = [];
                 
-                // Source 1: From registeredUsers (login system)
-                const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                console.log("=== LOADING ALL USERS ===");
                 
-                // Source 2: From userData_* format (dashboard system)
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('userData_')) {
-                        const username = key.replace('userData_', '');
-                        const userData = JSON.parse(localStorage.getItem(key) || '{}');
-                        
-                        // Skip admin accounts
-                        if (userData.isAdmin) continue;
-                        
-                        // Get email from registeredUsers or use default
-                        const email = registeredUsers[username] || userData.email || username + '@xbet.com';
-                        
-                        // Generate transaction code if not exists
-                        if (!userData.transactionCode) {
-                            userData.transactionCode = this.generateUserTransactionCode(username);
-                            localStorage.setItem(key, JSON.stringify(userData));
+                // SOURCE 1: Load from ALL_XBET_USERS (main source from signup.html)
+                const allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+                
+                if (allXbetUsers.length > 0) {
+                    console.log('✅ Found users in ALL_XBET_USERS:', allXbetUsers.length);
+                    this.allUsers = allXbetUsers.map(user => ({
+                        username: user.username,
+                        email: user.email,
+                        balance: user.balance || 0,
+                        transactionCode: user.transactionCode,
+                        status: user.status || 'active',
+                        lastLogin: user.lastLogin || new Date().toISOString(),
+                        isAdmin: false,
+                        dataKey: 'userData_' + user.username
+                    }));
+                } else {
+                    console.log('⚠️ No users found in ALL_XBET_USERS, checking other sources...');
+                    
+                    // FALLBACK: Check userData_* keys for backward compatibility
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith('userData_')) {
+                            const userData = JSON.parse(localStorage.getItem(key) || '{}');
+                            
+                            if (userData.username && !userData.isAdmin) {
+                                this.allUsers.push({
+                                    username: userData.username,
+                                    email: userData.email || userData.username + '@xbet.com',
+                                    balance: userData.balance || 0,
+                                    transactionCode: userData.transactionCode || this.generateUserTransactionCode(userData.username),
+                                    status: userData.status || 'active',
+                                    lastLogin: userData.lastLogin || new Date().toISOString(),
+                                    isAdmin: false,
+                                    dataKey: key
+                                });
+                            }
                         }
-                        
-                        // Ensure activities array exists
-                        if (!userData.activities) {
-                            userData.activities = [];
-                            localStorage.setItem(key, JSON.stringify(userData));
-                        }
-                        
-                        this.allUsers.push({
-                            username: username,
-                            email: email,
-                            balance: userData.balance || 0,
-                            transactionCode: userData.transactionCode,
-                            status: userData.status || 'active',
-                            lastLogin: userData.lastLogin || new Date().toISOString(),
-                            isAdmin: userData.isAdmin || false,
-                            dataKey: key
-                        });
                     }
                 }
                 
-                // If no users found, check for simple format (from login.html)
-                if (this.allUsers.length === 0) {
-                    for (const [username, email] of Object.entries(registeredUsers)) {
-                        // Skip admin accounts
-                        if (username.includes('admin')) continue;
-                        
-                        const userData = {
-                            username: username,
-                            email: email,
-                            balance: 0,
-                            transactionCode: this.generateUserTransactionCode(username),
-                            status: 'active',
-                            lastLogin: new Date().toISOString(),
-                            isAdmin: false
-                        };
-                        
-                        localStorage.setItem('userData_' + username, JSON.stringify(userData));
-                        this.allUsers.push(userData);
-                    }
-                }
+                console.log('Total users loaded:', this.allUsers.length);
+                console.log('Users:', this.allUsers.map(u => u.username).join(', '));
                 
                 // Update datalist for transaction codes
                 const datalist = document.getElementById('userCodes');
@@ -1114,7 +1097,7 @@
                 this.updateTransactionsDisplay(type);
             }
 
-            // MAIN FIX: Process admin transfer with proper user data handling
+            // Process admin transfer
             async processAdminTransfer() {
                 const userCode = document.getElementById('userTransactionCode').value.trim();
                 const amount = parseFloat(document.getElementById('transferAmount').value);
@@ -1140,8 +1123,32 @@
                     return;
                 }
                 
-                // Get user data - FIXED: Always use userData_username format
+                // Get user data
                 let userData = JSON.parse(localStorage.getItem('userData_' + user.username) || '{}');
+                
+                // 🔥 FIX: If userData doesn't exist but user is in ALL_XBET_USERS, create it
+                if (!userData || Object.keys(userData).length === 0) {
+                    // Check if user exists in ALL_XBET_USERS
+                    const allUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+                    const xbetUser = allUsers.find(u => u.username === user.username);
+                    
+                    if (xbetUser) {
+                        userData = {
+                            username: xbetUser.username,
+                            email: xbetUser.email,
+                            balance: xbetUser.balance || 0,
+                            transactionCode: xbetUser.transactionCode,
+                            isAdmin: false,
+                            status: 'active',
+                            registeredAt: new Date().toISOString(),
+                            lastLogin: new Date().toISOString(),
+                            activities: []
+                        };
+                        
+                        // Save to both formats
+                        localStorage.setItem('userData_' + user.username, JSON.stringify(userData));
+                    }
+                }
                 
                 // If user data doesn't exist, create it
                 if (!userData || Object.keys(userData).length === 0) {
@@ -1185,7 +1192,7 @@
                     this.adminBalance -= amount;
                     this.adminData.balance = this.adminBalance;
                     
-                    // Add transaction to user - USING CORRECT FORMAT
+                    // Add transaction to user
                     userData.activities.push({
                         id: 'TXN-' + Date.now(),
                         type: 'deposit',
@@ -1217,6 +1224,9 @@
                     // Save data
                     localStorage.setItem('userData_' + user.username, JSON.stringify(userData));
                     localStorage.setItem('admin_data_' + this.currentAdmin, JSON.stringify(this.adminData));
+                    
+                    // 🔥 FIX: Also update ALL_XBET_USERS
+                    this.updateAllXbetUsersBalance(user.username, userData.balance);
                     
                     alert(`✅ Deposit successful!\n\nAmount: $${amount.toFixed(2)}\nTo: ${user.username}\nTransaction Code: ${transactionCode}\nUser old balance: $${oldBalance.toFixed(2)}\nUser new balance: $${userData.balance.toFixed(2)}`);
                     
@@ -1268,6 +1278,9 @@
                     localStorage.setItem('userData_' + user.username, JSON.stringify(userData));
                     localStorage.setItem('admin_data_' + this.currentAdmin, JSON.stringify(this.adminData));
                     
+                    // 🔥 FIX: Also update ALL_XBET_USERS
+                    this.updateAllXbetUsersBalance(user.username, userData.balance);
+                    
                     alert(`✅ Withdrawal successful!\n\nAmount: $${amount.toFixed(2)}\nFrom: ${user.username}\nTransaction Code: ${transactionCode}\nUser old balance: $${oldBalance.toFixed(2)}\nUser new balance: $${userData.balance.toFixed(2)}`);
                 }
                 
@@ -1279,6 +1292,18 @@
                 this.loadAllUsers();
                 this.loadAllTransactions();
                 this.updateDisplay();
+            }
+
+            // 🔥 FIX: Helper function to update balance in ALL_XBET_USERS
+            updateAllXbetUsersBalance(username, newBalance) {
+                const allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+                const userIndex = allXbetUsers.findIndex(u => u.username === username);
+                
+                if (userIndex !== -1) {
+                    allXbetUsers[userIndex].balance = newBalance;
+                    localStorage.setItem('ALL_XBET_USERS', JSON.stringify(allXbetUsers));
+                    console.log('✅ Updated balance in ALL_XBET_USERS for', username);
+                }
             }
 
             // Save admin data
@@ -1508,6 +1533,24 @@
             
             // Save user data
             localStorage.setItem('userData_' + username, JSON.stringify(userData));
+            
+            // 🔥 FIX: Also save to ALL_XBET_USERS (for signup.html compatibility)
+            let allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+            const userExists = allXbetUsers.some(u => u.username === username);
+
+            if (!userExists) {
+                allXbetUsers.push({
+                    username: username,
+                    email: email,
+                    balance: balance,
+                    transactionCode: transactionCode,
+                    status: 'active',
+                    registeredAt: new Date().toISOString()
+                });
+                
+                localStorage.setItem('ALL_XBET_USERS', JSON.stringify(allXbetUsers));
+                console.log('✅ Saved new user to ALL_XBET_USERS:', username);
+            }
             
             alert(`✅ User created successfully!\n\nUsername: ${username}\nEmail: ${email}\nTransaction Code: ${transactionCode}\nInitial Balance: $${balance.toFixed(2)}\n\nUser can now login with this username and password.`);
             
