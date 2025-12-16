@@ -121,7 +121,7 @@
         
         .admin-list {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 1rem;
         }
         
@@ -148,6 +148,20 @@
         .admin-card span {
             color: #94a3b8;
             font-size: 0.9rem;
+        }
+        
+        .balance-info {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+        
+        .balance-master {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .balance-zero {
+            color: #f59e0b;
         }
         
         .back-link {
@@ -182,20 +196,33 @@
             </div>
             
             <button type="submit" class="login-btn">
-                <i class="fas fa-lock"></i> Access Admin Panel
+                Access Admin Panel
             </button>
         </form>
         
         <div class="admin-accounts">
-            <h3>Demo Admin Accounts</h3>
+            <h3>Admin Accounts</h3>
             <div class="admin-list">
-                <div class="admin-card" onclick="useAdminAccount('admin_master', 'admin123')">
+                <div class="admin-card" onclick="useAdminAccount('admin_master', 'master123')">
                     <strong>admin_master</strong>
-                    <span>Full Access Admin</span>
+                    <span>Full Access Master Admin</span>
+                    <div class="balance-info">
+                        Balance: <span class="balance-master">$14,050,000</span>
+                    </div>
                 </div>
-                <div class="admin-card" onclick="useAdminAccount('finance_manager', 'finance123')">
-                    <strong>finance_manager</strong>
-                    <span>Financial Admin</span>
+                <div class="admin-card" onclick="useAdminAccount('finance_admin', 'finance123')">
+                    <strong>finance_admin</strong>
+                    <span>Financial Operations Admin</span>
+                    <div class="balance-info">
+                        Balance: <span class="balance-zero">$0.00</span> (Can request from master)
+                    </div>
+                </div>
+                <div class="admin-card" onclick="useAdminAccount('support_admin', 'support123')">
+                    <strong>support_admin</strong>
+                    <span>Customer Support Admin</span>
+                    <div class="balance-info">
+                        Balance: <span class="balance-zero">$0.00</span> (Can request from master)
+                    </div>
                 </div>
             </div>
         </div>
@@ -206,31 +233,60 @@
     </div>
     
     <script>
-        // Initialize admin data if not exists
+        // Initialize THREE admin accounts with different balances
         function initializeAdminData() {
-            // Create admin_master account if not exists
+            // Create admin_master account with $14,050,000
             let adminMasterData = JSON.parse(localStorage.getItem('admin_data_admin_master') || '{}');
             if (!adminMasterData.balance) {
                 adminMasterData = {
+                    username: 'admin_master',
                     balance: 14050000.00,
                     transactions: [],
                     users: [],
-                    lastLogin: new Date().toISOString()
+                    lastLogin: new Date().toISOString(),
+                    role: 'master',
+                    isAdmin: true
                 };
                 localStorage.setItem('admin_data_admin_master', JSON.stringify(adminMasterData));
             }
             
-            // Create finance_manager account if not exists
-            let financeManagerData = JSON.parse(localStorage.getItem('admin_data_finance_manager') || '{}');
-            if (!financeManagerData.balance) {
-                financeManagerData = {
-                    balance: 14050000.00,
+            // Create finance_admin account with $0
+            let financeAdminData = JSON.parse(localStorage.getItem('admin_data_finance_admin') || '{}');
+            if (!financeAdminData.balance) {
+                financeAdminData = {
+                    username: 'finance_admin',
+                    balance: 0.00,
                     transactions: [],
                     users: [],
-                    lastLogin: new Date().toISOString()
+                    lastLogin: new Date().toISOString(),
+                    role: 'finance',
+                    isAdmin: true
                 };
-                localStorage.setItem('admin_data_finance_manager', JSON.stringify(financeManagerData));
+                localStorage.setItem('admin_data_finance_admin', JSON.stringify(financeAdminData));
             }
+            
+            // Create support_admin account with $0
+            let supportAdminData = JSON.parse(localStorage.getItem('admin_data_support_admin') || '{}');
+            if (!supportAdminData.balance) {
+                supportAdminData = {
+                    username: 'support_admin',
+                    balance: 0.00,
+                    transactions: [],
+                    users: [],
+                    lastLogin: new Date().toISOString(),
+                    role: 'support',
+                    isAdmin: true
+                };
+                localStorage.setItem('admin_data_support_admin', JSON.stringify(supportAdminData));
+            }
+            
+            // Store admin credentials
+            const adminCredentials = {
+                'admin_master': 'master123',
+                'finance_admin': 'finance123',
+                'support_admin': 'support123'
+            };
+            localStorage.setItem('admin_credentials', JSON.stringify(adminCredentials));
         }
         
         // Pre-fill admin account
@@ -246,14 +302,10 @@
             const username = document.getElementById('adminUsername').value.trim();
             const password = document.getElementById('adminPassword').value;
             
-            // Demo admin validation (in real system, use proper authentication)
-            const validAdmins = {
-                'admin_master': 'admin123',
-                'finance_manager': 'finance123',
-                'admin': 'admin123'
-            };
+            // Get stored credentials
+            const storedCredentials = JSON.parse(localStorage.getItem('admin_credentials') || '{}');
             
-            if (validAdmins[username] && validAdmins[username] === password) {
+            if (storedCredentials[username] && storedCredentials[username] === password) {
                 // Initialize admin data
                 initializeAdminData();
                 
@@ -274,4 +326,3 @@
     </script>
 </body>
 </html>
-
