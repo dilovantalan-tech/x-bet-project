@@ -4,16 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-BET - Sign Up</title>
-    <!-- Include Sync System -->
+    <!-- Include Sync System with fallback -->
     <script src="sync.js"></script>
     <style>
         /* [Keep all your existing CSS styles] */
         /* ... existing CSS ... */
+        
+        /* Add a fallback style in case sync.js fails */
+        .sync-fallback {
+            display: none;
+            background: #ff9800;
+            color: #000;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .sync-fallback.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <!-- [Keep all your existing HTML structure] -->
     <!-- ... existing HTML ... -->
+    
+    <!-- Add a fallback message container -->
+    <div id="syncFallback" class="sync-fallback">
+        ⚠️ Sync system loading... Using local storage only.
+    </div>
 
     <script>
         // 🔥 UPDATED SIGNUP SYSTEM - Uses Universal Sync
@@ -28,12 +48,71 @@
             
             const signupForm = document.getElementById('signupForm');
             const messageDiv = document.getElementById('message');
+            const syncFallback = document.getElementById('syncFallback');
             
-            // Check if sync system is loaded
-            if (!window.xbetSync) {
-                showMessage('⚠️ Sync system not loaded. Please refresh.', 'error');
-                console.error('Sync system not found');
+            // Wait for sync system to load
+            let syncSystemReady = false;
+            let syncCheckAttempts = 0;
+            const maxSyncCheckAttempts = 5;
+            
+            function checkSyncSystem() {
+                if (window.xbetSync && typeof window.xbetSync.registerUser === 'function') {
+                    syncSystemReady = true;
+                    console.log("✅ Sync system loaded successfully");
+                    syncFallback.style.display = 'none';
+                } else if (syncCheckAttempts < maxSyncCheckAttempts) {
+                    syncCheckAttempts++;
+                    console.log(`⏳ Waiting for sync system... Attempt ${syncCheckAttempts}/${maxSyncCheckAttempts}`);
+                    setTimeout(checkSyncSystem, 500);
+                    
+                    // Show fallback message on first attempt
+                    if (syncCheckAttempts === 1) {
+                        syncFallback.classList.add('show');
+                    }
+                } else {
+                    console.warn("⚠️ Sync system not loaded. Using fallback mode.");
+                    syncFallback.innerHTML = "⚠️ Sync system not available. Using local storage only.";
+                    syncFallback.classList.add('show');
+                    
+                    // Create minimal sync functions as fallback
+                    if (!window.xbetSync) {
+                        window.xbetSync = {
+                            registerUser: function(userData) {
+                                console.log("📦 Fallback: Storing user locally only");
+                                const users = JSON.parse(localStorage.getItem('xbet_universal_users') || '[]');
+                                userData.id = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                                users.push(userData);
+                                localStorage.setItem('xbet_universal_users', JSON.stringify(users));
+                                return userData.id;
+                            },
+                            getAllUsers: function() {
+                                return JSON.parse(localStorage.getItem('xbet_universal_users') || '[]');
+                            },
+                            generateTransactionCode: function(username) {
+                                return 'TRX-' + Date.now() + '-' + username.toUpperCase() + '-' + 
+                                       Math.random().toString(36).substr(2, 6).toUpperCase();
+                            },
+                            getSyncStatus: function() {
+                                return {
+                                    browser: navigator.userAgent.substring(0, 50),
+                                    universalUsers: JSON.parse(localStorage.getItem('xbet_universal_users') || '[]').length,
+                                    localUsers: Object.keys(JSON.parse(localStorage.getItem('registeredUsers') || '{}')).length,
+                                    lastSync: new Date().toLocaleTimeString(),
+                                    syncActive: false
+                                };
+                            },
+                            syncNow: function() {
+                                console.log("🔄 Fallback sync - nothing to sync");
+                                return true;
+                            }
+                        };
+                        syncSystemReady = true;
+                    }
+                }
             }
+            
+            // Start checking for sync system
+            setTimeout(checkSyncSystem, 100);
             
             // Auto-fill test account
             window.autoFillTest = function() {
@@ -44,6 +123,11 @@
             }
             
             function showMessage(text, type) {
+                if (!messageDiv) {
+                    console.error("Message div not found!");
+                    alert(text);
+                    return;
+                }
                 messageDiv.innerHTML = text;
                 messageDiv.className = `message ${type}`;
                 messageDiv.style.display = 'block';
@@ -164,6 +248,12 @@
             signupForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
+                // Wait for sync system if not ready
+                if (!syncSystemReady) {
+                    showMessage('🔄 Loading system... Please wait a moment and try again.', 'error');
+                    return;
+                }
+                
                 const username = document.getElementById('username').value.trim();
                 const email = document.getElementById('email').value.trim().toLowerCase();
                 const password = document.getElementById('password').value;
@@ -211,17 +301,21 @@
                 }
                 
                 // Check in universal storage via sync system
-                const allUsers = window.xbetSync.getAllUsers();
-                if (allUsers.find(u => u.username === username)) {
-                    showMessage('❌ Username already exists in system', 'error');
-                    return;
+                try {
+                    const allUsers = window.xbetSync.getAllUsers();
+                    if (allUsers.find(u => u.username === username)) {
+                        showMessage('❌ Username already exists in system', 'error');
+                        return;
+                    }
+                } catch (error) {
+                    console.warn("Could not check universal users:", error);
                 }
                 
                 // Generate transaction code
                 const transactionCode = generateTransactionCode(username);
                 
                 // Show loading
-                showMessage('🔄 Creating account and syncing across browsers...', 'success');
+                showMessage('🔄 Creating account...', 'success');
                 
                 // Disable form
                 signupForm.querySelectorAll('input, button').forEach(element => {
@@ -229,7 +323,7 @@
                 });
                 
                 // Register user with universal sync
-                const success = await registerUserUniversal(username, email, password, transactionCode);
+                const success = registerUserUniversal(username, email, password, transactionCode);
                 
                 if (!success) {
                     showMessage('❌ Error creating account. Please try again.', 'error');
@@ -264,7 +358,9 @@
                 
                 // Force immediate sync
                 setTimeout(() => {
-                    window.xbetSync.syncNow();
+                    if (window.xbetSync.syncNow) {
+                        window.xbetSync.syncNow();
+                    }
                 }, 1000);
                 
                 // Redirect to dashboard after 4 seconds
@@ -275,6 +371,10 @@
             
             // Test sync system button
             window.testSync = function() {
+                if (!window.xbetSync) {
+                    alert('Sync system not loaded!');
+                    return;
+                }
                 const status = window.xbetSync.getSyncStatus();
                 alert(`Sync System Status:\n\nBrowser: ${status.browser}\nUniversal Users: ${status.universalUsers}\nLocal Users: ${status.localUsers}\nLast Sync: ${status.lastSync}\nSync Active: ${status.syncActive ? 'Yes' : 'No'}`);
             };
@@ -291,10 +391,24 @@
                     testBtn.style.marginTop = '10px';
                     form.appendChild(testBtn);
                 }
-            }, 1000);
+            }, 1500);
             
             // Initialize
-            document.getElementById('username').focus();
+            setTimeout(() => {
+                if (document.getElementById('username')) {
+                    document.getElementById('username').focus();
+                }
+            }, 500);
+        });
+        
+        // Catch any errors during page load
+        window.addEventListener('error', function(e) {
+            console.error("Global error caught:", e.message, e.filename, e.lineno);
+            const fallback = document.getElementById('syncFallback');
+            if (fallback) {
+                fallback.innerHTML = "⚠️ Some scripts failed to load. Signup may work in limited mode.";
+                fallback.classList.add('show');
+            }
         });
     </script>
 </body>
