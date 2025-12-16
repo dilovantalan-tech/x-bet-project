@@ -4,27 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-BET - Sign Up</title>
-    <!-- Sync Systems -->
+    <!-- Cross-Browser Sync System -->
     <script src="cross-browser-sync.js"></script>
     <style>
-        /* [KEEP ALL YOUR EXISTING CSS - NO CHANGES] */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        
+
+        :root {
+            --primary: #3b82f6;
+            --secondary: #1d4ed8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+
         body {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: #f8fafc;
+            background: linear-gradient(135deg, var(--dark), #1e293b);
+            color: var(--light);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        
+
+        /* Signup Container */
         .signup-container {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -32,56 +43,243 @@
             padding: 40px;
             width: 100%;
             max-width: 500px;
-            border: 2px solid #3b82f6;
+            border: 2px solid var(--primary);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .header {
+
+        /* Glow Effect */
+        .signup-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            animation: pulse 8s infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            100% { transform: translate(20px, 20px) scale(1.1); opacity: 0.8; }
+        }
+
+        /* Header */
+        .signup-header {
             text-align: center;
             margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
         }
-        
-        .logo {
-            font-size: 2.5rem;
+
+        .signup-logo {
+            font-size: 2.8rem;
             font-weight: 800;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(90deg, var(--primary), #8b5cf6, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
         }
-        
-        .tagline {
-            color: #94a3b8;
+
+        .signup-tagline {
+            color: var(--gray);
             font-size: 0.9rem;
+            margin-bottom: 5px;
         }
-        
+
+        .signup-subtitle {
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        /* Sync Status */
+        .sync-status {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.85rem;
+            border-left: 4px solid var(--primary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Messages */
+        .message {
+            display: none;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            backdrop-filter: blur(10px);
+            border: 1px solid;
+            position: relative;
+            z-index: 1;
+        }
+
+        .message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+        }
+
+        .message.success {
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #86efac;
+        }
+
+        .message.error {
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .message.info {
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+
+        /* Form */
         .form-group {
             margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
         }
-        
-        label {
+
+        .form-label {
             display: block;
             margin-bottom: 8px;
             color: #cbd5e1;
+            font-size: 0.9rem;
             font-weight: 500;
         }
-        
-        input, select {
+
+        .input-container {
+            position: relative;
+        }
+
+        .form-input {
             width: 100%;
-            padding: 15px;
+            padding: 15px 15px 15px 45px;
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            color: white;
+            color: var(--light);
             font-size: 1rem;
+            transition: all 0.3s;
         }
-        
-        input:focus, select:focus {
+
+        .form-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.3);
         }
-        
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 18px;
+        }
+
+        /* Password Strength */
+        .password-strength {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--danger);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .strength-text {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        /* Password Toggle */
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+            width: auto;
+        }
+
+        .password-toggle:hover {
+            color: #94a3b8;
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+
+        .checkbox-group a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
+
+        /* Buttons */
         .btn {
             width: 100%;
             padding: 16px;
@@ -92,145 +290,273 @@
             cursor: pointer;
             transition: all 0.3s;
             margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
-        
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
         .btn-primary {
-            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
         }
-        
+
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
         }
-        
-        .message {
-            display: none;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            font-size: 0.9rem;
+
+        .btn-success {
+            background: linear-gradient(90deg, var(--success), #059669);
+            color: white;
         }
-        
-        .message.success {
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #86efac;
+
+        .btn-danger {
+            background: linear-gradient(90deg, var(--danger), #dc2626);
+            color: white;
         }
-        
-        .message.error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #fca5a5;
+
+        /* Button Grid */
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
         }
-        
-        .sync-status {
-            background: rgba(59, 130, 246, 0.1);
+
+        /* Transaction Code Display */
+        .transaction-code-display {
+            background: rgba(0, 0, 0, 0.4);
             padding: 15px;
             border-radius: 10px;
-            margin-bottom: 25px;
-            font-size: 0.85rem;
-            border-left: 4px solid #3b82f6;
+            margin: 15px 0;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            word-break: break-all;
+            text-align: center;
+            color: #86efac;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
         }
-        
-        .footer {
+
+        /* Sync Info */
+        .sync-info {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Footer */
+        .signup-footer {
             text-align: center;
             margin-top: 30px;
             color: #64748b;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
         }
-        
-        .footer a {
-            color: #3b82f6;
+
+        .signup-footer a {
+            color: var(--primary);
             text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .signup-footer a:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .signup-container {
+                padding: 30px 20px;
+            }
+            
+            .signup-logo {
+                font-size: 2.2rem;
+            }
+            
+            .form-input {
+                padding: 14px 14px 14px 40px;
+            }
+            
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="signup-container">
-        <div class="header">
-            <div class="logo">X-BET</div>
-            <div class="tagline">Universal Account System • Cross-Browser Sync</div>
+        <!-- Header -->
+        <div class="signup-header">
+            <div class="signup-logo">X-BET</div>
+            <div class="signup-tagline">Universal Account System</div>
+            <div class="signup-subtitle">Works Across All Browsers & Platforms</div>
         </div>
-        
+
+        <!-- Sync Status -->
         <div id="syncStatus" class="sync-status">
-            🔄 Connecting to cross-browser sync system...
+            <span class="loading"></span> Connecting to cross-browser sync system...
         </div>
-        
+
+        <!-- Messages -->
         <div id="message" class="message"></div>
-        
+
+        <!-- Signup Form -->
         <form id="signupForm">
+            <!-- Username -->
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Choose username (3-20 characters)" required>
+                <label class="form-label" for="username">👤 Username</label>
+                <div class="input-container">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="username" class="form-input" placeholder="Choose a username (3-20 characters)" required>
+                </div>
             </div>
-            
+
+            <!-- Email -->
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="Your email address" required>
+                <label class="form-label" for="email">📧 Email Address</label>
+                <div class="input-container">
+                    <span class="input-icon">📧</span>
+                    <input type="email" id="email" class="form-input" placeholder="Your email address" required>
+                </div>
             </div>
-            
+
+            <!-- Password -->
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="At least 6 characters" required>
+                <label class="form-label" for="password">🔒 Password</label>
+                <div class="input-container">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" id="password" class="form-input" placeholder="At least 6 characters" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')">👁</button>
+                </div>
+                <div class="password-strength">
+                    <div class="strength-bar" id="strengthBar"></div>
+                </div>
+                <div class="strength-text" id="strengthText">Password strength</div>
             </div>
-            
+
+            <!-- Confirm Password -->
             <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" placeholder="Repeat password" required>
+                <label class="form-label" for="confirmPassword">✅ Confirm Password</label>
+                <div class="input-container">
+                    <span class="input-icon">✅</span>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="Repeat your password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁</button>
+                </div>
             </div>
-            
+
+            <!-- Account Type -->
             <div class="form-group">
-                <label for="accountType">Account Type</label>
-                <select id="accountType">
-                    <option value="regular">Regular User</option>
-                    <option value="vip">VIP User</option>
-                </select>
+                <label class="form-label" for="accountType">🎮 Account Type</label>
+                <div class="input-container">
+                    <span class="input-icon">🎮</span>
+                    <select id="accountType" class="form-input">
+                        <option value="regular">Regular User</option>
+                        <option value="vip">VIP User</option>
+                        <option value="premium">Premium User</option>
+                    </select>
+                </div>
             </div>
-            
+
+            <!-- Terms -->
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">
+                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </label>
+            </div>
+
+            <!-- Submit Button -->
             <button type="submit" class="btn btn-primary" id="submitBtn">
-                Create Account
+                🚀 Create Account
             </button>
-            
-            <button type="button" class="btn btn-secondary" onclick="autoFillTest()">
-                Auto-Fill Test Account
+
+            <!-- Action Buttons -->
+            <div class="button-grid">
+                <button type="button" class="btn btn-secondary" onclick="autoFillTest()">
+                    🧪 Auto-Fill Test
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="testSyncSystem()" id="testSyncBtn">
+                    🔄 Test Sync
+                </button>
+            </div>
+
+            <!-- Admin Button -->
+            <button type="button" class="btn btn-success" onclick="goToAdminPanel()">
+                👑 Go to Admin Panel
             </button>
-            
-            <button type="button" class="btn btn-secondary" onclick="testSyncSystem()">
-                Test Sync System
+
+            <!-- Quick Login -->
+            <button type="button" class="btn btn-danger" onclick="quickLogin()">
+                ⚡ Quick Login (Test)
             </button>
         </form>
-        
-        <div class="footer">
+
+        <!-- Footer -->
+        <div class="signup-footer">
             Already have an account? <a href="login.html">Sign In</a><br>
-            <span style="font-size: 0.8rem; opacity: 0.7;">Sync System: <span id="syncVersion">v2.0</span></span>
+            <span style="font-size: 0.75rem; opacity: 0.7; margin-top: 10px; display: block;">
+                Sync System: <span id="syncVersion">Loading...</span> | 
+                <span id="userCount">0 users online</span>
+            </span>
         </div>
     </div>
 
     <script>
-        // 🔥 X-BET SIGNUP SYSTEM v2.0 - WITH CROSS-BROWSER SYNC
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎬 X-BET Signup System Starting...');
+        // 🔥 X-BET SIGNUP SYSTEM v3.0 - COMPLETE
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🎬 X-BET Signup System v3.0 Starting...');
             
-            // Elements
+            // Get DOM elements
             const signupForm = document.getElementById('signupForm');
             const messageDiv = document.getElementById('message');
             const syncStatusDiv = document.getElementById('syncStatus');
             const submitBtn = document.getElementById('submitBtn');
+            const testSyncBtn = document.getElementById('testSyncBtn');
             const syncVersion = document.getElementById('syncVersion');
+            const userCount = document.getElementById('userCount');
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
             
             // Check if already logged in
             if (sessionStorage.getItem('xbet_session')) {
-                showMessage('✅ You are already logged in. Redirecting...', 'success');
+                showMessage('✅ You are already logged in! Redirecting to dashboard...', 'info');
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 2000);
@@ -239,76 +565,193 @@
             
             // Initialize sync system status
             let syncSystemReady = false;
+            let syncSystem = null;
             
-            // Check sync system
-            function checkSyncSystem() {
-                if (window.crossBrowserSync) {
-                    syncSystemReady = true;
-                    const status = window.crossBrowserSync.getStatus();
+            // Check and wait for sync system
+            async function initializeSyncSystem() {
+                console.log('🔄 Initializing sync system...');
+                
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                while (attempts < maxAttempts) {
+                    if (window.crossBrowserSync && window.crossBrowserSync.getStatus) {
+                        syncSystem = window.crossBrowserSync;
+                        syncSystemReady = true;
+                        
+                        const status = syncSystem.getStatus();
+                        
+                        syncStatusDiv.innerHTML = `
+                            ✅ <strong>Cross-Browser Sync System Ready!</strong><br>
+                            • Version: ${status.version}<br>
+                            • Browser: ${status.browser} (${status.device})<br>
+                            • Total Users: ${status.adminUsers}<br>
+                            • Tab ID: ${status.tabId.substring(0, 10)}...
+                        `;
+                        
+                        syncVersion.textContent = status.version;
+                        userCount.textContent = `${status.adminUsers} users in system`;
+                        
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '🚀 Create Account';
+                        testSyncBtn.style.display = 'block';
+                        
+                        console.log('✅ Sync system initialized');
+                        return;
+                    }
                     
-                    syncStatusDiv.innerHTML = `
-                        ✅ <strong>Cross-Browser Sync System Ready!</strong><br>
-                        • Version: ${status.version}<br>
-                        • Browser: ${status.browser} (${status.device})<br>
-                        • Total Users: ${status.adminUsers}<br>
-                        • Tab ID: ${status.tabId.substring(0, 10)}...
-                    `;
-                    
-                    syncVersion.textContent = status.version;
-                    
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Create Account';
-                    
-                } else {
-                    syncStatusDiv.innerHTML = '⚠️ Sync system loading...';
-                    setTimeout(checkSyncSystem, 1000);
+                    attempts++;
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
+                
+                // Fallback if sync system not available
+                console.warn('⚠️ Sync system not available, using local mode');
+                syncStatusDiv.innerHTML = `
+                    ⚠️ <strong>Sync System Not Available</strong><br>
+                    Using local storage only. Some features may be limited.
+                `;
+                
+                syncVersion.textContent = 'Local Only';
+                userCount.textContent = 'Local mode';
+                
+                // Enable form anyway
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '🚀 Create Account (Local Mode)';
             }
             
-            // Start checking sync system
-            setTimeout(checkSyncSystem, 500);
+            // Start sync system initialization
+            initializeSyncSystem();
             
-            // Auto-fill test account
+            // 🔥 PASSWORD STRENGTH CHECKER
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                let text = 'Very Weak';
+                let color = '#ef4444';
+                
+                // Length check
+                if (password.length >= 6) strength += 1;
+                if (password.length >= 8) strength += 1;
+                
+                // Complexity checks
+                if (/[A-Z]/.test(password)) strength += 1;
+                if (/[0-9]/.test(password)) strength += 1;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+                
+                // Determine strength level
+                if (strength === 1) { text = 'Very Weak'; color = '#ef4444'; }
+                else if (strength === 2) { text = 'Weak'; color = '#f97316'; }
+                else if (strength === 3) { text = 'Fair'; color = '#eab308'; }
+                else if (strength === 4) { text = 'Good'; color = '#84cc16'; }
+                else if (strength >= 5) { text = 'Strong'; color = '#22c55e'; }
+                
+                // Update display
+                strengthBar.style.width = (strength * 20) + '%';
+                strengthBar.style.background = color;
+                strengthText.textContent = text;
+                strengthText.style.color = color;
+            });
+            
+            // 🔥 AUTO-FILL TEST ACCOUNT
             window.autoFillTest = function() {
                 const randomNum = Math.floor(Math.random() * 10000);
-                document.getElementById('username').value = 'player' + randomNum;
-                document.getElementById('email').value = 'test' + randomNum + '@xbet.com';
+                const username = 'player' + randomNum;
+                const email = 'test' + randomNum + '@xbet.com';
+                
+                document.getElementById('username').value = username;
+                document.getElementById('email').value = email;
                 document.getElementById('password').value = 'Test123!';
                 document.getElementById('confirmPassword').value = 'Test123!';
+                document.getElementById('accountType').value = 'regular';
+                document.getElementById('terms').checked = true;
                 
-                showMessage('✅ Test account data filled. Click Create Account to register.', 'success');
+                // Trigger password strength update
+                passwordInput.dispatchEvent(new Event('input'));
+                
+                showMessage(`✅ Test account data filled. Username: <strong>${username}</strong>`, 'info');
             };
             
-            // Test sync system
+            // 🔥 TOGGLE PASSWORD VISIBILITY
+            window.togglePassword = function(fieldId) {
+                const field = document.getElementById(fieldId);
+                const toggle = field.nextElementSibling;
+                
+                if (field.type === 'password') {
+                    field.type = 'text';
+                    toggle.textContent = '👁️‍🗨️';
+                } else {
+                    field.type = 'password';
+                    toggle.textContent = '👁';
+                }
+            };
+            
+            // 🔥 GO TO ADMIN PANEL
+            window.goToAdminPanel = function() {
+                if (confirm('Go to Admin Panel? You need admin privileges.')) {
+                    window.open('admin.html', '_blank');
+                }
+            };
+            
+            // 🔥 QUICK LOGIN (TEST)
+            window.quickLogin = function() {
+                const username = 'testuser_' + Math.floor(Math.random() * 1000);
+                const email = username + '@test.com';
+                
+                // Create test session
+                const sessionData = {
+                    username: username,
+                    email: email,
+                    transactionCode: 'XBT-TST-' + Date.now(),
+                    isAdmin: false,
+                    lastLogin: new Date().toISOString(),
+                    loginTime: Date.now(),
+                    balance: 1000.00,
+                    gameBalance: 500.00,
+                    sessionId: 'test_' + Date.now()
+                };
+                
+                sessionStorage.setItem('xbet_session', btoa(JSON.stringify(sessionData)));
+                localStorage.setItem('currentUser', username);
+                
+                showMessage(`✅ Test login created! Username: ${username}`, 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            };
+            
+            // 🔥 TEST SYNC SYSTEM
             window.testSyncSystem = function() {
-                if (window.crossBrowserSync) {
-                    const status = window.crossBrowserSync.getStatus();
-                    alert(`🔄 Sync System Status:\n\n` +
+                if (syncSystem && syncSystem.getStatus) {
+                    const status = syncSystem.getStatus();
+                    alert(`🔧 Sync System Test\n\n` +
+                          `Status: ✅ Ready\n` +
                           `Version: ${status.version}\n` +
                           `Browser: ${status.browser}\n` +
                           `Device: ${status.device}\n` +
                           `Total Users: ${status.adminUsers}\n` +
                           `Tab ID: ${status.tabId}\n` +
-                          `Last Update: ${status.timestamp}`);
+                          `Last Update: ${status.timestamp}\n\n` +
+                          `Test completed successfully!`);
                 } else {
                     alert('❌ Sync system not available');
                 }
             };
             
-            // Show message
-            function showMessage(text, type) {
+            // 🔥 SHOW MESSAGE FUNCTION
+            function showMessage(text, type = 'info') {
                 messageDiv.innerHTML = text;
                 messageDiv.className = 'message ' + type;
                 messageDiv.style.display = 'block';
                 
-                if (type === 'success') {
+                if (type === 'success' || type === 'info') {
                     setTimeout(() => {
                         messageDiv.style.display = 'none';
-                    }, 5000);
+                    }, type === 'success' ? 10000 : 5000);
                 }
             }
             
-            // Validation functions
+            // 🔥 VALIDATION FUNCTIONS
             function isValidEmail(email) {
                 return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
             }
@@ -317,8 +760,8 @@
                 return /^[a-zA-Z0-9_]{3,20}$/.test(username);
             }
             
-            // Create user session
-            function createUserSession(username, email, transactionCode) {
+            // 🔥 CREATE USER SESSION
+            function createUserSession(username, email, transactionCode, balance = 0, gameBalance = 0) {
                 const sessionData = {
                     username: username,
                     email: email,
@@ -326,17 +769,97 @@
                     isAdmin: false,
                     lastLogin: new Date().toISOString(),
                     loginTime: Date.now(),
-                    balance: 0,
-                    gameBalance: 0,
-                    sessionId: 'sess_' + Date.now()
+                    balance: balance,
+                    gameBalance: gameBalance,
+                    sessionId: 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
                 };
                 
                 sessionStorage.setItem('xbet_session', btoa(JSON.stringify(sessionData)));
                 localStorage.setItem('currentUser', username);
-                localStorage.setItem('session_expiry', Date.now() + 86400000);
+                localStorage.setItem('session_expiry', Date.now() + 86400000); // 24 hours
+                
+                console.log('🔐 User session created for:', username);
             }
             
-            // 🔥 MAIN SIGNUP FUNCTION
+            // 🔥 GENERATE TRANSACTION CODE (fallback)
+            function generateTransactionCode(username) {
+                const prefix = username ? username.substring(0, 3).toUpperCase() : 'XBT';
+                const timestamp = Date.now().toString(36).toUpperCase().slice(-6);
+                const random = Math.random().toString(36).slice(2, 8).toUpperCase();
+                return `XBT-${prefix}-${timestamp}-${random}`;
+            }
+            
+            // 🔥 REGISTER USER WITH SYNC SYSTEM
+            async function registerUserWithSync(userData) {
+                try {
+                    // Method 1: Cross-browser sync
+                    if (syncSystem && syncSystem.registerUser) {
+                        const userId = syncSystem.registerUser(userData);
+                        if (userId) {
+                            console.log('✅ Registered with cross-browser sync');
+                            return { success: true, userId: userId };
+                        }
+                    }
+                    
+                    // Method 2: Local storage fallback
+                    console.log('📦 Using local registration (fallback)');
+                    
+                    // Save to registeredUsers
+                    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                    registeredUsers[userData.username] = userData.email;
+                    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+                    
+                    // Generate transaction code
+                    const transactionCode = generateTransactionCode(userData.username);
+                    
+                    // Save detailed data
+                    const detailedData = {
+                        username: userData.username,
+                        email: userData.email,
+                        password: userData.password,
+                        balance: userData.balance || 0,
+                        gameBalance: userData.gameBalance || 0,
+                        transactionCode: transactionCode,
+                        isAdmin: false,
+                        status: 'active',
+                        accountType: userData.accountType || 'regular',
+                        registeredAt: new Date().toISOString(),
+                        lastLogin: new Date().toISOString(),
+                        activities: []
+                    };
+                    
+                    localStorage.setItem('userData_' + userData.username, JSON.stringify(detailedData));
+                    
+                    // Also update ALL_XBET_USERS for admin panel
+                    let allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+                    const exists = allXbetUsers.findIndex(u => u.username === userData.username);
+                    if (exists === -1) {
+                        allXbetUsers.push({
+                            username: userData.username,
+                            email: userData.email,
+                            balance: userData.balance || 0,
+                            gameBalance: userData.gameBalance || 0,
+                            transactionCode: transactionCode,
+                            status: 'active',
+                            registeredAt: new Date().toISOString(),
+                            source: 'local_signup'
+                        });
+                        localStorage.setItem('ALL_XBET_USERS', JSON.stringify(allXbetUsers));
+                    }
+                    
+                    return { 
+                        success: true, 
+                        userId: 'local_' + Date.now(),
+                        transactionCode: transactionCode
+                    };
+                    
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            // 🔥 MAIN SIGNUP HANDLER
             signupForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
@@ -345,21 +868,22 @@
                     return;
                 }
                 
-                // Get values
+                // Get form values
                 const username = document.getElementById('username').value.trim();
                 const email = document.getElementById('email').value.trim().toLowerCase();
                 const password = document.getElementById('password').value;
                 const confirmPassword = document.getElementById('confirmPassword').value;
                 const accountType = document.getElementById('accountType').value;
+                const termsAccepted = document.getElementById('terms').checked;
                 
-                // Validation
+                // 🔒 VALIDATION
                 if (!username || !email || !password || !confirmPassword) {
-                    showMessage('❌ Please fill all fields', 'error');
+                    showMessage('❌ Please fill in all fields', 'error');
                     return;
                 }
                 
                 if (!isValidUsername(username)) {
-                    showMessage('❌ Username must be 3-20 characters (letters, numbers, underscores)', 'error');
+                    showMessage('❌ Username must be 3-20 characters (letters, numbers, underscores only)', 'error');
                     return;
                 }
                 
@@ -378,14 +902,19 @@
                     return;
                 }
                 
-                // Check local storage for duplicates
+                if (!termsAccepted) {
+                    showMessage('❌ You must agree to the Terms of Service', 'error');
+                    return;
+                }
+                
+                // Check if user exists locally
                 const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
                 if (registeredUsers[username]) {
                     showMessage('❌ Username already taken', 'error');
                     return;
                 }
                 
-                // Check email
+                // Check if email exists
                 for (const existingEmail of Object.values(registeredUsers)) {
                     if (existingEmail === email) {
                         showMessage('❌ Email already registered', 'error');
@@ -393,105 +922,148 @@
                     }
                 }
                 
-                // Check with sync system
-                if (window.crossBrowserSync) {
-                    const allUsers = window.crossBrowserSync.getAllUsers();
-                    if (allUsers.find(u => u.username === username)) {
-                        showMessage('❌ Username already exists in system', 'error');
-                        return;
+                // Check with sync system if available
+                if (syncSystem && syncSystem.getAllUsers) {
+                    try {
+                        const allUsers = syncSystem.getAllUsers();
+                        if (allUsers.find(u => u.username === username)) {
+                            showMessage('❌ Username already exists in system', 'error');
+                            return;
+                        }
+                    } catch (error) {
+                        console.warn('Could not check sync system users:', error);
                     }
                 }
                 
-                // Generate transaction code
-                const transactionCode = window.crossBrowserSync.generateTransactionCode(username);
-                
-                // Show loading
+                // Show loading state
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '🔄 Creating Account...';
+                submitBtn.innerHTML = '<span class="loading"></span> Creating Account...';
                 
-                // Prepare user data
-                const userData = {
-                    username: username,
-                    email: email,
-                    password: password, // Note: In production, hash this!
-                    balance: 0.00,
-                    gameBalance: 0.00,
-                    status: 'active',
-                    accountType: accountType
-                };
+                // Disable all form inputs
+                signupForm.querySelectorAll('input, select, button').forEach(el => {
+                    if (el.id !== 'submitBtn') el.disabled = true;
+                });
                 
                 try {
-                    // 🔥 REGISTER WITH CROSS-BROWSER SYNC
-                    const userId = window.crossBrowserSync.registerUser(userData);
-                    
-                    if (!userId) {
-                        throw new Error('Registration failed');
-                    }
-                    
-                    // Also save locally for immediate access
-                    registeredUsers[username] = email;
-                    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-                    
-                    // Save detailed user data
-                    const detailedData = {
+                    // Prepare user data
+                    const userData = {
                         username: username,
                         email: email,
                         password: password,
                         balance: 0.00,
                         gameBalance: 0.00,
-                        transactionCode: transactionCode,
-                        isAdmin: false,
                         status: 'active',
-                        accountType: accountType,
-                        registeredAt: new Date().toISOString(),
-                        lastLogin: new Date().toISOString(),
-                        activities: []
+                        accountType: accountType
                     };
                     
-                    localStorage.setItem('userData_' + username, JSON.stringify(detailedData));
+                    // 🔥 REGISTER USER
+                    console.log('🔄 Registering user...');
+                    const result = await registerUserWithSync(userData);
                     
-                    // Create session
+                    if (!result.success) {
+                        throw new Error(result.error || 'Registration failed');
+                    }
+                    
+                    // Get transaction code
+                    const transactionCode = result.transactionCode || generateTransactionCode(username);
+                    
+                    // 🔥 CREATE USER SESSION
                     createUserSession(username, email, transactionCode);
                     
-                    // Get sync status
-                    const syncStatus = window.crossBrowserSync.getStatus();
+                    // 🔥 GET SYNC STATUS
+                    let syncInfo = {};
+                    if (syncSystem && syncSystem.getStatus) {
+                        syncInfo = syncSystem.getStatus();
+                    }
                     
-                    // Show success
+                    // 🔥 SHOW SUCCESS MESSAGE
                     showMessage(`
-                        ✅ <strong>Account Created Successfully!</strong><br><br>
-                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin: 10px 0;">
-                            <strong style="color: #3b82f6;">Your Transaction Code:</strong><br>
-                            <code style="font-family: monospace; font-size: 16px; color: #86efac; word-break: break-all;">${transactionCode}</code>
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 15px;">🎉 Welcome to X-BET!</div>
+                            
+                            <div class="transaction-code-display">
+                                ${transactionCode}
+                            </div>
+                            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">
+                                Save this code for transactions and account recovery
+                            </div>
+                            
+                            <div class="sync-info">
+                                <strong>📊 Account Details:</strong><br>
+                                • Username: <strong>${username}</strong><br>
+                                • Email: <strong>${email}</strong><br>
+                                • Account Type: <strong>${accountType}</strong><br>
+                                • Status: <span style="color: #86efac;">Active</span><br>
+                                • Balance: $0.00<br>
+                                • Registered: ${new Date().toLocaleString()}
+                            </div>
+                            
+                            ${syncInfo.version ? `
+                            <div class="sync-info">
+                                🔄 <strong>Sync Status:</strong><br>
+                                • Browser: ${syncInfo.browser}<br>
+                                • Device: ${syncInfo.device}<br>
+                                • System Users: ${syncInfo.adminUsers}<br>
+                                • Version: ${syncInfo.version}<br>
+                                • Your account is now available across all platforms!
+                            </div>
+                            ` : ''}
+                            
+                            <div style="margin-top: 15px; font-size: 13px; color: #94a3b8;">
+                                Redirecting to dashboard in 5 seconds...
+                            </div>
                         </div>
-                        <div style="background: rgba(59,130,246,0.1); padding: 12px; border-radius: 8px; margin: 10px 0; font-size: 13px;">
-                            📊 <strong>Sync Status:</strong><br>
-                            • Browser: ${syncStatus.browser}<br>
-                            • Device: ${syncStatus.device}<br>
-                            • System Users: ${syncStatus.adminUsers}<br>
-                            • Your account is now available on ALL browsers!
-                        </div>
-                        <small>Redirecting to dashboard...</small>
                     `, 'success');
                     
-                    // Redirect
+                    // 🔥 TRIGGER ADMIN PANEL UPDATE
+                    setTimeout(() => {
+                        // Trigger storage event for admin panel
+                        localStorage.setItem('XBET_NEW_USER_' + Date.now(), JSON.stringify({
+                            username: username,
+                            email: email,
+                            timestamp: Date.now()
+                        }));
+                        
+                        // Remove after short delay
+                        setTimeout(() => {
+                            localStorage.removeItem('XBET_NEW_USER_' + Date.now());
+                        }, 100);
+                        
+                        console.log('📢 Triggered admin panel update');
+                    }, 1000);
+                    
+                    // 🔥 REDIRECT TO DASHBOARD
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
-                    }, 4000);
+                    }, 5000);
                     
                 } catch (error) {
-                    console.error('Registration error:', error);
-                    showMessage('❌ Error creating account: ' + error.message, 'error');
+                    console.error('❌ Registration error:', error);
+                    showMessage(`❌ Error creating account: ${error.message}`, 'error');
+                    
+                    // Re-enable form
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Create Account';
+                    submitBtn.innerHTML = '🚀 Create Account';
+                    signupForm.querySelectorAll('input, select, button').forEach(el => {
+                        el.disabled = false;
+                    });
                 }
             });
             
-            // Focus on username
+            // Focus on username field
             setTimeout(() => {
-                document.getElementById('username').focus();
+                const usernameField = document.getElementById('username');
+                if (usernameField) {
+                    usernameField.focus();
+                }
             }, 500);
             
-            console.log('✅ Signup system ready');
+            console.log('✅ Signup system v3.0 ready');
+        });
+        
+        // Global error handler
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.message, e.filename, e.lineno);
         });
     </script>
 </body>
