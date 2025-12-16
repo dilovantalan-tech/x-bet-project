@@ -1,139 +1,117 @@
-// 🔥 X-BET CROSS-BROWSER SYNC ENGINE v1.0
+// 🔥 X-BET CROSS-BROWSER SYNC ENGINE v2.0
 // Works across ALL browsers, devices, and platforms
 (function() {
     'use strict';
     
-    console.log('🌐 Loading Cross-Browser Sync Engine...');
+    console.log('🌐 Loading X-BET Cross-Browser Sync Engine v2.0...');
     
     class CrossBrowserSync {
         constructor() {
-            this.SYSTEM_ID = 'xbet_cross_sync_v1';
+            this.SYSTEM_ID = 'xbet_cross_sync_v2';
             this.STORAGE_KEYS = {
-                MASTER_USERS: 'XBET_MASTER_USERS_V1',  // Master user database
-                SYNC_SIGNAL: 'XBET_SYNC_SIGNAL_V1',
-                ADMIN_USERS: 'XBET_ADMIN_USERS_V1',
-                BROADCAST_CHANNEL: 'xbet_broadcast_channel'
+                MASTER_USERS: 'XBET_MASTER_USERS_V2',
+                ADMIN_USERS: 'XBET_ADMIN_USERS_V2',
+                SYNC_SIGNAL: 'XBET_SYNC_SIGNAL_V2',
+                BROADCAST: 'XBET_BROADCAST_V2'
             };
             
-            this.channel = null;
             this.tabId = 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             this.init();
         }
         
         init() {
-            console.log('🚀 Initializing Cross-Browser Sync...');
+            console.log('🚀 Initializing Cross-Browser Sync Engine...');
             
-            // Setup BroadcastChannel for cross-tab communication
-            this.setupBroadcastChannel();
+            // Initialize storage if empty
+            this.initializeStorage();
             
-            // Listen for localStorage changes from other tabs/browsers
+            // Listen for storage events
             window.addEventListener('storage', this.handleStorageEvent.bind(this));
             
-            // Setup heartbeat to keep sync alive
-            this.setupHeartbeat();
+            // Setup auto-sync
+            this.setupAutoSync();
             
-            // Initial sync
-            this.syncAllBrowsers();
+            // Trigger initial sync
+            setTimeout(() => this.syncAllUsers(), 1000);
             
-            console.log('✅ Cross-Browser Sync Engine Ready');
-            console.log('📡 Tab ID:', this.tabId);
+            console.log('✅ Cross-Browser Sync Engine Ready (Tab ID: ' + this.tabId + ')');
         }
         
-        setupBroadcastChannel() {
-            try {
-                // Try BroadcastChannel API (works across tabs/windows in same browser)
-                if (typeof BroadcastChannel !== 'undefined') {
-                    this.channel = new BroadcastChannel(this.STORAGE_KEYS.BROADCAST_CHANNEL);
-                    
-                    this.channel.onmessage = (event) => {
-                        console.log('📨 Received broadcast message:', event.data);
-                        if (event.data.type === 'USER_ADDED') {
-                            this.addUserToMaster(event.data.user);
-                        } else if (event.data.type === 'SYNC_REQUEST') {
-                            this.broadcastUserList();
-                        }
-                    };
-                }
-            } catch (error) {
-                console.warn('BroadcastChannel not available:', error);
+        initializeStorage() {
+            // Initialize master users if empty
+            if (!localStorage.getItem(this.STORAGE_KEYS.MASTER_USERS)) {
+                localStorage.setItem(this.STORAGE_KEYS.MASTER_USERS, JSON.stringify([]));
+            }
+            
+            // Initialize admin users if empty
+            if (!localStorage.getItem(this.STORAGE_KEYS.ADMIN_USERS)) {
+                localStorage.setItem(this.STORAGE_KEYS.ADMIN_USERS, JSON.stringify([]));
             }
         }
         
-        setupHeartbeat() {
-            // Send heartbeat every 30 seconds
+        setupAutoSync() {
+            // Sync every 10 seconds
             setInterval(() => {
-                this.broadcastHeartbeat();
-            }, 30000);
+                this.syncAllUsers();
+            }, 10000);
         }
         
-        broadcastHeartbeat() {
-            const signal = {
-                type: 'HEARTBEAT',
-                tabId: this.tabId,
-                timestamp: Date.now(),
-                url: window.location.href
-            };
-            
-            this.sendBroadcast(signal);
-            localStorage.setItem(this.STORAGE_KEYS.SYNC_SIGNAL, JSON.stringify(signal));
-            
-            setTimeout(() => {
-                localStorage.removeItem(this.STORAGE_KEYS.SYNC_SIGNAL);
-            }, 100);
-        }
-        
-        sendBroadcast(data) {
-            // Method 1: BroadcastChannel
-            if (this.channel) {
-                this.channel.postMessage(data);
-            }
-            
-            // Method 2: localStorage event
-            localStorage.setItem('XBET_BROADCAST_' + Date.now(), JSON.stringify({
-                ...data,
-                _timestamp: Date.now()
-            }));
-        }
-        
-        // 🔥 ADD USER (Call this when user registers in ANY browser)
-        addUser(userData) {
-            console.log('➕ Adding user to cross-browser system:', userData.username);
-            
-            // Generate user ID and transaction code
-            const userId = 'CROSS_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            const transactionCode = this.generateTransactionCode(userData.username);
-            
-            const completeUserData = {
-                ...userData,
-                id: userId,
-                transactionCode: transactionCode,
-                registeredAt: new Date().toISOString(),
-                addedByTab: this.tabId,
-                addedFromUrl: window.location.href,
-                browser: this.getBrowserInfo(),
-                device: this.getDeviceInfo(),
-                syncVersion: '1.0'
-            };
-            
-            // 1. Add to master storage (this browser)
-            this.addUserToMaster(completeUserData);
-            
-            // 2. Broadcast to all other tabs/browsers
-            this.broadcastNewUser(completeUserData);
-            
-            // 3. Update admin storage
-            this.updateAdminStorage(completeUserData);
-            
-            console.log('✅ User added to cross-browser system:', userData.username);
-            return userId;
-        }
-        
-        addUserToMaster(userData) {
+        // 🔥 REGISTER NEW USER (Call this from signup)
+        registerUser(userData) {
             try {
-                // Get master users
-                let masterUsers = this.getMasterUsers();
+                console.log('📝 Registering user:', userData.username);
                 
-                // Check if user exists
+                // Validate
+                if (!userData.username || !userData.email) {
+                    console.error('Invalid user data');
+                    return null;
+                }
+                
+                // Generate IDs
+                const userId = 'USER_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                const transactionCode = this.generateTransactionCode(userData.username);
+                
+                // Create complete user
+                const completeUser = {
+                    ...userData,
+                    id: userId,
+                    transactionCode: transactionCode,
+                    registeredAt: new Date().toISOString(),
+                    lastSeen: new Date().toISOString(),
+                    browser: this.getBrowserInfo(),
+                    device: this.getDeviceInfo(),
+                    source: 'cross_browser_v2',
+                    status: 'active',
+                    balance: userData.balance || 0,
+                    gameBalance: userData.gameBalance || 0
+                };
+                
+                // 1. Add to master storage
+                this.addToMasterStorage(completeUser);
+                
+                // 2. Add to admin storage
+                this.addToAdminStorage(completeUser);
+                
+                // 3. Broadcast to other browsers
+                this.broadcastNewUser(completeUser);
+                
+                // 4. Update compatibility storage
+                this.updateCompatibilityStorage(completeUser);
+                
+                console.log('✅ User registered with cross-browser sync:', userData.username);
+                return userId;
+                
+            } catch (error) {
+                console.error('Error registering user:', error);
+                return null;
+            }
+        }
+        
+        addToMasterStorage(userData) {
+            try {
+                let masterUsers = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.MASTER_USERS) || '[]');
+                
+                // Check if exists
                 const existingIndex = masterUsers.findIndex(u => 
                     u.username === userData.username || u.email === userData.email
                 );
@@ -141,51 +119,25 @@
                 if (existingIndex === -1) {
                     // Add new user
                     masterUsers.push(userData);
-                    console.log('📝 Added to master storage:', userData.username);
                 } else {
-                    // Update existing user
+                    // Update existing
                     masterUsers[existingIndex] = {
                         ...masterUsers[existingIndex],
                         ...userData,
                         lastSeen: new Date().toISOString()
                     };
-                    console.log('🔄 Updated in master storage:', userData.username);
                 }
                 
-                // Save master users
                 localStorage.setItem(this.STORAGE_KEYS.MASTER_USERS, JSON.stringify(masterUsers));
-                
-                // Also update admin storage
-                this.updateAdminStorage(userData);
-                
                 return true;
+                
             } catch (error) {
-                console.error('Error adding to master:', error);
+                console.error('Error adding to master storage:', error);
                 return false;
             }
         }
         
-        broadcastNewUser(userData) {
-            const broadcastData = {
-                type: 'USER_ADDED',
-                user: userData,
-                timestamp: Date.now(),
-                tabId: this.tabId
-            };
-            
-            // Broadcast to all tabs
-            this.sendBroadcast(broadcastData);
-            
-            // Also trigger localStorage event
-            localStorage.setItem('XBET_NEW_USER_' + Date.now(), JSON.stringify(broadcastData));
-            setTimeout(() => {
-                localStorage.removeItem('XBET_NEW_USER_' + Date.now());
-            }, 100);
-            
-            console.log('📢 Broadcasted new user:', userData.username);
-        }
-        
-        updateAdminStorage(userData) {
+        addToAdminStorage(userData) {
             try {
                 // Format for admin panel
                 const adminUser = {
@@ -197,13 +149,12 @@
                     status: userData.status || 'active',
                     registeredAt: userData.registeredAt || new Date().toISOString(),
                     lastLogin: userData.lastLogin || new Date().toISOString(),
-                    source: 'cross_browser_sync',
-                    browser: userData.browser || this.getBrowserInfo(),
-                    device: userData.device || this.getDeviceInfo(),
-                    addedByTab: userData.addedByTab || this.tabId
+                    source: 'cross_browser_admin',
+                    browser: userData.browser || 'Unknown',
+                    device: userData.device || 'Unknown',
+                    tabId: this.tabId
                 };
                 
-                // Get existing admin users
                 let adminUsers = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.ADMIN_USERS) || '[]');
                 
                 // Check if exists
@@ -219,29 +170,25 @@
                     };
                 }
                 
-                // Save admin users
                 localStorage.setItem(this.STORAGE_KEYS.ADMIN_USERS, JSON.stringify(adminUsers));
                 
-                // Also update ALL_XBET_USERS for compatibility
-                this.updateCompatibilityStorage(adminUser);
-                
-                // Trigger admin update
-                this.triggerAdminUpdate();
+                // Also update ALL_XBET_USERS for backward compatibility
+                this.updateAllXbetUsers(adminUser);
                 
                 return true;
+                
             } catch (error) {
-                console.error('Error updating admin storage:', error);
+                console.error('Error adding to admin storage:', error);
                 return false;
             }
         }
         
-        updateCompatibilityStorage(userData) {
+        updateAllXbetUsers(userData) {
             try {
-                // Update ALL_XBET_USERS
                 let allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
                 const existingIndex = allXbetUsers.findIndex(u => u.username === userData.username);
                 
-                const compatibleUser = {
+                const formattedUser = {
                     username: userData.username,
                     email: userData.email,
                     balance: userData.balance || 0,
@@ -249,13 +196,13 @@
                     transactionCode: userData.transactionCode,
                     status: userData.status || 'active',
                     registeredAt: userData.registeredAt || new Date().toISOString(),
-                    source: 'cross_sync_compatible'
+                    source: 'cross_browser_compatible'
                 };
                 
                 if (existingIndex === -1) {
-                    allXbetUsers.push(compatibleUser);
+                    allXbetUsers.push(formattedUser);
                 } else {
-                    allXbetUsers[existingIndex] = compatibleUser;
+                    allXbetUsers[existingIndex] = formattedUser;
                 }
                 
                 localStorage.setItem('ALL_XBET_USERS', JSON.stringify(allXbetUsers));
@@ -266,27 +213,47 @@
                 localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
                 
                 return true;
+                
             } catch (error) {
-                console.error('Error updating compatibility storage:', error);
+                console.error('Error updating ALL_XBET_USERS:', error);
                 return false;
             }
         }
         
-        triggerAdminUpdate() {
-            localStorage.setItem('XBET_ADMIN_UPDATE_NOW', Date.now().toString());
-            setTimeout(() => {
-                localStorage.removeItem('XBET_ADMIN_UPDATE_NOW');
-            }, 100);
+        broadcastNewUser(userData) {
+            try {
+                const broadcastData = {
+                    type: 'NEW_USER',
+                    user: userData,
+                    timestamp: Date.now(),
+                    tabId: this.tabId,
+                    action: 'register'
+                };
+                
+                // Store in localStorage to trigger storage event
+                localStorage.setItem(this.STORAGE_KEYS.BROADCAST, JSON.stringify(broadcastData));
+                
+                // Remove after short delay
+                setTimeout(() => {
+                    localStorage.removeItem(this.STORAGE_KEYS.BROADCAST);
+                }, 100);
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Error broadcasting new user:', error);
+                return false;
+            }
         }
         
-        // 🔥 GET ALL USERS (For admin panel)
+        // 🔥 GET ALL USERS (for admin panel)
         getAllUsers() {
             try {
-                // First, get from admin storage
+                // Get from admin storage (primary)
                 let adminUsers = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.ADMIN_USERS) || '[]');
                 
-                // Also get from master storage
-                const masterUsers = this.getMasterUsers();
+                // Get from master storage (secondary)
+                const masterUsers = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.MASTER_USERS) || '[]');
                 
                 // Merge users (avoid duplicates)
                 masterUsers.forEach(masterUser => {
@@ -300,118 +267,98 @@
                             transactionCode: masterUser.transactionCode || this.generateTransactionCode(masterUser.username),
                             status: masterUser.status || 'active',
                             registeredAt: masterUser.registeredAt || new Date().toISOString(),
-                            source: 'master_sync',
+                            source: 'master_storage',
                             browser: masterUser.browser || 'Unknown',
                             device: masterUser.device || 'Unknown'
                         });
                     }
                 });
                 
-                // Also check compatibility storage
+                // Also get from ALL_XBET_USERS (compatibility)
                 const allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
                 allXbetUsers.forEach(xbetUser => {
                     const exists = adminUsers.find(u => u.username === xbetUser.username);
                     if (!exists) {
                         adminUsers.push({
                             ...xbetUser,
-                            source: xbetUser.source || 'compatibility'
+                            source: 'compatibility_storage'
                         });
                     }
                 });
                 
-                console.log(`📊 Total users from all sources: ${adminUsers.length}`);
+                console.log(`📊 Total users found: ${adminUsers.length}`);
                 return adminUsers;
+                
             } catch (error) {
                 console.error('Error getting all users:', error);
                 return [];
             }
         }
         
-        getMasterUsers() {
+        // 🔥 SYNC ALL USERS
+        syncAllUsers() {
             try {
-                const masterData = localStorage.getItem(this.STORAGE_KEYS.MASTER_USERS);
-                if (masterData) {
-                    return JSON.parse(masterData);
-                }
+                console.log('🔄 Syncing users across all browsers...');
+                
+                // Trigger sync signal
+                localStorage.setItem(this.STORAGE_KEYS.SYNC_SIGNAL, Date.now().toString());
+                
+                setTimeout(() => {
+                    localStorage.removeItem(this.STORAGE_KEYS.SYNC_SIGNAL);
+                }, 100);
+                
+                return {
+                    success: true,
+                    timestamp: new Date().toLocaleTimeString(),
+                    users: this.getAllUsers().length
+                };
+                
             } catch (error) {
-                console.error('Error getting master users:', error);
+                console.error('Error syncing users:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
             }
-            return [];
-        }
-        
-        broadcastUserList() {
-            const masterUsers = this.getMasterUsers();
-            const broadcastData = {
-                type: 'USER_LIST',
-                users: masterUsers,
-                timestamp: Date.now(),
-                tabId: this.tabId
-            };
-            
-            this.sendBroadcast(broadcastData);
-        }
-        
-        // 🔥 SYNC ALL BROWSERS
-        syncAllBrowsers() {
-            console.log('🔄 Syncing with all browsers...');
-            
-            // Request user list from other tabs
-            this.sendBroadcast({
-                type: 'SYNC_REQUEST',
-                timestamp: Date.now(),
-                tabId: this.tabId
-            });
-            
-            // Update admin storage with current master users
-            const masterUsers = this.getMasterUsers();
-            masterUsers.forEach(user => {
-                this.updateAdminStorage(user);
-            });
-            
-            return {
-                success: true,
-                users: masterUsers.length,
-                timestamp: new Date().toISOString()
-            };
         }
         
         handleStorageEvent(event) {
-            // Listen for cross-browser signals
-            if (event.key && (
-                event.key.includes('XBET_NEW_USER_') ||
-                event.key.includes('XBET_BROADCAST_') ||
-                event.key === this.STORAGE_KEYS.SYNC_SIGNAL ||
-                event.key === 'XBET_ADMIN_UPDATE_NOW'
-            )) {
-                console.log('🌐 Cross-browser event detected:', event.key);
-                
+            // Listen for sync signals
+            if (event.key === this.STORAGE_KEYS.BROADCAST && event.newValue) {
                 try {
-                    if (event.newValue) {
-                        const data = JSON.parse(event.newValue);
+                    const data = JSON.parse(event.newValue);
+                    
+                    if (data.type === 'NEW_USER') {
+                        console.log('📡 Received new user from other browser:', data.user.username);
                         
-                        if (data.type === 'USER_ADDED') {
-                            // Add user from other browser
-                            this.addUserToMaster(data.user);
-                        } else if (data.type === 'USER_LIST') {
-                            // Sync user list from other browser
-                            if (data.users && Array.isArray(data.users)) {
-                                data.users.forEach(user => {
-                                    this.addUserToMaster(user);
-                                });
-                            }
+                        // Add to local storage
+                        this.addToAdminStorage(data.user);
+                        this.addToMasterStorage(data.user);
+                        
+                        // Update admin panel if exists
+                        if (window.admin && window.admin.loadAllUsers) {
+                            setTimeout(() => {
+                                window.admin.loadAllUsers();
+                                window.admin.updateDisplay();
+                            }, 500);
                         }
                     }
                 } catch (error) {
-                    console.error('Error processing storage event:', error);
+                    console.error('Error processing broadcast:', error);
                 }
+            }
+            
+            // Listen for sync signals
+            if (event.key === this.STORAGE_KEYS.SYNC_SIGNAL) {
+                console.log('📡 Sync signal received from other browser');
                 
                 // Update admin panel
-                setTimeout(() => {
-                    if (window.admin && window.admin.loadAllUsers) {
+                if (window.admin && window.admin.loadAllUsers) {
+                    setTimeout(() => {
                         window.admin.loadAllUsers();
                         window.admin.updateDisplay();
-                    }
-                }, 500);
+                    }, 500);
+                }
             }
         }
         
@@ -424,15 +371,12 @@
         
         getBrowserInfo() {
             const ua = navigator.userAgent;
-            let browser = 'Unknown';
-            
-            if (ua.includes('Firefox')) browser = 'Firefox';
-            else if (ua.includes('Chrome')) browser = 'Chrome';
-            else if (ua.includes('Safari')) browser = 'Safari';
-            else if (ua.includes('Edge')) browser = 'Edge';
-            else if (ua.includes('Opera')) browser = 'Opera';
-            
-            return browser;
+            if (ua.includes('Firefox')) return 'Firefox';
+            else if (ua.includes('Chrome')) return 'Chrome';
+            else if (ua.includes('Safari')) return 'Safari';
+            else if (ua.includes('Edge')) return 'Edge';
+            else if (ua.includes('Opera')) return 'Opera';
+            else return 'Unknown';
         }
         
         getDeviceInfo() {
@@ -444,30 +388,28 @@
         
         // 🔥 FORCE SYNC
         forceSync() {
-            return this.syncAllBrowsers();
+            return this.syncAllUsers();
         }
         
         // 🔥 GET STATUS
         getStatus() {
-            const masterUsers = this.getMasterUsers();
             const adminUsers = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.ADMIN_USERS) || '[]');
+            const masterUsers = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.MASTER_USERS) || '[]');
             
             return {
-                masterUsers: masterUsers.length,
                 adminUsers: adminUsers.length,
+                masterUsers: masterUsers.length,
                 tabId: this.tabId,
                 browser: this.getBrowserInfo(),
                 device: this.getDeviceInfo(),
-                broadcastChannel: !!this.channel,
-                timestamp: new Date().toLocaleTimeString()
+                timestamp: new Date().toLocaleTimeString(),
+                version: '2.0'
             };
         }
     }
     
     // Create global instance
-    if (!window.crossBrowserSync) {
-        window.crossBrowserSync = new CrossBrowserSync();
-    }
+    window.crossBrowserSync = new CrossBrowserSync();
     
-    console.log('🌐 Cross-Browser Sync Engine loaded successfully');
+    console.log('✅ Cross-Browser Sync Engine v2.0 loaded successfully');
 })();
