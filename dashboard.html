@@ -1,11 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X-BET - Dashboard</title>
+    
+    <!-- Sync Systems -->
+    <script src="cross-browser-sync.js"></script>
+    
     <style>
+        /* [ALL YOUR EXISTING CSS STYLES ARE PRESERVED - UNCHANGED] */
         * {
             margin: 0;
             padding: 0;
@@ -394,6 +398,70 @@
             color: white;
         }
 
+        /* Game Integration Section - NEW */
+        .game-integration {
+            background: rgba(255,255,255,0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .game-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .game-btn {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .game-btn.test {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .game-btn.warning {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        /* Sync Status */
+        .sync-status {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 4px solid #3b82f6;
+            font-size: 0.9rem;
+        }
+
+        /* Balance Validation */
+        .balance-warning {
+            background: rgba(239, 68, 68, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            display: none;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .navbar {
@@ -443,11 +511,11 @@
             <a href="#activity">📊 Activity</a>
             
             <div class="balance-display">
-                <div style="font-size: 0.9rem; color: #94a3b8;">Balance</div>
+                <div style="font-size: 0.9rem; color: #94a3b8;">Main Balance</div>
                 <div class="balance-amount" id="currentBalance">$0.00</div>
             </div>
             
-            <button class="logout-btn" onclick="logout()">
+            <button class="logout-btn" onclick="dashboard.logout()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 5px;">
                     <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
                 </svg>
@@ -458,9 +526,19 @@
 
     <!-- Main Content -->
     <div class="dashboard-container">
+        <!-- Sync Status -->
+        <div class="sync-status" id="syncStatus">
+            <span class="loading"></span> Connecting to system...
+        </div>
+
+        <!-- Balance Warning -->
+        <div class="balance-warning" id="balanceWarning">
+            ⚠️ Your balance is too low for games. Please deposit funds.
+        </div>
+
         <!-- Welcome Section -->
         <div class="welcome-section">
-            <h1>Welcome back, <span id="usernameDisplay"></span>! 👋</h1>
+            <h1>Welcome back, <span id="usernameDisplay"></span>! 🎉</h1>
             <p>Track your balance, send money, and view all transactions</p>
             <div class="user-id" id="userIdDisplay">
                 User ID: Loading...
@@ -471,17 +549,17 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
-                    <div class="stat-title">Total Remaining Balance</div>
+                    <div class="stat-title">Total Main Balance</div>
                     <div class="stat-icon">💰</div>
                 </div>
                 <div class="stat-value stat-neutral" id="remainingBalance">$0.00</div>
-                <div style="color: #94a3b8; font-size: 0.9rem;">Available for use</div>
+                <div style="color: #94a3b8; font-size: 0.9rem;">Available for all transactions</div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-header">
                     <div class="stat-title">Received Balance</div>
-                    <div class="stat-icon">📥</div>
+                    <div class="stat-icon">⬇️</div>
                 </div>
                 <div class="stat-value stat-positive" id="receivedBalance">$0.00</div>
                 <div style="color: #94a3b8; font-size: 0.9rem;">From admins & users</div>
@@ -490,7 +568,7 @@
             <div class="stat-card">
                 <div class="stat-header">
                     <div class="stat-title">Sent Balance</div>
-                    <div class="stat-icon">📤</div>
+                    <div class="stat-icon">⬆️</div>
                 </div>
                 <div class="stat-value stat-negative" id="sentBalance">$0.00</div>
                 <div style="color: #94a3b8; font-size: 0.9rem;">To other users</div>
@@ -498,8 +576,8 @@
 
             <div class="stat-card">
                 <div class="stat-header">
-                    <div class="stat-title">Won Balance</div>
-                    <div class="stat-icon">🎯</div>
+                    <div class="stat-title">Game Wins</div>
+                    <div class="stat-icon">🏆</div>
                 </div>
                 <div class="stat-value stat-positive" id="wonBalance">$0.00</div>
                 <div style="color: #94a3b8; font-size: 0.9rem;">From games & bets</div>
@@ -507,8 +585,8 @@
 
             <div class="stat-card">
                 <div class="stat-header">
-                    <div class="stat-title">Lost Balance</div>
-                    <div class="stat-icon">📉</div>
+                    <div class="stat-title">Game Losses</div>
+                    <div class="stat-icon">💸</div>
                 </div>
                 <div class="stat-value stat-negative" id="lostBalance">$0.00</div>
                 <div style="color: #94a3b8; font-size: 0.9rem;">From games & bets</div>
@@ -517,22 +595,48 @@
             <div class="stat-card">
                 <div class="stat-header">
                     <div class="stat-title">Total Transactions</div>
-                    <div class="stat-icon">📋</div>
+                    <div class="stat-icon">📊</div>
                 </div>
                 <div class="stat-value stat-neutral" id="totalTransactions">0</div>
                 <div style="color: #94a3b8; font-size: 0.9rem;">All activities</div>
             </div>
         </div>
 
+        <!-- Game Integration Section -->
+        <div class="game-integration">
+            <h2 style="margin-bottom: 1rem;">🎮 Game Integration System</h2>
+            <p style="color: #94a3b8; margin-bottom: 1rem;">
+                <strong>Unique Game Code:</strong> <span id="gameCode" style="font-family: monospace; color: #f59e0b;"></span><br>
+                Use this code in any game to automatically deduct/credit your main balance
+            </p>
+            
+            <div class="game-buttons">
+                <button class="game-btn" onclick="dashboard.testGameWin(10)">
+                    🎲 Test Win $10
+                </button>
+                <button class="game-btn test" onclick="dashboard.testGameLoss(5)">
+                    🎯 Test Loss $5
+                </button>
+                <button class="game-btn warning" onclick="dashboard.checkGameBalance()">
+                    ⚡ Check Game Status
+                </button>
+            </div>
+            
+            <div style="margin-top: 1rem; font-size: 0.85rem; color: #94a3b8;">
+                💡 <strong>How it works:</strong> When playing games, your main balance will be automatically used.<br>
+                Wins add to balance, losses deduct from balance. No separate game balance needed.
+            </div>
+        </div>
+
         <!-- Quick Actions -->
         <div class="quick-actions">
-            <button class="action-btn" onclick="openDepositModal()">
+            <button class="action-btn" onclick="dashboard.openDepositModal()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                 </svg>
                 Deposit Funds
             </button>
-            <button class="action-btn" onclick="openWithdrawModal()">
+            <button class="action-btn" onclick="dashboard.openWithdrawModal()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                 </svg>
@@ -560,7 +664,7 @@
                     <input type="number" id="transferAmount" min="0.01" step="0.01" placeholder="0.00" required>
                 </div>
                 
-                <button class="transfer-btn" onclick="processTransfer()">
+                <button class="transfer-btn" onclick="dashboard.processTransfer()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                     </svg>
@@ -577,11 +681,11 @@
             <h2 style="margin-bottom: 1rem;">📋 Activity Log</h2>
             
             <div class="activity-tabs">
-                <button class="tab-btn active" onclick="filterActivities('all')">All Activities</button>
-                <button class="tab-btn" onclick="filterActivities('receive')">Received</button>
-                <button class="tab-btn" onclick="filterActivities('send')">Sent</button>
-                <button class="tab-btn" onclick="filterActivities('win')">Won</button>
-                <button class="tab-btn" onclick="filterActivities('lose')">Lost</button>
+                <button class="tab-btn active" onclick="dashboard.filterActivities('all')">All Activities</button>
+                <button class="tab-btn" onclick="dashboard.filterActivities('receive')">Received</button>
+                <button class="tab-btn" onclick="dashboard.filterActivities('send')">Sent</button>
+                <button class="tab-btn" onclick="dashboard.filterActivities('win')">Won</button>
+                <button class="tab-btn" onclick="dashboard.filterActivities('lose')">Lost</button>
             </div>
             
             <div class="activity-list" id="activityList">
@@ -599,8 +703,8 @@
     <!-- Deposit Modal -->
     <div id="depositModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeDepositModal()">&times;</span>
-            <h2>💳 Deposit Funds</h2>
+            <span class="close" onclick="dashboard.closeDepositModal()">&times;</span>
+            <h2>💰 Deposit Funds</h2>
             <p style="margin: 1rem 0; color: #94a3b8;">To deposit money, contact an admin and provide your transaction code below:</p>
             
             <div style="background: rgba(59, 130, 246, 0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
@@ -613,7 +717,7 @@
                 <h4 style="margin-bottom: 1rem;">Admin Contacts:</h4>
                 <div style="display: grid; gap: 0.75rem;">
                     <div>
-                        <strong>📞 Finance Manager</strong>
+                        <strong>👑 Finance Manager</strong>
                         <div style="color: #94a3b8; font-size: 0.9rem;">Contact for all deposit requests</div>
                     </div>
                     <div>
@@ -623,7 +727,7 @@
                 </div>
             </div>
             
-            <button class="transfer-btn" onclick="closeDepositModal()" style="margin-top: 1.5rem; width: 100%;">
+            <button class="transfer-btn" onclick="dashboard.closeDepositModal()" style="margin-top: 1.5rem; width: 100%;">
                 Understood
             </button>
         </div>
@@ -632,10 +736,10 @@
     <!-- Withdraw Modal -->
     <div id="withdrawModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeWithdrawModal()">&times;</span>
+            <span class="close" onclick="dashboard.closeWithdrawModal()">&times;</span>
             <h2>💰 Withdraw Funds</h2>
             
-            <form id="withdrawForm" onsubmit="processWithdrawal(event)">
+            <form id="withdrawForm" onsubmit="dashboard.processWithdrawal(event)">
                 <div class="form-group" style="margin-bottom: 1rem;">
                     <label>Amount to Withdraw ($)</label>
                     <input type="number" id="withdrawAmount" min="1" step="0.01" placeholder="0.00" required>
@@ -665,71 +769,125 @@
     </div>
 
     <script>
-        // User Data Management
-        class UserDashboard {
+        // 🔥 X-BET DASHBOARD v4.0 - COMPLETE TRANSACTION & GAME SYSTEM
+        class Dashboard {
             constructor() {
                 this.currentUser = null;
                 this.userData = null;
                 this.transactionCode = null;
                 this.activityFilter = 'all';
+                this.gameCode = null;
+                this.allUsers = [];
+                this.allAdmins = [];
+                this.syncStatus = 'loading';
             }
 
-            init() {
+            async init() {
+                console.log('🎮 X-BET Dashboard Initializing...');
+                
                 // Check authentication
                 this.checkAuth();
                 
                 // Load user data
-                this.loadUserData();
+                await this.loadUserData();
                 
                 // Generate/load transaction code
                 this.setupTransactionCode();
                 
+                // Generate game code
+                this.generateGameCode();
+                
+                // Load all users for transfers
+                await this.loadAllUsers();
+                
                 // Load activities
                 this.loadActivities();
+                
+                // Update display
+                this.updateDisplay();
+                
+                // Setup sync status
+                this.setupSyncStatus();
+                
+                // Setup auto-refresh
+                this.setupAutoRefresh();
+                
+                console.log('✅ Dashboard ready for:', this.currentUser);
             }
 
             checkAuth() {
-                // Check for Firebase session
+                // Check session storage
                 const sessionData = sessionStorage.getItem('xbet_session');
                 
                 if (sessionData) {
                     try {
                         const session = JSON.parse(atob(sessionData));
-                        this.currentUser = session.username || session.email.split('@')[0];
+                        this.currentUser = session.username || 'Unknown';
+                        console.log('👤 User authenticated:', this.currentUser);
                     } catch (e) {
                         console.error('Session parse error:', e);
+                        this.redirectToLogin();
+                    }
+                } else {
+                    // Check localStorage
+                    this.currentUser = localStorage.getItem('currentUser');
+                    if (!this.currentUser) {
+                        this.redirectToLogin();
+                    }
+                }
+            }
+
+            redirectToLogin() {
+                window.location.href = 'login.html';
+            }
+
+            async loadUserData() {
+                // Try to load from localStorage
+                this.userData = JSON.parse(localStorage.getItem('userData_' + this.currentUser) || '{}');
+                
+                // If no data, create default structure
+                if (Object.keys(this.userData).length === 0) {
+                    console.log('📝 Creating new user data structure');
+                    this.userData = {
+                        username: this.currentUser,
+                        email: '',
+                        balance: 0.00,
+                        received: 0.00,
+                        sent: 0.00,
+                        won: 0.00,
+                        lost: 0.00,
+                        transactionCode: this.generateTransactionCode(),
+                        isAdmin: false,
+                        status: 'active',
+                        registeredAt: new Date().toISOString(),
+                        lastLogin: new Date().toISOString(),
+                        activities: []
+                    };
+                    
+                    // Save to localStorage
+                    this.saveUserData();
+                }
+                
+                // Check for cross-browser sync
+                if (window.crossBrowserSync && window.crossBrowserSync.getUserData) {
+                    try {
+                        const syncData = window.crossBrowserSync.getUserData(this.currentUser);
+                        if (syncData) {
+                            console.log('🔄 Syncing data from cross-browser system');
+                            // Merge sync data with local data
+                            this.userData = { ...this.userData, ...syncData };
+                            this.saveUserData();
+                        }
+                    } catch (error) {
+                        console.error('Sync error:', error);
                     }
                 }
                 
-                // Fallback to localStorage
-                if (!this.currentUser) {
-                    this.currentUser = localStorage.getItem('currentUser');
-                }
-                
-                if (!this.currentUser) {
-                    window.location.href = 'login.html';
-                    return;
-                }
-            }
-
-            loadUserData() {
-                // Try to get user data from localStorage
-                this.userData = JSON.parse(localStorage.getItem('userData_' + this.currentUser) || '{}');
-                
-                // Initialize default values if not exists
-                if (!this.userData.balance) this.userData.balance = 0;
-                if (!this.userData.received) this.userData.received = 0;
-                if (!this.userData.sent) this.userData.sent = 0;
-                if (!this.userData.won) this.userData.won = 0;
-                if (!this.userData.lost) this.userData.lost = 0;
-                if (!this.userData.activities) this.userData.activities = [];
-                
-                // Update display
-                this.updateDisplay();
+                return this.userData;
             }
 
             setupTransactionCode() {
-                // Generate or load unique transaction code
+                // Ensure transaction code exists
                 if (!this.userData.transactionCode) {
                     this.userData.transactionCode = this.generateTransactionCode();
                     this.saveUserData();
@@ -738,26 +896,103 @@
                 
                 // Display transaction code
                 document.getElementById('userTransactionCode').textContent = this.transactionCode;
-                document.getElementById('userIdDisplay').textContent = `User ID: ${this.currentUser} | Code: ${this.transactionCode}`;
+                document.getElementById('userIdDisplay').textContent = 
+                    `User ID: ${this.currentUser} | Code: ${this.transactionCode.substring(0, 20)}...`;
             }
 
-            generateTransactionCode() {
-                const timestamp = Date.now().toString(36);
-                const random = Math.random().toString(36).substr(2, 6);
-                const userPrefix = this.currentUser.substring(0, 3).toUpperCase();
-                return `XBT-${userPrefix}-${timestamp}-${random}`.toUpperCase();
+            generateTransactionCode(username = this.currentUser) {
+                const prefix = username ? username.substring(0, 3).toUpperCase() : 'XBT';
+                const timestamp = Date.now().toString(36).toUpperCase().slice(-6);
+                const random = Math.random().toString(36).slice(2, 8).toUpperCase();
+                return `XBT-${prefix}-${timestamp}-${random}`;
+            }
+
+            generateGameCode() {
+                // Unique code for game integration
+                const prefix = this.currentUser ? this.currentUser.substring(0, 3).toUpperCase() : 'GAM';
+                const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
+                const random = Math.random().toString(36).slice(2, 6).toUpperCase();
+                this.gameCode = `GAME-${prefix}-${timestamp}-${random}`;
+                document.getElementById('gameCode').textContent = this.gameCode;
+                return this.gameCode;
+            }
+
+            async loadAllUsers() {
+                this.allUsers = [];
+                this.allAdmins = [];
+                
+                console.log('🔍 Loading all users for transfers...');
+                
+                // Try cross-browser sync first
+                if (window.crossBrowserSync && window.crossBrowserSync.getAllUsers) {
+                    try {
+                        const syncUsers = window.crossBrowserSync.getAllUsers();
+                        this.allUsers = syncUsers.filter(user => !user.isAdmin);
+                        this.allAdmins = syncUsers.filter(user => user.isAdmin);
+                        console.log(`✅ Loaded ${this.allUsers.length} users from sync`);
+                    } catch (error) {
+                        console.error('Sync load error:', error);
+                    }
+                }
+                
+                // Fallback to localStorage
+                if (this.allUsers.length === 0) {
+                    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                    Object.entries(registeredUsers).forEach(([username, email]) => {
+                        if (username !== this.currentUser) {
+                            const userData = JSON.parse(localStorage.getItem('userData_' + username) || '{}');
+                            this.allUsers.push({
+                                username: username,
+                                email: email,
+                                transactionCode: userData.transactionCode || this.generateTransactionCode(username),
+                                balance: userData.balance || 0
+                            });
+                        }
+                    });
+                    console.log(`📦 Loaded ${this.allUsers.length} users from local storage`);
+                }
+                
+                // Load admin data
+                const adminData = JSON.parse(localStorage.getItem('admin_data_admin_master') || '{}');
+                if (adminData && adminData.username) {
+                    this.allAdmins.push(adminData);
+                }
+                
+                return this.allUsers;
             }
 
             updateDisplay() {
                 // Update user info
                 document.getElementById('usernameDisplay').textContent = this.currentUser;
-                document.getElementById('currentBalance').textContent = `$${this.userData.balance.toFixed(2)}`;
-                document.getElementById('remainingBalance').textContent = `$${this.userData.balance.toFixed(2)}`;
-                document.getElementById('receivedBalance').textContent = `$${this.userData.received.toFixed(2)}`;
-                document.getElementById('sentBalance').textContent = `$${this.userData.sent.toFixed(2)}`;
-                document.getElementById('wonBalance').textContent = `$${this.userData.won.toFixed(2)}`;
-                document.getElementById('lostBalance').textContent = `$${this.userData.lost.toFixed(2)}`;
-                document.getElementById('totalTransactions').textContent = this.userData.activities.length;
+                
+                // Format currency
+                const formatter = new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                
+                // Update all balances
+                const balance = this.userData.balance || 0;
+                const received = this.userData.received || 0;
+                const sent = this.userData.sent || 0;
+                const won = this.userData.won || 0;
+                const lost = this.userData.lost || 0;
+                
+                document.getElementById('currentBalance').textContent = `$${formatter.format(balance)}`;
+                document.getElementById('remainingBalance').textContent = `$${formatter.format(balance)}`;
+                document.getElementById('receivedBalance').textContent = `$${formatter.format(received)}`;
+                document.getElementById('sentBalance').textContent = `$${formatter.format(sent)}`;
+                document.getElementById('wonBalance').textContent = `$${formatter.format(won)}`;
+                document.getElementById('lostBalance').textContent = `$${formatter.format(lost)}`;
+                document.getElementById('totalTransactions').textContent = (this.userData.activities || []).length;
+                
+                // Show/hide balance warning
+                const warningDiv = document.getElementById('balanceWarning');
+                if (balance < 1) {
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
+                }
             }
 
             loadActivities(filter = 'all') {
@@ -776,21 +1011,34 @@
                     return;
                 }
                 
-                // Filter activities if needed
+                // Filter activities
                 let activities = this.userData.activities;
                 if (filter !== 'all') {
                     activities = activities.filter(activity => activity.type === filter);
                 }
                 
-                // Reverse to show newest first
-                activities = activities.reverse();
+                // Sort by date (newest first)
+                activities.sort((a, b) => new Date(b.date || b.timestamp) - new Date(a.date || a.timestamp));
                 
-                activityList.innerHTML = activities.map(activity => {
+                // Take only recent 20 activities
+                const recentActivities = activities.slice(0, 20);
+                
+                if (recentActivities.length === 0) {
+                    activityList.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+                            No ${filter} activities found
+                        </div>
+                    `;
+                    return;
+                }
+                
+                activityList.innerHTML = recentActivities.map(activity => {
                     const amount = activity.amount || 0;
                     const isPositive = amount >= 0;
                     const typeClass = `activity-${activity.type}`;
                     const amountClass = isPositive ? 'stat-positive' : 'stat-negative';
                     const amountSign = isPositive ? '+' : '-';
+                    const amountAbs = Math.abs(amount).toFixed(2);
                     
                     return `
                         <div class="activity-item ${typeClass}">
@@ -798,9 +1046,9 @@
                                 ${this.getActivityIcon(activity.type)}
                             </div>
                             <div class="activity-details">
-                                <div class="activity-title">${activity.title || activity.type}</div>
+                                <div class="activity-title">${activity.title || this.getActivityTitle(activity.type)}</div>
                                 <div class="activity-meta">
-                                    <span>${new Date(activity.date).toLocaleString()}</span>
+                                    <span>${new Date(activity.date || activity.timestamp).toLocaleString()}</span>
                                     <span class="transaction-code">${activity.code || 'N/A'}</span>
                                     ${activity.from ? `<span>From: ${activity.from}</span>` : ''}
                                     ${activity.to ? `<span>To: ${activity.to}</span>` : ''}
@@ -808,7 +1056,7 @@
                                 ${activity.description ? `<div style="margin-top: 0.5rem; color: #94a3b8; font-size: 0.9rem;">${activity.description}</div>` : ''}
                             </div>
                             <div class="activity-amount ${amountClass}">
-                                ${amountSign}$${Math.abs(amount).toFixed(2)}
+                                ${amountSign}$${amountAbs}
                             </div>
                         </div>
                     `;
@@ -817,576 +1065,458 @@
 
             getActivityIcon(type) {
                 const icons = {
-                    'receive': '📥',
-                    'send': '📤',
-                    'win': '🎯',
-                    'lose': '📉',
-                    'withdraw': '💰',
-                    'deposit': '💳'
+                    'receive': '⬇️',
+                    'send': '⬆️',
+                    'win': '🏆',
+                    'lose': '💸',
+                    'withdraw': '💳',
+                    'deposit': '💰',
+                    'game_win': '🎮',
+                    'game_loss': '🎲'
                 };
-                return icons[type] || '📋';
+                return icons[type] || '📝';
             }
 
-            addActivity(type, amount, details = {}) {
-                const activity = {
-                    type: type,
-                    amount: amount,
-                    date: new Date().toISOString(),
-                    code: this.generateActivityCode(),
-                    ...details
-                };
-                
-                // Set title based on type
+            getActivityTitle(type) {
                 const titles = {
                     'receive': 'Money Received',
                     'send': 'Money Sent',
                     'win': 'Game Win',
                     'lose': 'Game Loss',
                     'withdraw': 'Withdrawal Request',
-                    'deposit': 'Deposit Received'
+                    'deposit': 'Deposit Received',
+                    'game_win': 'Game Win',
+                    'game_loss': 'Game Loss'
                 };
-                activity.title = titles[type] || 'Activity';
+                return titles[type] || 'Activity';
+            }
+
+            addActivity(type, amount, details = {}) {
+                const activity = {
+                    id: 'ACT-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
+                    type: type,
+                    amount: amount,
+                    date: new Date().toISOString(),
+                    code: this.generateTransactionCode().substring(0, 15),
+                    title: this.getActivityTitle(type),
+                    ...details
+                };
                 
-                this.userData.activities.push(activity);
+                // Ensure activities array exists
+                if (!this.userData.activities) {
+                    this.userData.activities = [];
+                }
+                
+                // Add to beginning of array (newest first)
+                this.userData.activities.unshift(activity);
+                
+                // Update statistics
+                this.updateStats(type, amount);
+                
+                // Save user data
                 this.saveUserData();
+                
+                // Update display
                 this.updateDisplay();
                 this.loadActivities(this.activityFilter);
                 
                 return activity.code;
             }
 
-            generateActivityCode() {
-                const timestamp = Date.now().toString(36).substr(-4);
-                const random = Math.random().toString(36).substr(2, 4);
-                return `ACT-${timestamp}-${random}`.toUpperCase();
+            updateStats(type, amount) {
+                // Update relevant statistics
+                switch(type) {
+                    case 'receive':
+                    case 'deposit':
+                        this.userData.received = (this.userData.received || 0) + Math.abs(amount);
+                        break;
+                    case 'send':
+                    case 'withdraw':
+                        this.userData.sent = (this.userData.sent || 0) + Math.abs(amount);
+                        break;
+                    case 'win':
+                    case 'game_win':
+                        this.userData.won = (this.userData.won || 0) + Math.abs(amount);
+                        break;
+                    case 'lose':
+                    case 'game_loss':
+                        this.userData.lost = (this.userData.lost || 0) + Math.abs(amount);
+                        break;
+                }
+                
+                // Always update balance
+                this.userData.balance = (this.userData.balance || 0) + amount;
             }
 
-            async processTransfer(receiverCode, amount) {
-                // Find receiver by transaction code
-                const allUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-                let receiverUser = null;
+            async processTransfer() {
+                const receiverCode = document.getElementById('receiverCode').value.trim();
+                const amountInput = document.getElementById('transferAmount');
+                const amount = parseFloat(amountInput.value);
                 
-                for (const [username, email] of Object.entries(allUsers)) {
-                    const userData = JSON.parse(localStorage.getItem('userData_' + username) || '{}');
-                    if (userData.transactionCode === receiverCode) {
-                        receiverUser = username;
-                        break;
+                // Validation
+                if (!receiverCode) {
+                    alert('⚠️ Please enter receiver transaction code');
+                    return;
+                }
+                
+                if (!amount || amount <= 0) {
+                    alert('⚠️ Please enter a valid amount (minimum $0.01)');
+                    return;
+                }
+                
+                if (this.userData.balance < amount) {
+                    alert(`❌ Insufficient balance! You have only $${this.userData.balance.toFixed(2)}`);
+                    return;
+                }
+                
+                // Check if sending to self
+                if (receiverCode === this.transactionCode) {
+                    alert('❌ You cannot send money to yourself');
+                    return;
+                }
+                
+                try {
+                    // Find receiver
+                    let receiver = null;
+                    
+                    // Check regular users
+                    for (const user of this.allUsers) {
+                        if (user.transactionCode === receiverCode) {
+                            receiver = user;
+                            break;
+                        }
+                    }
+                    
+                    // Check admins
+                    if (!receiver && this.allAdmins.length > 0) {
+                        for (const admin of this.allAdmins) {
+                            if (admin.transactionCode === receiverCode) {
+                                receiver = admin;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Check sync system
+                    if (!receiver && window.crossBrowserSync && window.crossBrowserSync.findUserByCode) {
+                        receiver = window.crossBrowserSync.findUserByCode(receiverCode);
+                    }
+                    
+                    if (!receiver) {
+                        alert('❌ Receiver not found. Please check the transaction code.');
+                        return;
+                    }
+                    
+                    // Process sender side
+                    const transactionCode = this.addActivity('send', -amount, {
+                        to: receiver.username,
+                        description: `Transfer to ${receiver.username}`
+                    });
+                    
+                    // Process receiver side
+                    await this.updateReceiverBalance(receiver, amount);
+                    
+                    // Clear form
+                    document.getElementById('receiverCode').value = '';
+                    amountInput.value = '';
+                    
+                    // Success message
+                    alert(`✅ Transfer successful!\n\nTo: ${receiver.username}\nAmount: $${amount.toFixed(2)}\nTransaction Code: ${transactionCode}\nNew Balance: $${this.userData.balance.toFixed(2)}`);
+                    
+                } catch (error) {
+                    console.error('Transfer error:', error);
+                    alert(`❌ Transfer failed: ${error.message || 'Unknown error'}`);
+                }
+            }
+
+            async updateReceiverBalance(receiver, amount) {
+                if (receiver.isAdmin) {
+                    // Update admin balance
+                    const adminData = JSON.parse(localStorage.getItem('admin_data_' + receiver.username) || '{}');
+                    adminData.balance = (adminData.balance || 0) + amount;
+                    
+                    // Add to admin transactions
+                    if (!adminData.transactions) adminData.transactions = [];
+                    adminData.transactions.push({
+                        id: 'TXN-' + Date.now(),
+                        type: 'receive',
+                        amount: amount,
+                        date: new Date().toISOString(),
+                        from: this.currentUser,
+                        description: `Transfer from ${this.currentUser}`
+                    });
+                    
+                    localStorage.setItem('admin_data_' + receiver.username, JSON.stringify(adminData));
+                    
+                } else {
+                    // Update user balance
+                    const receiverData = JSON.parse(localStorage.getItem('userData_' + receiver.username) || '{}');
+                    receiverData.balance = (receiverData.balance || 0) + amount;
+                    
+                    // Ensure activities array
+                    if (!receiverData.activities) receiverData.activities = [];
+                    
+                    // Add activity for receiver
+                    receiverData.activities.push({
+                        id: 'ACT-' + Date.now(),
+                        type: 'receive',
+                        amount: amount,
+                        date: new Date().toISOString(),
+                        code: this.generateTransactionCode(),
+                        title: 'Money Received',
+                        from: this.currentUser,
+                        description: `Transfer from ${this.currentUser}`,
+                        status: 'completed'
+                    });
+                    
+                    localStorage.setItem('userData_' + receiver.username, JSON.stringify(receiverData));
+                }
+                
+                // Sync with cross-browser system
+                if (window.crossBrowserSync && window.crossBrowserSync.updateUserBalance) {
+                    try {
+                        window.crossBrowserSync.updateUserBalance(receiver.username, amount);
+                    } catch (error) {
+                        console.error('Sync update error:', error);
                     }
                 }
+            }
+
+            // 🎮 GAME INTEGRATION SYSTEM
+            testGameWin(amount) {
+                this.processGameResult(true, amount);
+            }
+
+            testGameLoss(amount) {
+                this.processGameResult(false, amount);
+            }
+
+            processGameResult(isWin, amount) {
+                if (!amount || amount <= 0) {
+                    alert('⚠️ Invalid amount');
+                    return;
+                }
                 
-                if (!receiverUser) {
-                    throw new Error('Invalid receiver transaction code');
+                if (!isWin && this.userData.balance < amount) {
+                    alert(`❌ Insufficient balance! You have only $${this.userData.balance.toFixed(2)}`);
+                    return;
+                }
+                
+                const finalAmount = isWin ? amount : -amount;
+                const type = isWin ? 'game_win' : 'game_loss';
+                const title = isWin ? 'Game Win' : 'Game Loss';
+                
+                // Add activity
+                const gameCode = this.addActivity(type, finalAmount, {
+                    description: `${title} - Game integration test`,
+                    gameId: this.gameCode,
+                    category: 'gaming'
+                });
+                
+                // Success message
+                alert(`🎮 ${title}!\n\nAmount: ${isWin ? '+' : '-'}$${amount.toFixed(2)}\nGame Code: ${gameCode}\nNew Balance: $${this.userData.balance.toFixed(2)}`);
+            }
+
+            checkGameBalance() {
+                const balance = this.userData.balance || 0;
+                const minGameAmount = 1;
+                
+                if (balance < minGameAmount) {
+                    alert(`⚠️ Game Balance Status\n\nCurrent Balance: $${balance.toFixed(2)}\nMinimum Required: $${minGameAmount.toFixed(2)}\n\nPlease deposit funds to play games.`);
+                } else {
+                    alert(`✅ Game Balance Status\n\nCurrent Balance: $${balance.toFixed(2)}\nAvailable for Games: $${(balance - minGameAmount).toFixed(2)}\n\nYou can play games up to $${balance.toFixed(2)}`);
+                }
+            }
+
+            // Modal Functions
+            openDepositModal() {
+                document.getElementById('depositModal').style.display = 'block';
+            }
+
+            closeDepositModal() {
+                document.getElementById('depositModal').style.display = 'none';
+            }
+
+            openWithdrawModal() {
+                if (this.userData.balance <= 0) {
+                    alert('❌ Insufficient balance for withdrawal!');
+                    return;
+                }
+                
+                document.getElementById('withdrawModal').style.display = 'block';
+            }
+
+            closeWithdrawModal() {
+                document.getElementById('withdrawModal').style.display = 'none';
+            }
+
+            processWithdrawal(event) {
+                event.preventDefault();
+                
+                const amount = parseFloat(document.getElementById('withdrawAmount').value);
+                const method = document.getElementById('paymentMethod').value;
+                const account = document.getElementById('accountDetails').value.trim();
+                
+                if (!amount || amount <= 0) {
+                    alert('⚠️ Please enter a valid amount');
+                    return;
                 }
                 
                 if (this.userData.balance < amount) {
-                    throw new Error('Insufficient balance');
+                    alert('❌ Insufficient balance!');
+                    return;
                 }
                 
-                if (amount <= 0) {
-                    throw new Error('Amount must be greater than 0');
+                if (!method) {
+                    alert('⚠️ Please select a payment method');
+                    return;
                 }
                 
-                // Update sender data
-                this.userData.balance -= amount;
-                this.userData.sent += amount;
-                const senderCode = this.addActivity('send', -amount, {
-                    to: receiverUser,
-                    description: `Transfer to ${receiverUser}`
-                });
+                if (!account) {
+                    alert('⚠️ Please enter your account details');
+                    return;
+                }
                 
-                // Update receiver data
-                const receiverData = JSON.parse(localStorage.getItem('userData_' + receiverUser) || '{}');
-                receiverData.balance = (receiverData.balance || 0) + amount;
-                receiverData.received = (receiverData.received || 0) + amount;
-                
-                // Add activity for receiver
-                if (!receiverData.activities) receiverData.activities = [];
-                const receiverActivity = {
-                    type: 'receive',
-                    amount: amount,
-                    date: new Date().toISOString(),
-                    code: receiverData.transactionCode ? `${receiverData.transactionCode}-RECV` : 'RECV',
-                    title: 'Money Received',
-                    from: this.currentUser,
-                    description: `Transfer from ${this.currentUser}`
-                };
-                receiverData.activities.push(receiverActivity);
-                
-                // Save both users
-                localStorage.setItem('userData_' + receiverUser, JSON.stringify(receiverData));
-                this.saveUserData();
-                
-                return {
-                    success: true,
-                    senderCode: senderCode,
-                    receiver: receiverUser
-                };
+                try {
+                    const withdrawalCode = this.addActivity('withdraw', -amount, {
+                        description: `Withdrawal via ${method} to ${account}`,
+                        method: method,
+                        account: account,
+                        status: 'pending'
+                    });
+                    
+                    this.closeWithdrawModal();
+                    
+                    alert(`✅ Withdrawal request submitted!\n\nTransaction Code: ${withdrawalCode}\nAmount: $${amount.toFixed(2)}\nStatus: Pending\n\nAdmin will process it soon.`);
+                    
+                } catch (error) {
+                    alert(`❌ Withdrawal failed: ${error.message}`);
+                }
             }
 
-            processWithdrawal(amount, method, account) {
-                if (this.userData.balance < amount) {
-                    throw new Error('Insufficient balance');
-                }
+            filterActivities(type) {
+                // Update active tab
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
                 
-                this.userData.balance -= amount;
-                this.userData.sent += amount; // Track as sent for withdrawal
-                
-                const withdrawalCode = this.addActivity('withdraw', -amount, {
-                    description: `Withdrawal via ${method} to ${account}`,
-                    method: method,
-                    account: account,
-                    status: 'pending'
-                });
-                
-                this.saveUserData();
-                
-                return withdrawalCode;
-            }
-
-            receiveDeposit(amount, from = 'Admin') {
-                this.userData.balance += amount;
-                this.userData.received += amount;
-                
-                const depositCode = this.addActivity('deposit', amount, {
-                    from: from,
-                    description: `Deposit from ${from}`
-                });
-                
-                this.saveUserData();
-                
-                return depositCode;
+                // Load filtered activities
+                this.loadActivities(type);
             }
 
             saveUserData() {
-                localStorage.setItem('userData_' + this.currentUser, JSON.stringify(this.userData));
-                this.updateDisplay();
+                try {
+                    localStorage.setItem('userData_' + this.currentUser, JSON.stringify(this.userData));
+                    
+                    // Update session
+                    const sessionData = sessionStorage.getItem('xbet_session');
+                    if (sessionData) {
+                        const session = JSON.parse(atob(sessionData));
+                        session.balance = this.userData.balance;
+                        sessionStorage.setItem('xbet_session', btoa(JSON.stringify(session)));
+                    }
+                    
+                    // Sync with cross-browser if available
+                    if (window.crossBrowserSync && window.crossBrowserSync.updateUser) {
+                        window.crossBrowserSync.updateUser(this.currentUser, this.userData);
+                    }
+                    
+                    console.log('💾 User data saved');
+                } catch (error) {
+                    console.error('Save error:', error);
+                }
+            }
+
+            logout() {
+                if (confirm('Are you sure you want to logout?')) {
+                    sessionStorage.removeItem('xbet_session');
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('session_expiry');
+                    window.location.href = 'login.html';
+                }
+            }
+
+            setupSyncStatus() {
+                const syncDiv = document.getElementById('syncStatus');
+                
+                if (window.crossBrowserSync && window.crossBrowserSync.getStatus) {
+                    try {
+                        const status = window.crossBrowserSync.getStatus();
+                        syncDiv.innerHTML = `✅ Cross-Browser Sync Active | Users: ${status.adminUsers} | ${status.browser}`;
+                        this.syncStatus = 'active';
+                    } catch (error) {
+                        syncDiv.innerHTML = '⚠️ Sync system error';
+                        this.syncStatus = 'error';
+                    }
+                } else {
+                    syncDiv.innerHTML = '📱 Local Storage Mode | No cross-browser sync';
+                    this.syncStatus = 'local';
+                }
+            }
+
+            setupAutoRefresh() {
+                // Auto-refresh every 30 seconds to check for updates
+                setInterval(async () => {
+                    await this.loadUserData();
+                    this.updateDisplay();
+                }, 30000);
             }
         }
 
         // Initialize Dashboard
-        const dashboard = new UserDashboard();
+        const dashboard = new Dashboard();
         dashboard.init();
 
-        // UI Functions
-        function filterActivities(type) {
-            // Update active tab
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Load filtered activities
-            dashboard.loadActivities(type);
-        }
+        // UI Helper Functions
+        window.filterActivities = function(type) { dashboard.filterActivities(type); };
+        window.processTransfer = function() { dashboard.processTransfer(); };
+        window.processWithdrawal = function(event) { dashboard.processWithdrawal(event); };
+        window.openDepositModal = function() { dashboard.openDepositModal(); };
+        window.openWithdrawModal = function() { dashboard.openWithdrawModal(); };
+        window.closeDepositModal = function() { dashboard.closeDepositModal(); };
+        window.closeWithdrawModal = function() { dashboard.closeWithdrawModal(); };
 
-        function openDepositModal() {
-            document.getElementById('depositModal').style.display = 'block';
-        }
-
-        function closeDepositModal() {
-            document.getElementById('depositModal').style.display = 'none';
-        }
-
-        function openWithdrawModal() {
-            const balance = dashboard.userData.balance || 0;
-            
-            if (balance <= 0) {
-                alert('Insufficient balance for withdrawal!');
-                return;
-            }
-            
-            document.getElementById('withdrawModal').style.display = 'block';
-            document.getElementById('withdrawAmount').value = '';
-            document.getElementById('paymentMethod').value = '';
-            document.getElementById('accountDetails').value = '';
-        }
-
-        function closeWithdrawModal() {
-            document.getElementById('withdrawModal').style.display = 'none';
-        }
-
-        async function processTransfer() {
-            const receiverCode = document.getElementById('receiverCode').value.trim();
-            const amount = parseFloat(document.getElementById('transferAmount').value);
-            
-            if (!receiverCode) {
-                alert('Please enter receiver transaction code');
-                return;
-            }
-            
-            if (!amount || amount <= 0) {
-                alert('Please enter a valid amount');
-                return;
-            }
-            
-            if (dashboard.userData.balance < amount) {
-                alert('Insufficient balance!');
-                return;
-            }
-            
-            try {
-                const result = await dashboard.processTransfer(receiverCode, amount);
-                
-                if (result.success) {
-                    alert(`✅ Transfer successful!\nSent to: ${result.receiver}\nTransaction Code: ${result.senderCode}`);
-                    
-                    // Clear form
-                    document.getElementById('receiverCode').value = '';
-                    document.getElementById('transferAmount').value = '';
-                }
-            } catch (error) {
-                alert(`❌ Transfer failed: ${error.message}`);
-            }
-        }
-
-        function processWithdrawal(event) {
-            event.preventDefault();
-            
-            const amount = parseFloat(document.getElementById('withdrawAmount').value);
-            const method = document.getElementById('paymentMethod').value;
-            const account = document.getElementById('accountDetails').value.trim();
-            
-            if (!amount || amount <= 0) {
-                alert('Please enter a valid amount');
-                return;
-            }
-            
-            if (!method) {
-                alert('Please select a payment method');
-                return;
-            }
-            
-            if (!account) {
-                alert('Please enter your account details');
-                return;
-            }
-            
-            try {
-                const withdrawalCode = dashboard.processWithdrawal(amount, method, account);
-                
-                alert(`✅ Withdrawal request submitted!\nTransaction Code: ${withdrawalCode}\nAdmin will process it soon.`);
-                
-                closeWithdrawModal();
-            } catch (error) {
-                alert(`❌ Withdrawal failed: ${error.message}`);
-            }
-        }
-
-        function logout() {
-            // Clear sessions
-            sessionStorage.removeItem('xbet_session');
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('session_expiry');
-            
-            // Redirect to login
-            window.location.href = 'login.html';
-        }
-
-        // Close modals when clicking outside
+        // Close modals on outside click
         window.onclick = function(event) {
             const depositModal = document.getElementById('depositModal');
             const withdrawModal = document.getElementById('withdrawModal');
             
-            if (event.target === depositModal) closeDepositModal();
-            if (event.target === withdrawModal) closeWithdrawModal();
-        }
+            if (event.target === depositModal) dashboard.closeDepositModal();
+            if (event.target === withdrawModal) dashboard.closeWithdrawModal();
+        };
 
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closeDepositModal();
-                closeWithdrawModal();
+                dashboard.closeDepositModal();
+                dashboard.closeWithdrawModal();
             }
         });
 
-        // Auto-refresh every 30 seconds to check for deposits
-        setInterval(() => {
-            dashboard.loadUserData();
-        }, 30000);
-    </script>
-</body>
-</html>	
-
-Admin.login.html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET - Admin Login</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        :root {
-            --primary: #3b82f6;
-            --danger: #ef4444;
-            --success: #10b981;
-            --dark: #0f172a;
-            --light: #f8fafc;
-        }
-
-        body {
-            background: linear-gradient(135deg, var(--dark), #1e293b);
-            color: var(--light);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .logo span {
-            color: var(--success);
-        }
-
-        .logo p {
-            color: #ef4444;
-            margin-top: 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .form-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            color: var(--light);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #94a3b8;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 1rem;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin-top: 1rem;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .message {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-        }
-
-        .success {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .error {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .user-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #94a3b8;
-        }
-
-        .user-link a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .user-link a:hover {
-            text-decoration: underline;
-        }
-
-        .warning {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <h1>X<span>-BET</span> ADMIN</h1>
-            <p>Admin Access Only</p>
-        </div>
-
-        <div class="form-card">
-            <h2 class="form-title">Admin Login</h2>
+        // Global Game Integration Function
+        window.XBET_GAME_SYSTEM = {
+            // Function to call from games to process wins/losses
+            processGameResult: function(isWin, amount, gameId) {
+                return dashboard.processGameResult(isWin, amount, gameId);
+            },
             
-            <div class="warning">
-                ⚠️ Restricted area. Unauthorized access prohibited.
-            </div>
+            // Check if user can play
+            canPlayGame: function(minAmount) {
+                const balance = dashboard.userData.balance || 0;
+                return balance >= minAmount;
+            },
             
-            <div id="message" class="message"></div>
+            // Get current balance
+            getCurrentBalance: function() {
+                return dashboard.userData.balance || 0;
+            },
             
-            <div class="form-group">
-                <label for="username">Admin Username</label>
-                <input type="text" id="username" placeholder="Enter admin username" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Admin Password</label>
-                <input type="password" id="password" placeholder="Enter admin password" required>
-            </div>
-            
-            <button class="btn btn-primary" onclick="adminLogin()">Login as Admin</button>
-            <button class="btn btn-secondary" onclick="autoFillAdmin()">Auto Fill Admin</button>
-            
-            <div class="user-link">
-                User access? <a href="login.html">Login as user</a>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function showMessage(text, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type}`;
-            messageDiv.style.display = 'block';
-        }
-
-        function autoFillAdmin() {
-            document.getElementById('username').value = 'admin_master';
-            document.getElementById('password').value = 'admin123';
-        }
-
-        function adminLogin() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                showMessage('Please fill all fields', 'error');
-                return;
+            // Get user game code
+            getUserGameCode: function() {
+                return dashboard.gameCode;
             }
+        };
 
-            // Hardcoded admin credentials
-            const adminCredentials = {
-                'admin_master': 'admin123',
-                'finance_manager': 'finance123'
-            };
-
-            // Check if username is admin and password matches
-            if (adminCredentials[username] && adminCredentials[username] === password) {
-                // Create admin data if not exists
-                let adminData = JSON.parse(localStorage.getItem('admin_data_' + username) || '{}');
-                
-                if (!adminData.balance) {
-                    adminData.balance = username === 'admin_master' ? 14050000.00 : 1000000.00;
-                    adminData.transactions = [];
-                    adminData.users = [];
-                    localStorage.setItem('admin_data_' + username, JSON.stringify(adminData));
-                }
-
-                // Create session
-                const adminSession = btoa(JSON.stringify({
-                    username: username,
-                    loginTime: Date.now(),
-                    isAdmin: true
-                }));
-                
-                sessionStorage.setItem('admin_session', adminSession);
-                localStorage.setItem('admin_session_expiry', Date.now() + 86400000); // 24 hours
-
-                showMessage('Admin login successful! Redirecting...', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'admin.html';
-                }, 1000);
-            } else {
-                showMessage('Invalid admin credentials', 'error');
-            }
-        }
-
-        // Allow form submission with Enter key
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                adminLogin();
-            }
-        });
+        console.log('🎮 X-BET Game System Ready!');
     </script>
 </body>
 </html>
