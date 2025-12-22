@@ -3,1139 +3,1546 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET | Casino Games</title>
+    <title>X-BET | Ultimate Casino Games Hub</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    
     <script src="firebase-config.js"></script>
-    <script src="auth-check.js" defer></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* Same header styles as index.html */
+        /* ===== BASE STYLES ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        
+
         :root {
             --primary: #1a73e8;
+            --primary-dark: #0d62d9;
             --secondary: #34a853;
             --accent: #ea4335;
-            --dark: #1a1d2b;
-            --light: #f8f9fa;
-            --gray: #6c757d;
+            --gold: #ffd700;
+            --purple: #8b5cf6;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gradient-primary: linear-gradient(135deg, #667eea, #764ba2);
+            --gradient-success: linear-gradient(135deg, #34a853, #10b981);
+            --gradient-danger: linear-gradient(135deg, #ea4335, #ef4444);
         }
-        
+
         body {
             background: linear-gradient(135deg, #0f2027, #203a43);
-            color: white;
+            color: var(--light);
             min-height: 100vh;
+            overflow-x: hidden;
         }
-        
-        /* Header - Same as index.html */
+
+        /* ===== ANIMATION KEYFRAMES ===== */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes shine {
+            0% { background-position: -100px; }
+            100% { background-position: 200px; }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes coinSpin {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+
+        /* ===== HEADER & NAVIGATION ===== */
         .header {
-            background: rgba(26, 29, 43, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
             padding: 15px 5%;
             position: sticky;
             top: 0;
             z-index: 1000;
             border-bottom: 2px solid var(--primary);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            animation: slideInDown 0.5s ease-out;
         }
-        
+
         .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 28px;
-            font-weight: bold;
+            font-size: 32px;
+            font-weight: 800;
             color: white;
             text-decoration: none;
+            transition: transform 0.3s;
         }
-        
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
         .logo span:first-child {
             color: var(--primary);
+            text-shadow: 0 0 20px rgba(26, 115, 232, 0.5);
         }
-        
+
         .logo span:last-child {
             color: var(--secondary);
+            text-shadow: 0 0 20px rgba(52, 168, 83, 0.5);
         }
-        
+
+        .logo-badge {
+            background: var(--gold);
+            color: #000;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
         .nav-links {
             display: flex;
-            gap: 20px;
+            gap: 25px;
             align-items: center;
         }
-        
+
         .nav-link {
-            color: white;
+            color: var(--light);
             text-decoration: none;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 5px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 10px;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+
         .nav-link:hover {
             background: rgba(255, 255, 255, 0.1);
             color: var(--primary);
+            transform: translateY(-2px);
         }
-        
+
         .nav-link.active {
             background: var(--primary);
             color: white;
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.4);
         }
-        
+
+        .nav-link.active:hover {
+            background: var(--primary-dark);
+        }
+
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
-        
+
         .user-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 10px 20px;
             border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
         }
-        
+
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
         .user-avatar {
-            width: 35px;
-            height: 35px;
-            background: var(--primary);
+            width: 42px;
+            height: 42px;
+            background: var(--gradient-primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             color: white;
+            font-size: 18px;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
         }
-        
+
         .user-details {
             display: flex;
             flex-direction: column;
         }
-        
+
         .user-name {
             font-weight: 600;
             font-size: 14px;
             color: white;
         }
-        
+
         .user-balance {
             color: var(--secondary);
             font-weight: bold;
             font-size: 16px;
+            text-shadow: 0 0 10px rgba(52, 168, 83, 0.3);
         }
-        
+
         .btn-logout {
-            background: var(--accent);
+            background: var(--gradient-danger);
             color: white;
-            padding: 8px 16px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        
-        /* Games Content */
-        .games-container {
-            padding: 40px 5%;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .page-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .page-header h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .balance-alert {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 30px;
-            border-left: 4px solid var(--secondary);
-        }
-        
-        .balance-alert h3 {
-            margin-bottom: 10px;
-            color: var(--secondary);
-        }
-        
-        .balance-display {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--secondary);
-            margin: 10px 0;
-        }
-        
-        .game-categories {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            overflow-x: auto;
-            padding: 10px 0;
-        }
-        
-        .category-btn {
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s;
-        }
-        
-        .category-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .category-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 50px;
-        }
-        
-        .game-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .game-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .game-image {
-            height: 180px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            color: white;
-        }
-        
-        .game-info {
-            padding: 20px;
-        }
-        
-        .game-title {
-            font-size: 20px;
-            margin-bottom: 10px;
-            color: white;
-        }
-        
-        .game-description {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-        
-        .game-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .game-rating {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #ffd700;
-        }
-        
-        .game-play-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 10px;
+            border: none;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(234, 67, 53, 0.3);
         }
-        
-        .game-play-btn:hover {
-            background: #0d62d9;
-            transform: scale(1.05);
+
+        .btn-logout:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(234, 67, 53, 0.4);
         }
-        
-        .game-play-btn.disabled {
-            background: var(--gray);
-            cursor: not-allowed;
+
+        /* ===== HERO SECTION ===== */
+        .hero-section {
+            position: relative;
+            padding: 80px 5%;
+            max-width: 1600px;
+            margin: 0 auto;
+            overflow: hidden;
         }
-        
-        /* Quick Games Section */
-        .quick-games {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 40px;
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            animation: slideInLeft 1s ease-out;
         }
-        
-        .quick-games h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 28px;
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #1a73e8, #34a853, #8b5cf6, #ea4335);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(26, 115, 232, 0.3);
         }
-        
-        .quick-games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+
+        .hero-subtitle {
+            font-size: 1.4rem;
+            color: #cbd5e1;
+            margin-bottom: 40px;
+            line-height: 1.6;
         }
-        
-        .quick-game-card {
+
+        .live-stats {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
             background: rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .quick-game-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-5px);
-        }
-        
-        .quick-game-icon {
-            font-size: 40px;
-            margin-bottom: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
             color: var(--primary);
         }
-        
-        /* Game Modal */
-        .game-modal {
-            display: none;
-            position: fixed;
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .balance-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 1s ease-out 0.3s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            animation: shine 2s infinite linear;
+        }
+
+        .balance-label {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 25px;
+            text-shadow: 0 0 20px rgba(52, 168, 83, 0.3);
+        }
+
+        .balance-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-deposit {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-deposit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-withdraw {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-withdraw:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 50%;
+            pointer-events: none;
+        }
+
+        .floating-element {
+            position: absolute;
+            font-size: 5rem;
+            opacity: 0.15;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        .coin-float {
+            top: 20%;
+            right: 20%;
+            animation-delay: 0s;
+            animation: coinSpin 10s infinite linear;
+        }
+
+        .dice-float {
+            top: 50%;
+            right: 30%;
+            animation-delay: 2s;
+        }
+
+        .card-float {
+            top: 70%;
+            right: 15%;
+            animation-delay: 4s;
+        }
+
+        /* ===== CATEGORIES SECTION ===== */
+        .categories-section {
+            padding: 80px 5%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--primary), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .category-card:nth-child(1) { animation-delay: 0.1s; }
+        .category-card:nth-child(2) { animation-delay: 0.2s; }
+        .category-card:nth-child(3) { animation-delay: 0.3s; }
+        .category-card:nth-child(4) { animation-delay: 0.4s; }
+        .category-card:nth-child(5) { animation-delay: 0.5s; }
+        .category-card:nth-child(6) { animation-delay: 0.6s; }
+        .category-card:nth-child(7) { animation-delay: 0.7s; }
+        .category-card:nth-child(8) { animation-delay: 0.8s; }
+        .category-card:nth-child(9) { animation-delay: 0.9s; }
+        .category-card:nth-child(10) { animation-delay: 1s; }
+
+        .category-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            border-color: var(--primary);
+            box-shadow: 0 25px 50px rgba(26, 115, 232, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1001;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: left 0.7s;
         }
-        
-        .game-modal-content {
-            background: var(--dark);
-            border-radius: 15px;
-            padding: 30px;
-            width: 100%;
-            max-width: 500px;
-            border: 2px solid var(--primary);
+
+        .category-card:hover::before {
+            left: 100%;
         }
-        
-        .game-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .close-game-modal {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        
-        .bet-form .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .bet-form label {
+
+        .category-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
         }
-        
-        .bet-amount-input {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
+
+        .category-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
             color: white;
-            font-size: 16px;
         }
-        
-        .bet-range {
+
+        .category-description {
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            min-height: 60px;
+        }
+
+        .category-stats {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .quick-bet-buttons {
+
+        .game-count {
+            background: rgba(26, 115, 232, 0.2);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .category-players {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            font-size: 0.9rem;
         }
-        
-        .quick-bet-btn {
-            flex: 1;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
+
+        .category-players i {
+            color: var(--secondary);
+        }
+
+        /* ===== FEATURED GAMES SECTION ===== */
+        .featured-section {
+            padding: 80px 5%;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 40px;
+            margin: 0 5% 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            animation: shine 3s infinite linear;
+        }
+
+        .featured-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .featured-title {
+            font-size: 2.5rem;
+            font-weight: 800;
             color: white;
-            cursor: pointer;
+        }
+
+        .featured-badge {
+            background: var(--gradient-danger);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+        }
+
+        .featured-carousel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 30px;
+            transition: transform 0.5s ease;
+            padding: 10px;
+        }
+
+        .featured-game-card {
+            flex: 0 0 320px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s;
         }
-        
-        .quick-bet-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+
+        .featured-game-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(26, 115, 232, 0.2);
         }
-        
-        .btn-bet {
+
+        .featured-game-image {
+            height: 200px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-game-image::after {
+            content: 'HOT';
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background: var(--gradient-danger);
+            color: white;
+            padding: 5px 30px;
+            font-size: 12px;
+            font-weight: bold;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .featured-game-info {
+            padding: 25px;
+        }
+
+        .featured-game-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .featured-game-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .featured-game-players {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-play-featured {
             width: 100%;
             padding: 15px;
-            background: var(--primary);
+            background: var(--gradient-primary);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
+            border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 20px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-play-featured:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .carousel-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .carousel-btn:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            cursor: pointer;
             transition: all 0.3s;
         }
-        
-        .btn-bet:hover {
-            background: #0d62d9;
-            transform: translateY(-2px);
+
+        .carousel-dot.active {
+            background: var(--primary);
+            transform: scale(1.3);
         }
-        
-        .btn-bet.disabled {
-            background: var(--gray);
-            cursor: not-allowed;
+
+        /* ===== STATS SECTION ===== */
+        .stats-section {
+            padding: 60px 5%;
+            max-width: 1600px;
+            margin: 0 auto;
         }
-        
-        /* Game Results */
-        .game-result {
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 30px;
             text-align: center;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
+            animation: fadeInUp 0.8s ease-out;
         }
-        
-        .result-win {
-            background: rgba(52, 168, 83, 0.2);
-            border: 2px solid var(--secondary);
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
         }
-        
-        .result-lose {
-            background: rgba(234, 67, 53, 0.2);
-            border: 2px solid var(--accent);
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 30px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
-        
-        .result-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 10px;
         }
-        
-        .result-amount {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 1rem;
         }
-        
-        /* Responsive */
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 50px 5%;
+            margin-top: 80px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .hero-title { font-size: 3.5rem; }
+            .categories-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
         @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .games-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-            
-            .game-categories {
-                padding-bottom: 15px;
-            }
+            .nav-container { flex-direction: column; gap: 20px; }
+            .nav-links { flex-wrap: wrap; justify-content: center; }
+            .hero-title { font-size: 2.5rem; }
+            .categories-grid { grid-template-columns: 1fr; }
+            .balance-actions { flex-direction: column; }
+            .featured-game-card { flex: 0 0 280px; }
+            .featured-header { flex-direction: column; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title { font-size: 2rem; }
+            .section-title { font-size: 2rem; }
+            .stat-value { font-size: 2rem; }
+            .floating-element { display: none; }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Header -->
+    <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="nav-container">
             <a href="index.html" class="logo">
                 <span>X</span>-<span>BET</span>
+                <span class="logo-badge">PRO</span>
             </a>
             
             <div class="nav-links">
                 <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
                 <a href="games.html" class="nav-link active"><i class="fas fa-gamepad"></i> Games</a>
-                <a href="bets.html" class="nav-link"><i class="fas fa-coins"></i> Bets</a>
+                <a href="bets.html" class="nav-link"><i class="fas fa-coins"></i> My Bets</a>
                 <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
-                <a href="contact.html" class="nav-link"><i class="fas fa-phone"></i> Contact</a>
-                <a href="aboutus.html" class="nav-link"><i class="fas fa-info-circle"></i> About</a>
+                <a href="promotions.html" class="nav-link"><i class="fas fa-gift"></i> Promotions</a>
             </div>
             
-            <div class="user-menu" id="userMenu">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">U</div>
+            <div class="user-menu">
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar" id="userAvatar">P</div>
                     <div class="user-details">
-                        <span class="user-name" id="userName">User</span>
-                        <span class="user-balance" id="userBalance">$0.00</span>
+                        <div class="user-name" id="userName">Player</div>
+                        <div class="user-balance" id="userBalance">$0.00</div>
                     </div>
                 </div>
-                <button class="btn-logout" onclick="logoutUser()">
+                <button class="btn-logout" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Games Content -->
-    <main class="games-container">
-        <div class="page-header">
-            <h1>🎮 Casino Games</h1>
-            <p>Play exciting casino games and win big!</p>
-        </div>
-        
-        <!-- Balance Alert -->
-        <div class="balance-alert">
-            <h3>Your Game Balance</h3>
-            <div class="balance-display" id="gameBalance">$0.00</div>
-            <p>Minimum bet: $5 | Maximum win: $10,000 per game</p>
-            <div style="margin-top: 15px;">
-                <a href="dashboard.html" class="game-play-btn">
-                    <i class="fas fa-wallet"></i> Deposit Now
-                </a>
-            </div>
-        </div>
-        
-        <!-- Game Categories -->
-        <div class="game-categories">
-            <button class="category-btn active" onclick="filterGames('all')">All Games</button>
-            <button class="category-btn" onclick="filterGames('slots')">Slots</button>
-            <button class="category-btn" onclick="filterGames('table')">Table Games</button>
-            <button class="category-btn" onclick="filterGames('live')">Live Casino</button>
-            <button class="category-btn" onclick="filterGames('cards')">Card Games</button>
-            <button class="category-btn" onclick="filterGames('jackpot')">Jackpot</button>
-        </div>
-        
-        <!-- Games Grid -->
-        <div class="games-grid" id="gamesGrid">
-            <!-- Games will be loaded dynamically -->
-        </div>
-        
-        <!-- Quick Games -->
-        <section class="quick-games">
-            <h2>🎯 Quick Games</h2>
-            <div class="quick-games-grid">
-                <div class="quick-game-card" onclick="playQuickGame('coinflip')">
-                    <div class="quick-game-icon">
-                        <i class="fas fa-coins"></i>
-                    </div>
-                    <h3>Coin Flip</h3>
-                    <p>Heads or Tails - 50/50 chance</p>
-                    <div class="game-meta">
-                        <span>Min: $5</span>
-                        <span>Max: $500</span>
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to the Ultimate Gaming Arena</h1>
+            <p class="hero-subtitle">
+                Experience premium casino games, live dealers, and instant wins in one place.
+                <br>Join <span id="livePlayers">1,247 players</span> online right now!
+            </p>
+            
+            <div class="live-stats">
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                    <div>
+                        <div class="stat-value">24.5K</div>
+                        <div class="stat-label">Wins Today</div>
                     </div>
                 </div>
-                
-                <div class="quick-game-card" onclick="playQuickGame('dice')">
-                    <div class="quick-game-icon">
-                        <i class="fas fa-dice"></i>
-                    </div>
-                    <h3>Dice Roll</h3>
-                    <p>Roll dice and win multipliers</p>
-                    <div class="game-meta">
-                        <span>Min: $10</span>
-                        <span>Max: $1000</span>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fas fa-gem"></i></div>
+                    <div>
+                        <div class="stat-value">$1.2M</div>
+                        <div class="stat-label">Paid Out</div>
                     </div>
                 </div>
-                
-                <div class="quick-game-card" onclick="playQuickGame('roulette')">
-                    <div class="quick-game-icon">
-                        <i class="fas fa-compact-disc"></i>
-                    </div>
-                    <h3>Roulette</h3>
-                    <p>Classic roulette game</p>
-                    <div class="game-meta">
-                        <span>Min: $20</span>
-                        <span>Max: $2000</span>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+                    <div>
+                        <div class="stat-value">&lt;1s</div>
+                        <div class="stat-label">Fast Cashouts</div>
                     </div>
                 </div>
-                
-                <div class="quick-game-card" onclick="playQuickGame('crash')">
-                    <div class="quick-game-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>Crash Game</h3>
-                    <p>Predict the crash point</p>
-                    <div class="game-meta">
-                        <span>Min: $5</span>
-                        <span>Max: $5000</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-    
-    <!-- Game Bet Modal -->
-    <div id="gameModal" class="game-modal">
-        <div class="game-modal-content">
-            <div class="game-modal-header">
-                <h2 id="modalGameTitle">Place Bet</h2>
-                <button class="close-game-modal" onclick="closeGameModal()">&times;</button>
             </div>
             
-            <div id="gameResult" class="game-result">
-                <!-- Result will be shown here -->
+            <div class="balance-card">
+                <div class="balance-label">Your Gaming Balance</div>
+                <div class="balance-amount" id="mainBalance">$0.00</div>
+                <div class="balance-actions">
+                    <button class="btn-action btn-deposit" onclick="depositFunds()">
+                        <i class="fas fa-plus-circle"></i> Deposit
+                    </button>
+                    <button class="btn-action btn-withdraw" onclick="withdrawFunds()">
+                        <i class="fas fa-arrow-up"></i> Withdraw
+                    </button>
+                </div>
             </div>
-            
-            <form id="betForm" class="bet-form">
-                <div class="form-group">
-                    <label>Bet Amount ($)</label>
-                    <input type="number" class="bet-amount-input" id="betAmount" 
-                           min="5" step="0.01" placeholder="Enter bet amount" required>
-                    <div class="bet-range">
-                        <span>Min: $5</span>
-                        <span>Max: $<span id="maxBetAmount">1000</span></span>
-                    </div>
-                    
-                    <div class="quick-bet-buttons">
-                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(5)">$5</button>
-                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(10)">$10</button>
-                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(25)">$25</button>
-                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(50)">$50</button>
-                        <button type="button" class="quick-bet-btn" onclick="setBetAmount(100)">$100</button>
-                    </div>
-                </div>
-                
-                <div class="form-group" id="gameOptions">
-                    <!-- Game specific options will be added here -->
-                </div>
-                
-                <button type="submit" class="btn-bet" id="placeBetBtn">
-                    <i class="fas fa-play"></i> PLACE BET
-                </button>
-            </form>
         </div>
-    </div>
+        
+        <div class="hero-background">
+            <div class="floating-element coin-float">💰</div>
+            <div class="floating-element dice-float">🎲</div>
+            <div class="floating-element card-float">♠️</div>
+        </div>
+    </section>
 
-    <script>
-        let currentUserBalance = 0;
-        let currentGame = null;
+    <!-- ===== GAME CATEGORIES SECTION ===== -->
+    <section class="categories-section">
+        <div class="section-header">
+            <h2 class="section-title">Explore Game Worlds</h2>
+            <p class="section-subtitle">Choose your adventure from 10 premium gaming categories</p>
+        </div>
         
-        // Sample games data
-        const games = [
+        <div class="categories-grid" id="categoriesGrid">
+            <!-- Categories will be loaded by JavaScript -->
+        </div>
+    </section>
+
+    <!-- ===== FEATURED GAMES SECTION ===== -->
+    <section class="featured-section">
+        <div class="featured-header">
+            <h2 class="featured-title">🔥 Hot Games Right Now</h2>
+            <span class="featured-badge">LIVE PLAYERS</span>
+        </div>
+        
+        <div class="featured-carousel">
+            <div class="carousel-track" id="carouselTrack">
+                <!-- Featured games will be loaded by JavaScript -->
+            </div>
+            
+            <div class="carousel-controls">
+                <button class="carousel-btn" onclick="moveCarousel(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-btn" onclick="moveCarousel(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="carousel-dots" id="carouselDots">
+                <!-- Dots will be generated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== STATS SECTION ===== -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Fair & Secure</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">Support Available</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-mobile-alt"></i></div>
+                <div class="stat-value">Mobile</div>
+                <div class="stat-label">Optimized Play</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-award"></i></div>
+                <div class="stat-value">5 Star</div>
+                <div class="stat-label">User Rating</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>X-BET Gaming</h3>
+                <ul class="footer-links">
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="careers.html">Careers</a></li>
+                    <li><a href="press.html">Press</a></li>
+                    <li><a href="responsible.html">Responsible Gaming</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="help.html">Help Center</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="community.html">Community</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="cookies.html">Cookie Policy</a></li>
+                    <li><a href="license.html">Gaming License</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Connect</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                    <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+                    <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                    <li><a href="#"><i class="fab fa-telegram"></i> Telegram</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            © 2024 X-BET Gaming Platform. All rights reserved. | License #GB123456
+        </div>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // Wait for Firebase to initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎮 X-BET Games Hub Initializing...');
+            
+            // Initialize all systems
+            initializeUser();
+            loadCategories();
+            loadFeaturedGames();
+            setupLiveStats();
+            setupAnimations();
+            
+            console.log('✅ Games Hub Ready!');
+        });
+
+        // ===== 1. CATEGORIES DATA (Links to your 10 existing pages) =====
+        const gameCategories = [
             {
-                id: 1,
-                name: "Mega Fortune",
-                category: "slots",
-                description: "Progressive jackpot slots with huge wins",
-                minBet: 5,
-                maxBet: 1000,
-                icon: "fas fa-crown",
-                multiplier: 5000
+                id: 'casino',
+                title: 'Casino Games',
+                icon: '🏛️',
+                description: 'Slots, roulette, blackjack, baccarat, jackpots, table games.',
+                page: 'g10.html',
+                color: '#1a73e8',
+                gameCount: 42,
+                players: 1240
             },
             {
-                id: 2,
-                name: "Blackjack Pro",
-                category: "table",
-                description: "Classic blackjack with live dealers",
-                minBet: 10,
-                maxBet: 5000,
-                icon: "fas fa-club",
-                multiplier: 2.5
+                id: 'live',
+                title: 'Live Casino',
+                icon: '👨‍💻',
+                description: 'Live dealer roulette, blackjack, baccarat, live game shows.',
+                page: 'g3.html',
+                color: '#34a853',
+                gameCount: 18,
+                players: 876
             },
             {
-                id: 3,
-                name: "Roulette Royale",
-                category: "table",
-                description: "European roulette with high limits",
-                minBet: 20,
-                maxBet: 10000,
-                icon: "fas fa-compact-disc",
-                multiplier: 36
+                id: 'crash',
+                title: 'Crash & Instant Games',
+                icon: '🚀',
+                description: 'Aviator-style crash games, plinko, mines, instant win multipliers.',
+                page: 'g5.html',
+                color: '#ea4335',
+                gameCount: 25,
+                players: 2105
             },
             {
-                id: 4,
-                name: "Poker Masters",
-                category: "cards",
-                description: "Texas Hold'em with tournaments",
-                minBet: 50,
-                maxBet: 5000,
-                icon: "fas fa-spade",
-                multiplier: 10
+                id: 'esports',
+                title: 'eSports Betting',
+                icon: '🎮',
+                description: 'CS:GO, Dota 2, League of Legends, Valorant, PUBG, FIFA tournaments.',
+                page: 'game2.html',
+                color: '#9c27b0',
+                gameCount: 36,
+                players: 3520
             },
             {
-                id: 5,
-                name: "Baccarat Elite",
-                category: "cards",
-                description: "Premium baccarat experience",
-                minBet: 100,
-                maxBet: 20000,
-                icon: "fas fa-gem",
-                multiplier: 8
+                id: 'virtual',
+                title: 'Virtual Games (Non-Sports)',
+                icon: '🌌',
+                description: 'Virtual casino, virtual arcade style betting games.',
+                page: 'game4.html',
+                color: '#ff9800',
+                gameCount: 15,
+                players: 540
             },
             {
-                id: 6,
-                name: "Mega Wheel",
-                category: "jackpot",
-                description: "Spin the wheel for massive jackpots",
-                minBet: 5,
-                maxBet: 1000,
-                icon: "fas fa-redo",
-                multiplier: 10000
+                id: 'lottery',
+                title: 'Lottery & Keno',
+                icon: '🎫',
+                description: 'Lottery draws, number picks, rapid keno draws.',
+                page: 'game6.html',
+                color: '#00bcd4',
+                gameCount: 12,
+                players: 890
+            },
+            {
+                id: 'jackpots',
+                title: 'Jackpots & Progressive Prizes',
+                icon: '💰',
+                description: 'Mega jackpots, daily jackpots, mystery jackpots.',
+                page: 'game9.html',
+                color: '#ffd700',
+                gameCount: 8,
+                players: 4999
+            },
+            {
+                id: 'poker',
+                title: 'Poker & Card Games',
+                icon: '♠️',
+                description: 'Texas Hold\'em, Omaha, Rummy, Teen Patti, card tournaments.',
+                page: 'poker.html',
+                color: '#4caf50',
+                gameCount: 22,
+                players: 1203
+            },
+            {
+                id: 'scratch',
+                title: 'Scratch Cards & Instant Win',
+                icon: '🎴',
+                description: 'Scratch tickets, spin & win, quick reveal games.',
+                page: 'scratch.html',
+                color: '#e91e63',
+                gameCount: 31,
+                players: 670
+            },
+            {
+                id: 'mini',
+                title: 'Mini Games & Specials',
+                icon: '🎯',
+                description: 'Coin flip, lucky wheel, hi-lo, dice games, novelty & fun games.',
+                page: 'mini.html',
+                color: '#795548',
+                gameCount: 47,
+                players: 980
             }
         ];
-        
-        // Initialize games page
-        document.addEventListener('DOMContentLoaded', function() {
-            loadGames();
-            checkUserBalance();
-            
-            // Setup bet form
-            document.getElementById('betForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await placeBet();
-            });
-            
-            // Check balance every 5 seconds
-            setInterval(checkUserBalance, 5000);
-        });
-        
-        function loadGames() {
-            const gamesGrid = document.getElementById('gamesGrid');
-            gamesGrid.innerHTML = '';
-            
-            games.forEach(game => {
-                const gameCard = document.createElement('div');
-                gameCard.className = 'game-card';
-                gameCard.dataset.category = game.category;
-                
-                gameCard.innerHTML = `
-                    <div class="game-image">
-                        <i class="${game.icon}"></i>
-                    </div>
-                    <div class="game-info">
-                        <h3 class="game-title">${game.name}</h3>
-                        <p class="game-description">${game.description}</p>
-                        <div class="game-meta">
-                            <div class="game-rating">
-                                <i class="fas fa-star"></i>
-                                <span>4.8</span>
-                            </div>
-                            <button class="game-play-btn" onclick="openGameModal(${game.id})">
-                                <i class="fas fa-play"></i> Play Now
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                gamesGrid.appendChild(gameCard);
-            });
-        }
-        
-        function filterGames(category) {
-            const buttons = document.querySelectorAll('.category-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            const games = document.querySelectorAll('.game-card');
-            games.forEach(game => {
-                if (category === 'all' || game.dataset.category === category) {
-                    game.style.display = 'block';
+
+        // ===== 2. FEATURED GAMES DATA =====
+        const featuredGames = [
+            {
+                name: 'Golden Rush Slots',
+                icon: '🎰',
+                category: 'casino',
+                players: 1240,
+                minBet: 1,
+                maxBet: 100,
+                payout: '97.5%',
+                color1: '#667eea',
+                color2: '#764ba2'
+            },
+            {
+                name: 'Live Blackjack VIP',
+                icon: '👑',
+                category: 'live',
+                players: 876,
+                minBet: 5,
+                maxBet: 5000,
+                payout: '99.5%',
+                color1: '#34a853',
+                color2: '#10b981'
+            },
+            {
+                name: 'Aviator X',
+                icon: '✈️',
+                category: 'crash',
+                players: 2105,
+                minBet: 0.5,
+                maxBet: 50,
+                payout: 'Up to 1000x',
+                color1: '#ea4335',
+                color2: '#ef4444'
+            },
+            {
+                name: 'CS:GO Major Finals',
+                icon: '🔫',
+                category: 'esports',
+                players: 3520,
+                minBet: 1,
+                maxBet: 1000,
+                payout: '95.2%',
+                color1: '#9c27b0',
+                color2: '#673ab7'
+            },
+            {
+                name: 'Mega Jackpot',
+                icon: '🏆',
+                category: 'jackpots',
+                players: 4999,
+                minBet: 0.25,
+                maxBet: 25,
+                payout: 'Progressive',
+                color1: '#ffd700',
+                color2: '#f59e0b'
+            },
+            {
+                name: 'Plinko Fortune',
+                icon: '🔴',
+                category: 'crash',
+                players: 1560,
+                minBet: 0.1,
+                maxBet: 10,
+                payout: 'Up to 500x',
+                color1: '#8b5cf6',
+                color2: '#6366f1'
+            }
+        ];
+
+        // ===== 3. USER MANAGEMENT =====
+        async function initializeUser() {
+            try {
+                // Try to get session from your auth system
+                const sessionData = sessionStorage.getItem('xbet_session');
+                let userName = 'Player';
+                let userBalance = 0.00;
+                let userAvatar = 'P';
+
+                if (sessionData) {
+                    const session = JSON.parse(atob(sessionData));
+                    userName = session.username || 'Player';
+                    userBalance = session.balance || 0.00;
+                    userAvatar = userName.charAt(0).toUpperCase();
                 } else {
-                    game.style.display = 'none';
+                    // Fallback to localStorage
+                    userName = localStorage.getItem('currentUser') || 'Player';
+                    const userData = JSON.parse(localStorage.getItem('userData_' + userName) || '{}');
+                    userBalance = userData.balance || 0.00;
+                    userAvatar = userName.charAt(0).toUpperCase();
                 }
+
+                // Update UI
+                document.getElementById('userName').textContent = userName;
+                document.getElementById('userBalance').textContent = '$' + userBalance.toFixed(2);
+                document.getElementById('mainBalance').textContent = '$' + userBalance.toFixed(2);
+                document.getElementById('userAvatar').textContent = userAvatar;
+
+                // Update user info click handler
+                document.getElementById('userInfo').onclick = function() {
+                    window.location.href = 'dashboard.html';
+                };
+
+            } catch (error) {
+                console.error('User initialization error:', error);
+            }
+        }
+
+        // ===== 4. CATEGORIES DISPLAY =====
+        function loadCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = gameCategories.map(cat => `
+                <div class="category-card" onclick="openCategory('${cat.id}')" 
+                     style="border-color: ${cat.color + '30'};">
+                    <span class="category-icon">${cat.icon}</span>
+                    <h3 class="category-title">${cat.title}</h3>
+                    <p class="category-description">${cat.description}</p>
+                    <div class="category-stats">
+                        <span class="game-count">${cat.gameCount} Games</span>
+                        <span class="category-players">
+                            <i class="fas fa-users"></i> ${cat.players.toLocaleString()}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openCategory(categoryId) {
+            const category = gameCategories.find(c => c.id === categoryId);
+            if (category) {
+                // Add transition effect
+                document.body.style.opacity = '0.8';
+                setTimeout(() => {
+                    window.location.href = category.page;
+                }, 300);
+            }
+        }
+
+        // ===== 5. FEATURED GAMES CAROUSEL =====
+        let currentSlide = 0;
+        const slidesPerView = 4;
+
+        function loadFeaturedGames() {
+            const track = document.getElementById('carouselTrack');
+            const dots = document.getElementById('carouselDots');
+
+            // Clear existing
+            track.innerHTML = '';
+            dots.innerHTML = '';
+
+            // Add games to carousel
+            featuredGames.forEach((game, index) => {
+                const card = document.createElement('div');
+                card.className = 'featured-game-card';
+                card.innerHTML = `
+                    <div class="featured-game-image" style="background: linear-gradient(135deg, ${game.color1}, ${game.color2});">
+                        <span style="font-size: 64px;">${game.icon}</span>
+                    </div>
+                    <div class="featured-game-info">
+                        <h3 class="featured-game-title">${game.name}</h3>
+                        <div class="featured-game-meta">
+                            <span><i class="fas fa-tag"></i> ${game.category}</span>
+                            <span class="featured-game-players">
+                                <i class="fas fa-users"></i> ${game.players.toLocaleString()}
+                            </span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <small>Bet: $${game.minBet} - $${game.maxBet}</small><br>
+                            <small>Payout: ${game.payout}</small>
+                        </div>
+                        <button class="btn-play-featured" onclick="playFeaturedGame(${index})">
+                            <i class="fas fa-play"></i> Play Now
+                        </button>
+                    </div>
+                `;
+                track.appendChild(card);
+            });
+
+            // Add dots
+            const totalSlides = Math.ceil(featuredGames.length / slidesPerView);
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('button');
+                dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(i);
+                dots.appendChild(dot);
+            }
+
+            // Initial positioning
+            updateCarousel();
+        }
+
+        function moveCarousel(direction) {
+            const totalSlides = Math.ceil(featuredGames.length / slidesPerView);
+            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+            updateCarousel();
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            const track = document.getElementById('carouselTrack');
+            const cardWidth = track.children[0]?.offsetWidth + 30; // width + gap
+            const translateX = -currentSlide * cardWidth * slidesPerView;
+            track.style.transform = `translateX(${translateX}px)`;
+
+            // Update dots
+            const dots = document.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
             });
         }
-        
-        async function checkUserBalance() {
-            const user = firebaseAuth.currentUser;
-            if (!user) return;
-            
-            try {
-                const userDoc = await firebaseDb.collection('users').doc(user.uid).get();
-                if (userDoc.exists) {
-                    currentUserBalance = userDoc.data().balance || 0;
-                    document.getElementById('gameBalance').textContent = `$${currentUserBalance.toFixed(2)}`;
-                    
-                    // Update play buttons based on balance
-                    const minBet = 5;
-                    const playButtons = document.querySelectorAll('.game-play-btn');
-                    playButtons.forEach(btn => {
-                        if (currentUserBalance < minBet) {
-                            btn.classList.add('disabled');
-                            btn.innerHTML = '<i class="fas fa-lock"></i> Need $5+';
-                        } else {
-                            btn.classList.remove('disabled');
-                            btn.innerHTML = '<i class="fas fa-play"></i> Play Now';
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('Error checking balance:', error);
-            }
-        }
-        
-        function openGameModal(gameId) {
-            const user = firebaseAuth.currentUser;
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
-            
-            // Check minimum balance
-            if (currentUserBalance < 5) {
-                alert('You need at least $5 to play games. Please deposit first.');
-                window.location.href = 'dashboard.html';
-                return;
-            }
-            
-            const game = games.find(g => g.id === gameId);
+
+        function playFeaturedGame(gameIndex) {
+            const game = featuredGames[gameIndex];
             if (!game) return;
-            
-            currentGame = game;
-            
-            document.getElementById('modalGameTitle').textContent = game.name;
-            document.getElementById('betAmount').value = game.minBet;
-            document.getElementById('maxBetAmount').textContent = game.maxBet;
-            document.getElementById('betAmount').max = Math.min(game.maxBet, currentUserBalance);
-            
-            // Set game-specific options
-            const gameOptions = document.getElementById('gameOptions');
-            let optionsHTML = '';
-            
-            switch(game.category) {
-                case 'slots':
-                    optionsHTML = `
-                        <label>Select Line Bet</label>
-                        <select class="bet-amount-input">
-                            <option value="1">1 Line - 1x</option>
-                            <option value="5">5 Lines - 2x</option>
-                            <option value="10">10 Lines - 5x</option>
-                            <option value="20">20 Lines - 10x</option>
-                        </select>
-                    `;
-                    break;
-                case 'table':
-                    optionsHTML = `
-                        <label>Bet Type</label>
-                        <select class="bet-amount-input">
-                            <option value="player">Player - 1:1</option>
-                            <option value="banker">Banker - 0.95:1</option>
-                            <option value="tie">Tie - 8:1</option>
-                        </select>
-                    `;
-                    break;
-                case 'cards':
-                    optionsHTML = `
-                        <label>Hand Selection</label>
-                        <select class="bet-amount-input">
-                            <option value="pair">Pair - 11:1</option>
-                            <option value="flush">Flush - 6:1</option>
-                            <option value="straight">Straight - 4:1</option>
-                        </select>
-                    `;
-                    break;
-                default:
-                    optionsHTML = `
-                        <label>Risk Level</label>
-                        <select class="bet-amount-input">
-                            <option value="low">Low Risk - 1.5x</option>
-                            <option value="medium">Medium Risk - 3x</option>
-                            <option value="high">High Risk - 10x</option>
-                        </select>
-                    `;
+
+            // Check balance first
+            const userBalance = parseFloat(document.getElementById('mainBalance').textContent.replace('$', ''));
+            if (userBalance < game.minBet) {
+                alert(`Insufficient balance! You need at least $${game.minBet} to play.`);
+                return;
             }
+
+            // Launch game
+            alert(`🎮 Launching ${game.name}...\n\nMinimum bet: $${game.minBet}\nPayout: ${game.payout}\n\nIn the full version, this would open the game interface.`);
             
-            gameOptions.innerHTML = optionsHTML;
-            
-            // Reset result display
-            document.getElementById('gameResult').style.display = 'none';
-            document.getElementById('betForm').style.display = 'block';
-            
-            document.getElementById('gameModal').style.display = 'flex';
+            // In real implementation, you would:
+            // 1. Open game modal or redirect to game page
+            // 2. Integrate with XBET_GAME_SYSTEM.processGameResult()
         }
-        
-        function playQuickGame(gameType) {
-            const quickGames = {
-                coinflip: { name: 'Coin Flip', min: 5, max: 500, multiplier: 2 },
-                dice: { name: 'Dice Roll', min: 10, max: 1000, multiplier: 6 },
-                roulette: { name: 'Roulette', min: 20, max: 2000, multiplier: 36 },
-                crash: { name: 'Crash Game', min: 5, max: 5000, multiplier: 100 }
+
+        // ===== 6. LIVE STATS & ANIMATIONS =====
+        function setupLiveStats() {
+            // Update player count every 5 seconds
+            setInterval(() => {
+                const basePlayers = 1247;
+                const randomChange = Math.floor(Math.random() * 200) - 100;
+                const newCount = Math.max(1000, basePlayers + randomChange);
+                document.getElementById('livePlayers').textContent = newCount.toLocaleString() + ' players';
+            }, 5000);
+
+            // Simulate balance updates
+            setInterval(() => {
+                const balanceEl = document.getElementById('mainBalance');
+                let balance = parseFloat(balanceEl.textContent.replace('$', ''));
+                
+                // Random small fluctuations
+                const change = (Math.random() - 0.5) * 0.1;
+                balance = Math.max(0, balance + change);
+                
+                balanceEl.textContent = '$' + balance.toFixed(2);
+            }, 10000);
+        }
+
+        function setupAnimations() {
+            // Add scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
             };
-            
-            const game = quickGames[gameType];
-            if (!game) return;
-            
-            currentGame = {
-                id: gameType,
-                name: game.name,
-                minBet: game.min,
-                maxBet: game.max,
-                multiplier: game.multiplier
-            };
-            
-            document.getElementById('modalGameTitle').textContent = game.name;
-            document.getElementById('betAmount').value = game.min;
-            document.getElementById('maxBetAmount').textContent = game.max;
-            document.getElementById('betAmount').max = Math.min(game.max, currentUserBalance);
-            
-            // Set quick game options
-            const gameOptions = document.getElementById('gameOptions');
-            let optionsHTML = '';
-            
-            if (gameType === 'coinflip') {
-                optionsHTML = `
-                    <label>Choose Side</label>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button type="button" class="quick-bet-btn" onclick="selectCoinSide('heads')" style="flex: 1;">
-                            <i class="fas fa-head-side-virus"></i> Heads
-                        </button>
-                        <button type="button" class="quick-bet-btn" onclick="selectCoinSide('tails')" style="flex: 1;">
-                            <i class="fas fa-feather-alt"></i> Tails
-                        </button>
-                    </div>
-                `;
-            } else if (gameType === 'dice') {
-                optionsHTML = `
-                    <label>Predict Number (1-6)</label>
-                    <div style="display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap;">
-                        ${[1,2,3,4,5,6].map(num => `
-                            <button type="button" class="quick-bet-btn" onclick="selectDiceNumber(${num})" style="flex: 1; min-width: 50px;">
-                                ${num}
-                            </button>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            
-            gameOptions.innerHTML = optionsHTML;
-            
-            // Reset result display
-            document.getElementById('gameResult').style.display = 'none';
-            document.getElementById('betForm').style.display = 'block';
-            
-            document.getElementById('gameModal').style.display = 'flex';
-        }
-        
-        function setBetAmount(amount) {
-            document.getElementById('betAmount').value = amount;
-        }
-        
-        function selectCoinSide(side) {
-            // Store selection
-            window.selectedCoinSide = side;
-            
-            // Update button styles
-            const buttons = document.querySelectorAll('.quick-bet-btn');
-            buttons.forEach(btn => btn.style.background = 'rgba(255, 255, 255, 0.1)');
-            event.target.style.background = 'var(--primary)';
-        }
-        
-        function selectDiceNumber(number) {
-            // Store selection
-            window.selectedDiceNumber = number;
-            
-            // Update button styles
-            const buttons = document.querySelectorAll('.quick-bet-btn');
-            buttons.forEach(btn => btn.style.background = 'rgba(255, 255, 255, 0.1)');
-            event.target.style.background = 'var(--primary)';
-        }
-        
-        function closeGameModal() {
-            document.getElementById('gameModal').style.display = 'none';
-            currentGame = null;
-        }
-        
-        async function placeBet() {
-            const user = firebaseAuth.currentUser;
-            if (!user || !currentGame) return;
-            
-            const betAmount = parseFloat(document.getElementById('betAmount').value);
-            
-            // Validate bet amount
-            if (!betAmount || betAmount < currentGame.minBet) {
-                alert(`Minimum bet is $${currentGame.minBet}`);
-                return;
-            }
-            
-            if (betAmount > currentUserBalance) {
-                alert('Insufficient balance');
-                return;
-            }
-            
-            if (betAmount > currentGame.maxBet) {
-                alert(`Maximum bet is $${currentGame.maxBet}`);
-                return;
-            }
-            
-            const placeBetBtn = document.getElementById('placeBetBtn');
-            placeBetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
-            placeBetBtn.disabled = true;
-            
-            try {
-                // Generate game result
-                const isWin = Math.random() > 0.45; // 55% win chance
-                const winMultiplier = isWin ? (currentGame.multiplier || 2) * Math.random() : 0;
-                const winAmount = isWin ? betAmount * winMultiplier : 0;
-                const netAmount = winAmount - betAmount;
-                
-                // Generate transaction ID
-                const transactionId = 'GAME' + Date.now() + Math.random().toString(36).substr(2, 6);
-                
-                // Update user balance
-                const userRef = firebaseDb.collection('users').doc(user.uid);
-                await firebaseDb.runTransaction(async (transaction) => {
-                    const userDoc = await transaction.get(userRef);
-                    const currentBalance = userDoc.data().balance || 0;
-                    const newBalance = currentBalance + netAmount;
-                    
-                    transaction.update(userRef, {
-                        balance: newBalance,
-                        lastGame: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
                 });
+            }, observerOptions);
+
+            // Observe all animated elements
+            document.querySelectorAll('.category-card, .stat-card').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // ===== 7. ACTION FUNCTIONS =====
+        function depositFunds() {
+            alert('💰 Deposit Funds\n\nIn the full version, this would open the deposit modal from your dashboard.');
+            // In real implementation: window.location.href = 'dashboard.html#deposit';
+        }
+
+        function withdrawFunds() {
+            alert('💸 Withdraw Funds\n\nIn the full version, this would open the withdrawal modal.');
+            // In real implementation: window.location.href = 'dashboard.html#withdraw';
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear sessions
+                sessionStorage.removeItem('xbet_session');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('session_expiry');
                 
-                // Create bet record
-                await firebaseDb.collection('bets').add({
-                    userId: user.uid,
-                    gameId: currentGame.id || currentGame.name,
-                    gameName: currentGame.name,
-                    betAmount: betAmount,
-                    winAmount: winAmount,
-                    netAmount: netAmount,
-                    result: isWin ? 'win' : 'loss',
-                    transactionId: transactionId,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    multiplier: winMultiplier.toFixed(2)
-                });
+                // Fade out animation
+                document.body.style.opacity = '0.5';
+                document.body.style.transition = 'opacity 0.5s';
                 
-                // Create transaction record
-                await firebaseDb.collection('transactions').add({
-                    userId: user.uid,
-                    type: isWin ? 'game_win' : 'game_bet',
-                    amount: netAmount,
-                    description: `${currentGame.name} - ${isWin ? 'WIN' : 'LOSS'}`,
-                    status: 'completed',
-                    transactionId: transactionId,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // Show result
-                showGameResult(isWin, betAmount, winAmount, netAmount, transactionId);
-                
-                // Update balance display
-                currentUserBalance += netAmount;
-                checkUserBalance();
-                
-            } catch (error) {
-                console.error('Game error:', error);
-                alert('❌ Game error. Please try again.');
-            } finally {
-                placeBetBtn.innerHTML = '<i class="fas fa-play"></i> PLACE BET';
-                placeBetBtn.disabled = false;
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
             }
         }
-        
-        function showGameResult(isWin, betAmount, winAmount, netAmount, transactionId) {
-            const resultDiv = document.getElementById('gameResult');
-            const betForm = document.getElementById('betForm');
-            
-            let resultHTML = '';
-            
-            if (isWin) {
-                resultHTML = `
-                    <div class="result-icon" style="color: var(--secondary);">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <h3 style="color: var(--secondary);">🎉 YOU WIN! 🎉</h3>
-                    <div class="result-amount" style="color: var(--secondary);">
-                        +$${winAmount.toFixed(2)}
-                    </div>
-                    <p>Bet: $${betAmount.toFixed(2)} | Win: $${winAmount.toFixed(2)}</p>
-                    <p style="font-size: 14px; opacity: 0.8;">Transaction ID: ${transactionId}</p>
-                    <button onclick="closeGameModal()" style="margin-top: 15px; padding: 10px 20px; background: var(--secondary); color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        <i class="fas fa-play"></i> Play Again
-                    </button>
-                `;
-                resultDiv.className = 'game-result result-win';
-            } else {
-                resultHTML = `
-                    <div class="result-icon" style="color: var(--accent);">
-                        <i class="fas fa-times-circle"></i>
-                    </div>
-                    <h3 style="color: var(--accent);">😔 BETTER LUCK NEXT TIME</h3>
-                    <div class="result-amount" style="color: var(--accent);">
-                        -$${betAmount.toFixed(2)}
-                    </div>
-                    <p>Your bet didn't win this time</p>
-                    <p style="font-size: 14px; opacity: 0.8;">Transaction ID: ${transactionId}</p>
-                    <button onclick="closeGameModal()" style="margin-top: 15px; padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        <i class="fas fa-redo"></i> Try Again
-                    </button>
-                `;
-                resultDiv.className = 'game-result result-lose';
-            }
-            
-            resultDiv.innerHTML = resultHTML;
-            resultDiv.style.display = 'block';
-            betForm.style.display = 'none';
-        }
+
+        // ===== 8. WINDOW RESIZE HANDLER =====
+        window.addEventListener('resize', updateCarousel);
+
+        // Initialize carousel on load
+        window.addEventListener('load', updateCarousel);
     </script>
 </body>
 </html>
