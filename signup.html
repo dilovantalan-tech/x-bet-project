@@ -116,6 +116,12 @@
             color: #fca5a5;
         }
 
+        .message.info {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #93c5fd;
+        }
+
         /* Form */
         .form-group {
             margin-bottom: 25px;
@@ -245,6 +251,41 @@
             text-align: center;
             color: #86efac;
             letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .transaction-code-display:hover {
+            background: rgba(0, 0, 0, 0.6);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Data Sources Info */
+        .data-sources {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         /* Footer */
@@ -351,6 +392,11 @@
             </button>
         </form>
 
+        <!-- Data Sources Info -->
+        <div id="dataSources" class="data-sources" style="display: none;">
+            Data saved to: <span id="savedSources"></span>
+        </div>
+
         <!-- Footer -->
         <div class="signup-footer">
             Already have an account? <a href="login.html">Sign In</a>
@@ -358,15 +404,17 @@
     </div>
 
     <script>
-        // Clean Signup System
+        // 🔥 X-BET SIGNUP SYSTEM v2.0 - MULTI-SOURCE DATA SAVING
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('X-BET Signup System Starting...');
+            console.log('🎯 X-BET Enhanced Signup System Starting...');
             
             // Get DOM elements
             const signupForm = document.getElementById('signupForm');
             const messageDiv = document.getElementById('message');
             const syncStatusDiv = document.getElementById('syncStatus');
             const submitBtn = document.getElementById('submitBtn');
+            const dataSourcesDiv = document.getElementById('dataSources');
+            const savedSourcesSpan = document.getElementById('savedSources');
             
             // Check if already logged in
             if (sessionStorage.getItem('xbet_session')) {
@@ -374,19 +422,8 @@
                 return;
             }
             
-            // Check sync system
-            function checkSyncSystem() {
-                if (window.crossBrowserSync) {
-                    const status = window.crossBrowserSync.getStatus();
-                    syncStatusDiv.innerHTML = `✅ System Ready`;
-                    submitBtn.disabled = false;
-                } else {
-                    setTimeout(checkSyncSystem, 500);
-                }
-            }
-            
-            // Start checking sync system
-            checkSyncSystem();
+            // Initialize sync system status
+            updateSyncStatus();
             
             // Toggle password visibility
             window.togglePassword = function(fieldId) {
@@ -403,7 +440,7 @@
             };
             
             // Show message
-            function showMessage(text, type) {
+            function showMessage(text, type = 'info') {
                 messageDiv.innerHTML = text;
                 messageDiv.className = 'message ' + type;
                 messageDiv.style.display = 'block';
@@ -411,7 +448,21 @@
                 if (type === 'success') {
                     setTimeout(() => {
                         messageDiv.style.display = 'none';
-                    }, 5000);
+                    }, 10000); // Longer display for success
+                }
+            }
+            
+            // Update sync status
+            function updateSyncStatus() {
+                if (window.crossBrowserSync && window.crossBrowserSync.getStatus) {
+                    try {
+                        const status = window.crossBrowserSync.getStatus();
+                        syncStatusDiv.innerHTML = `✅ Cross-Browser Sync Active | Users: ${status.adminUsers} | ${status.browser}`;
+                    } catch (error) {
+                        syncStatusDiv.innerHTML = '📱 Local Mode | No cross-browser sync';
+                    }
+                } else {
+                    syncStatusDiv.innerHTML = '📱 Local Mode | No cross-browser sync';
                 }
             }
             
@@ -432,69 +483,289 @@
                 return `XBT-${prefix}-${timestamp}-${random}`;
             }
             
-            // Create user session
-            function createUserSession(username, email, transactionCode) {
-                const sessionData = {
-                    username: username,
-                    email: email,
-                    transactionCode: transactionCode,
-                    isAdmin: false,
-                    lastLogin: new Date().toISOString(),
-                    loginTime: Date.now(),
-                    balance: 0,
-                    gameBalance: 0,
-                    sessionId: 'sess_' + Date.now()
-                };
+            // Check if user exists in ANY data source
+            function checkUserExists(username, email) {
+                console.log('🔍 Checking if user exists:', username, email);
                 
-                sessionStorage.setItem('xbet_session', btoa(JSON.stringify(sessionData)));
-                localStorage.setItem('currentUser', username);
-                localStorage.setItem('session_expiry', Date.now() + 86400000);
+                let exists = false;
+                let sources = [];
+                
+                // Check 1: registeredUsers
+                const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                if (registeredUsers[username]) {
+                    exists = true;
+                    sources.push('registeredUsers');
+                }
+                
+                // Check 2: Check email in registeredUsers
+                for (const [existingUsername, existingEmail] of Object.entries(registeredUsers)) {
+                    if (existingEmail === email && existingUsername !== username) {
+                        exists = true;
+                        sources.push('email_in_registeredUsers');
+                        break;
+                    }
+                }
+                
+                // Check 3: ALL_XBET_USERS
+                const allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+                const userInAllUsers = allXbetUsers.find(u => 
+                    u.username === username || u.email === email
+                );
+                if (userInAllUsers) {
+                    exists = true;
+                    sources.push('ALL_XBET_USERS');
+                }
+                
+                // Check 4: Cross-browser sync
+                if (window.crossBrowserSync && window.crossBrowserSync.getAllUsers) {
+                    try {
+                        const syncUsers = window.crossBrowserSync.getAllUsers();
+                        const syncUser = syncUsers.find(u => 
+                            u.username === username || u.email === email
+                        );
+                        if (syncUser) {
+                            exists = true;
+                            sources.push('crossBrowserSync');
+                        }
+                    } catch (error) {
+                        console.error('Error checking sync users:', error);
+                    }
+                }
+                
+                if (exists) {
+                    console.log('❌ User exists in:', sources);
+                }
+                
+                return { exists, sources };
             }
             
-            // Register user
-            async function registerUser(userData) {
+            // 🔥 ENHANCED USER REGISTRATION - SAVES TO 5 PLACES
+            async function registerUserEnhanced(username, email, password) {
+                console.log('📝 Starting enhanced registration for:', username);
+                
+                let savedSources = [];
+                let transactionCode = '';
+                
                 try {
-                    // Try cross-browser sync first
+                    // Generate transaction code
+                    transactionCode = generateTransactionCode(username);
+                    
+                    // Prepare user data object
+                    const userData = {
+                        username: username,
+                        email: email,
+                        password: password, // In production, HASH THIS!
+                        balance: 0.00,
+                        gameBalance: 0.00,
+                        transactionCode: transactionCode,
+                        status: 'active',
+                        isAdmin: false,
+                        registeredAt: new Date().toISOString(),
+                        lastLogin: new Date().toISOString(),
+                        activities: [],
+                        source: 'enhanced_registration_v2'
+                    };
+                    
+                    // 🔥 SAVE TO 5 DIFFERENT PLACES
+                    
+                    // 1. Save to registeredUsers (simple mapping)
+                    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                    registeredUsers[username] = email;
+                    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+                    savedSources.push('registeredUsers');
+                    console.log('✅ Saved to registeredUsers');
+                    
+                    // 2. Save to userData_[username] (detailed data)
+                    localStorage.setItem('userData_' + username, JSON.stringify(userData));
+                    savedSources.push('userData_' + username);
+                    console.log('✅ Saved to userData_' + username);
+                    
+                    // 3. Save to ALL_XBET_USERS array (for admin panel)
+                    const allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+                    
+                    // Remove if exists (update instead)
+                    const existingIndex = allXbetUsers.findIndex(u => u.username === username);
+                    if (existingIndex !== -1) {
+                        allXbetUsers[existingIndex] = {
+                            username: username,
+                            email: email,
+                            transactionCode: transactionCode,
+                            balance: 0.00,
+                            status: 'active',
+                            registeredAt: new Date().toISOString(),
+                            lastUpdated: new Date().toISOString(),
+                            lastLogin: new Date().toISOString(),
+                            source: 'updated_registration'
+                        };
+                    } else {
+                        allXbetUsers.push({
+                            username: username,
+                            email: email,
+                            transactionCode: transactionCode,
+                            balance: 0.00,
+                            status: 'active',
+                            registeredAt: new Date().toISOString(),
+                            lastUpdated: new Date().toISOString(),
+                            lastLogin: new Date().toISOString(),
+                            source: 'new_registration'
+                        });
+                    }
+                    
+                    localStorage.setItem('ALL_XBET_USERS', JSON.stringify(allXbetUsers));
+                    savedSources.push('ALL_XBET_USERS');
+                    console.log('✅ Saved to ALL_XBET_USERS');
+                    
+                    // 4. Save to XBET_USERS_STORE (central store)
+                    const usersStore = JSON.parse(localStorage.getItem('XBET_USERS_STORE') || '{}');
+                    usersStore[username] = {
+                        ...userData,
+                        storeSavedAt: new Date().toISOString(),
+                        storeVersion: '2.0'
+                    };
+                    localStorage.setItem('XBET_USERS_STORE', JSON.stringify(usersStore));
+                    savedSources.push('XBET_USERS_STORE');
+                    console.log('✅ Saved to XBET_USERS_STORE');
+                    
+                    // 5. Cross-browser sync registration
                     if (window.crossBrowserSync && window.crossBrowserSync.registerUser) {
-                        const userId = window.crossBrowserSync.registerUser(userData);
-                        if (userId) {
-                            console.log('User registered with cross-browser sync');
-                            return { success: true };
+                        try {
+                            window.crossBrowserSync.registerUser(userData);
+                            savedSources.push('crossBrowserSync');
+                            console.log('✅ Registered with cross-browser sync');
+                        } catch (syncError) {
+                            console.error('Sync registration error:', syncError);
                         }
                     }
                     
-                    // Fallback to local registration
-                    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-                    registeredUsers[userData.username] = userData.email;
-                    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+                    // 6. Create data backup
+                    createRegistrationBackup(username, savedSources);
                     
-                    const transactionCode = generateTransactionCode(userData.username);
+                    // 7. Broadcast new user registration
+                    broadcastNewUser(username);
                     
-                    const detailedData = {
-                        username: userData.username,
-                        email: userData.email,
-                        password: userData.password,
-                        balance: 0,
-                        gameBalance: 0,
+                    console.log('🎉 Enhanced registration complete!');
+                    console.log('📊 Saved to sources:', savedSources);
+                    
+                    return {
+                        success: true,
                         transactionCode: transactionCode,
-                        isAdmin: false,
-                        status: 'active',
-                        registeredAt: new Date().toISOString(),
-                        lastLogin: new Date().toISOString(),
-                        activities: []
+                        savedSources: savedSources,
+                        userCount: allXbetUsers.length
                     };
                     
-                    localStorage.setItem('userData_' + userData.username, JSON.stringify(detailedData));
-                    
-                    return { success: true, transactionCode: transactionCode };
-                    
                 } catch (error) {
-                    console.error('Registration error:', error);
-                    return { success: false, error: error.message };
+                    console.error('❌ Enhanced registration error:', error);
+                    return {
+                        success: false,
+                        error: error.message,
+                        savedSources: savedSources
+                    };
                 }
             }
             
-            // Main signup handler
+            // Create central store if not exists
+            function initializeUserStore() {
+                if (!localStorage.getItem('XBET_USERS_STORE')) {
+                    console.log('🛒 Initializing XBET_USERS_STORE...');
+                    localStorage.setItem('XBET_USERS_STORE', JSON.stringify({}));
+                }
+            }
+            
+            // Create registration backup
+            function createRegistrationBackup(username, sources) {
+                try {
+                    const backup = {
+                        username: username,
+                        sources: sources,
+                        timestamp: new Date().toISOString(),
+                        backupType: 'user_registration',
+                        data: {
+                            registeredUsers: JSON.parse(localStorage.getItem('registeredUsers') || '{}'),
+                            allXbetUsers: JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]'),
+                            userStore: JSON.parse(localStorage.getItem('XBET_USERS_STORE') || '{}')
+                        }
+                    };
+                    
+                    const backupKey = 'BACKUP_REG_' + Date.now();
+                    localStorage.setItem(backupKey, JSON.stringify(backup));
+                    console.log('💾 Registration backup created:', backupKey);
+                    
+                } catch (error) {
+                    console.error('Backup creation error:', error);
+                }
+            }
+            
+            // Broadcast new user to other tabs
+            function broadcastNewUser(username) {
+                try {
+                    // Use localStorage event for cross-tab communication
+                    localStorage.setItem('xbet_new_user', JSON.stringify({
+                        username: username,
+                        timestamp: Date.now(),
+                        action: 'registration'
+                    }));
+                    
+                    // Custom event for same tab
+                    const event = new CustomEvent('xbetNewUser', {
+                        detail: { username: username }
+                    });
+                    window.dispatchEvent(event);
+                    
+                    console.log('📢 Broadcast new user:', username);
+                    
+                } catch (error) {
+                    console.error('Broadcast error:', error);
+                }
+            }
+            
+            // Create user session
+            function createUserSession(username, email, transactionCode, sources) {
+                try {
+                    const sessionData = {
+                        username: username,
+                        email: email,
+                        transactionCode: transactionCode,
+                        isAdmin: false,
+                        lastLogin: new Date().toISOString(),
+                        loginTime: Date.now(),
+                        balance: 0,
+                        gameBalance: 0,
+                        registrationSources: sources,
+                        sessionId: 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+                    };
+                    
+                    // Save session
+                    sessionStorage.setItem('xbet_session', btoa(JSON.stringify(sessionData)));
+                    localStorage.setItem('currentUser', username);
+                    localStorage.setItem('session_expiry', Date.now() + 86400000); // 24 hours
+                    
+                    console.log('✅ Session created with sources:', sources);
+                    return true;
+                    
+                } catch (error) {
+                    console.error('Session creation error:', error);
+                    return false;
+                }
+            }
+            
+            // Show data sources info
+            function showDataSources(sources) {
+                dataSourcesDiv.style.display = 'block';
+                savedSourcesSpan.innerHTML = sources.map(source => 
+                    `<span style="color: #86efac; margin: 0 5px;">${source}</span>`
+                ).join(' • ');
+            }
+            
+            // Copy transaction code to clipboard
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showMessage('Transaction code copied to clipboard!', 'info');
+                }).catch(err => {
+                    console.error('Copy failed:', err);
+                });
+            }
+            
+            // 🔥 MAIN SIGNUP HANDLER
             signupForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
@@ -536,83 +807,169 @@
                     return;
                 }
                 
-                // Check if user exists
-                const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-                if (registeredUsers[username]) {
-                    showMessage('Username already taken', 'error');
+                // Check if user exists in ANY data source
+                const userCheck = checkUserExists(username, email);
+                if (userCheck.exists) {
+                    showMessage(`Account already exists! Found in: ${userCheck.sources.join(', ')}`, 'error');
                     return;
                 }
                 
-                // Check email
-                for (const existingEmail of Object.values(registeredUsers)) {
-                    if (existingEmail === email) {
-                        showMessage('Email already registered', 'error');
-                        return;
-                    }
-                }
+                // Initialize user store
+                initializeUserStore();
                 
                 // Show loading
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = 'Creating Account...';
-                
-                // Prepare user data
-                const userData = {
-                    username: username,
-                    email: email,
-                    password: password,
-                    balance: 0.00,
-                    gameBalance: 0.00,
-                    status: 'active'
-                };
+                submitBtn.innerHTML = '<span class="loading"></span> Creating Account...';
                 
                 try {
-                    // Register user
-                    const result = await registerUser(userData);
+                    console.log('=== ENHANCED REGISTRATION START ===');
+                    
+                    // Enhanced registration
+                    const result = await registerUserEnhanced(username, email, password);
                     
                     if (!result.success) {
                         throw new Error(result.error || 'Registration failed');
                     }
                     
-                    const transactionCode = result.transactionCode || generateTransactionCode(username);
+                    // Show data sources
+                    showDataSources(result.savedSources);
                     
                     // Create session
-                    createUserSession(username, email, transactionCode);
+                    const sessionCreated = createUserSession(
+                        username, 
+                        email, 
+                        result.transactionCode,
+                        result.savedSources
+                    );
                     
-                    // Show success
+                    if (!sessionCreated) {
+                        throw new Error('Session creation failed');
+                    }
+                    
+                    // Show success message with transaction code
                     showMessage(`
                         <div style="text-align: center;">
-                            <div style="font-size: 20px; margin-bottom: 15px;">Account Created Successfully!</div>
+                            <div style="font-size: 20px; margin-bottom: 15px; color: #86efac;">✅ Account Created Successfully!</div>
                             
-                            <div class="transaction-code-display">
-                                ${transactionCode}
+                            <div style="margin-bottom: 10px; color: #94a3b8;">
+                                Username: <strong>${username}</strong><br>
+                                Email: <strong>${email}</strong>
                             </div>
+                            
+                            <div class="transaction-code-display" onclick="copyToClipboard('${result.transactionCode}')" 
+                                 title="Click to copy">
+                                ${result.transactionCode}
+                            </div>
+                            
                             <div style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">
-                                Save this code for transactions
+                                ⚡ Save this code for all transactions (Click to copy)
                             </div>
                             
                             <div style="margin-top: 15px; font-size: 13px; color: #94a3b8;">
-                                Redirecting to dashboard...
+                                <div>📊 Total users in system: ${result.userCount}</div>
+                                <div>🎯 You will appear in admin panel immediately</div>
+                                <div>⏳ Redirecting to dashboard...</div>
                             </div>
                         </div>
                     `, 'success');
                     
-                    // Redirect
+                    // Add copy function to global scope
+                    window.copyToClipboard = copyToClipboard;
+                    
+                    // Redirect to dashboard
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
-                    }, 3000);
+                    }, 4000);
+                    
+                    console.log('✅ Registration successful!');
                     
                 } catch (error) {
                     console.error('Registration error:', error);
-                    showMessage('Error creating account. Please try again.', 'error');
+                    showMessage(`Error: ${error.message}. Please try again.`, 'error');
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = 'Create Account';
                 }
             });
             
-            // Focus on username
+            // Auto-focus username field
             setTimeout(() => {
                 document.getElementById('username').focus();
             }, 500);
+            
+            // Listen for storage events (other tabs)
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'xbet_new_user') {
+                    console.log('📢 New user registered in another tab');
+                    // You could update UI if needed
+                }
+            });
+            
+            console.log('✅ Enhanced signup system ready');
+        });
+        
+        // 🚨 EMERGENCY SAVE ON PAGE UNLOAD
+        window.addEventListener('beforeunload', function(e) {
+            console.log('🚨 Signup page unloading...');
+            
+            // Create unload backup
+            try {
+                localStorage.setItem('last_signup_unload', Date.now().toString());
+                console.log('✅ Unload timestamp saved');
+            } catch (error) {
+                console.error('Unload save error:', error);
+            }
+        });
+        
+        // 🚀 PAGE LOAD CHECK
+        window.addEventListener('load', function() {
+            console.log('📂 Signup page loaded');
+            
+            // Check storage usage
+            try {
+                let totalSize = 0;
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    totalSize += (key.length + value.length) * 2;
+                }
+                
+                console.log(`💾 Total storage usage: ${Math.round(totalSize / 1024)}KB`);
+                
+                // If storage is getting full, clean old backups
+                if (totalSize > 4 * 1024 * 1024) {
+                    console.warn('⚠️ Storage is getting full!');
+                    // Could add automatic cleanup here
+                }
+                
+            } catch (error) {
+                console.error('Storage check error:', error);
+            }
+        });
+        
+        // Debug function to check current state
+        function debugCheckState() {
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+            const allXbetUsers = JSON.parse(localStorage.getItem('ALL_XBET_USERS') || '[]');
+            const userStore = JSON.parse(localStorage.getItem('XBET_USERS_STORE') || '{}');
+            
+            console.log('🔍 DEBUG STATE');
+            console.log('registeredUsers:', Object.keys(registeredUsers).length, 'users');
+            console.log('ALL_XBET_USERS:', allXbetUsers.length, 'users');
+            console.log('XBET_USERS_STORE:', Object.keys(userStore).length, 'users');
+            
+            // Show recent users
+            if (allXbetUsers.length > 0) {
+                console.log('Recent users:', allXbetUsers.slice(-3).map(u => u.username));
+            }
+        }
+        
+        // Run debug on shift+ctrl+D
+        document.addEventListener('keydown', function(e) {
+            if (e.shiftKey && e.ctrlKey && e.key === 'D') {
+                e.preventDefault();
+                debugCheckState();
+                alert('Debug info logged to console!');
+            }
         });
     </script>
 </body>
