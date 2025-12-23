@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET - Admin Control Panel</title>
+    <title>X-BET - Admin Control Panel v5.0</title>
     <!-- Sync Systems -->
     <script src="cross-browser-sync.js"></script>
     <style>
-        /* [KEEP ALL YOUR EXISTING CSS] */
+        /* [ALL YOUR EXISTING CSS REMAINS UNCHANGED] */
         * {
             margin: 0;
             padding: 0;
@@ -384,6 +384,9 @@
         .transaction-withdrawal { border-left-color: var(--admin-danger); }
         .transaction-transfer { border-left-color: var(--admin-primary); }
         .transaction-admin { border-left-color: var(--admin-warning); }
+        .transaction-win { border-left-color: #22c55e; }
+        .transaction-loss { border-left-color: #ef4444; }
+        .transaction-game { border-left-color: #8b5cf6; }
 
         .transaction-code {
             background: rgba(59, 130, 246, 0.1);
@@ -492,6 +495,42 @@
 
         .win-stat { color: var(--admin-success); }
         .loss-stat { color: var(--admin-danger); }
+
+        /* Alert Styles */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--admin-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -500,7 +539,7 @@
         <nav class="admin-nav">
             <div class="admin-logo">
                 <h1>X<span>-BET</span> ADMIN</h1>
-                <div class="admin-badge">CONTROL PANEL</div>
+                <div class="admin-badge">v5.0 SECURE SYSTEM</div>
             </div>
             
             <div class="admin-user-info">
@@ -526,15 +565,18 @@
             🔄 Connecting to cross-browser sync system...
         </div>
 
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
         <!-- Admin Stats -->
         <div class="admin-stats-grid">
             <div class="admin-stat-card">
                 <div class="stat-header">
-                    <div class="stat-title">Total Admin Balance</div>
+                    <div class="stat-title">Total Platform Balance</div>
                     <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2);">💰</div>
                 </div>
-                <div class="stat-value stat-positive" id="totalBalance">$14,050,000.00</div>
-                <div style="color: #94a3b8; font-size: 0.9rem;">Available funds for management</div>
+                <div class="stat-value stat-positive" id="totalBalance">$0.00</div>
+                <div style="color: #94a3b8; font-size: 0.9rem;">All users + admin funds</div>
             </div>
 
             <div class="admin-stat-card">
@@ -543,7 +585,7 @@
                     <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2);">👥</div>
                 </div>
                 <div class="stat-value stat-primary" id="totalUsers">0</div>
-                <div style="color: #94a3b8; font-size: 0.9rem;">Registered platform users</div>
+                <div style="color: #94a3b8; font-size: 0.9rem;">Active registered users</div>
             </div>
 
             <div class="admin-stat-card">
@@ -672,12 +714,14 @@
                             <th>Transaction Code</th>
                             <th>Status</th>
                             <th>Win/Loss</th>
+                            <th>Created</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
                         <tr>
-                            <td colspan="8" style="text-align: center; padding: 3rem; color: #94a3b8;">
+                            <td colspan="9" style="text-align: center; padding: 3rem; color: #94a3b8;">
+                                <div class="spinner"></div>
                                 Loading users data...
                             </td>
                         </tr>
@@ -698,11 +742,13 @@
                     <option value="admin_transfer">Admin Transfers</option>
                     <option value="win">Wins</option>
                     <option value="loss">Losses</option>
+                    <option value="game">Game Results</option>
                 </select>
             </div>
             
             <div class="transactions-log" id="transactionsLog">
                 <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+                    <div class="spinner"></div>
                     Loading transactions...
                 </div>
             </div>
@@ -843,78 +889,581 @@
         </div>
     </div>
 
+    <!-- Game Results Modal -->
+    <div id="gameResultsModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="modal-close" onclick="closeGameResultsModal()">&times;</span>
+            <h2 style="margin-bottom: 1.5rem; color: var(--admin-primary);">🎮 Manual Game Result Entry</h2>
+            
+            <div class="admin-form-group">
+                <label>User Transaction Code</label>
+                <input type="text" id="gameUserCode" placeholder="Enter user transaction code">
+            </div>
+            
+            <div class="admin-form-group">
+                <label>Game Type</label>
+                <select id="gameType">
+                    <option value="slots">Slots</option>
+                    <option value="blackjack">Blackjack</option>
+                    <option value="roulette">Roulette</option>
+                    <option value="poker">Poker</option>
+                    <option value="baccarat">Baccarat</option>
+                    <option value="crash">Crash Game</option>
+                </select>
+            </div>
+            
+            <div class="admin-form-group">
+                <label>Result</label>
+                <select id="gameResult">
+                    <option value="win">Win</option>
+                    <option value="loss">Loss</option>
+                </select>
+            </div>
+            
+            <div class="admin-form-group">
+                <label>Amount ($)</label>
+                <input type="number" id="gameAmount" min="0.01" step="0.01" placeholder="0.00">
+            </div>
+            
+            <div class="admin-form-group">
+                <label>Game Details</label>
+                <input type="text" id="gameDetails" placeholder="Game details (e.g., 'Hit Blackjack')">
+            </div>
+            
+            <button class="admin-transfer-btn" onclick="processManualGameResult()" style="width: 100%; margin-top: 1.5rem;">
+                Record Game Result
+            </button>
+        </div>
+    </div>
+
     <script>
-        // 🔐 ADMIN PANEL v4.0 - ENHANCED SECURITY & PERMANENT STORAGE
-        class AdminPanel {
+        // 🔐 X-BET ADMIN PANEL v5.0 - COMPLETE CENTRALIZED STORAGE SYSTEM
+        class XBetStorage {
             constructor() {
-                this.currentAdmin = null;
-                this.adminData = null;
-                this.allUsers = [];
-                this.allTransactions = [];
-                this.hiddenAdmins = [
-                    { 
-                        username: 'admin_master', 
-                        balance: 14050000.00, 
-                        password: this.generateStrongPassword(),
-                        hidden: true,
-                        permissions: ['all']
-                    },
-                    { 
-                        username: 'finance_manager', 
-                        balance: 0.00, 
-                        password: this.generateStrongPassword(),
-                        hidden: true,
-                        permissions: ['view', 'deposit']
-                    },
-                    { 
-                        username: 'support_admin', 
-                        balance: 0.00, 
-                        password: this.generateStrongPassword(),
-                        hidden: true,
-                        permissions: ['view', 'support']
-                    }
-                ];
-                
-                // Initialize permanent storage
-                this.initializePermanentStorage();
+                this.version = '5.0';
+                this.initializeStorage();
             }
 
-            initializePermanentStorage() {
-                // Create master storage if not exists
+            initializeStorage() {
+                // Master storage for the entire platform
                 if (!localStorage.getItem('XBET_MASTER_STORE')) {
                     const masterStore = {
-                        version: '4.0',
+                        version: this.version,
                         created: new Date().toISOString(),
+                        lastUpdated: new Date().toISOString(),
                         totalUsers: 0,
                         totalTransactions: 0,
-                        totalBalance: 0,
+                        totalPlatformBalance: 0,
                         totalWins: 0,
                         totalLosses: 0,
-                        admins: this.hiddenAdmins,
+                        users: {}, // Index of all users
+                        admins: {
+                            admin_master: {
+                                username: 'admin_master',
+                                balance: 14050000.00,
+                                password: this.hashPassword('Master@Xbet2024!'),
+                                permissions: ['all'],
+                                hidden: true,
+                                created: new Date().toISOString()
+                            },
+                            finance_manager: {
+                                username: 'finance_manager',
+                                balance: 0.00,
+                                password: this.hashPassword('Finance@Xbet2024!'),
+                                permissions: ['view', 'deposit', 'withdrawal'],
+                                hidden: true,
+                                created: new Date().toISOString()
+                            },
+                            support_admin: {
+                                username: 'support_admin',
+                                balance: 0.00,
+                                password: this.hashPassword('Support@Xbet2024!'),
+                                permissions: ['view', 'support'],
+                                hidden: true,
+                                created: new Date().toISOString()
+                            }
+                        },
                         security: {
                             encryptionKey: this.generateEncryptionKey(),
-                            lastBackup: new Date().toISOString()
+                            lastBackup: new Date().toISOString(),
+                            loginAttempts: {},
+                            ipWhitelist: []
+                        },
+                        settings: {
+                            minDeposit: 10,
+                            maxDeposit: 10000,
+                            minWithdrawal: 20,
+                            maxWithdrawal: 5000,
+                            commissionRate: 0.05
                         }
                     };
                     localStorage.setItem('XBET_MASTER_STORE', JSON.stringify(masterStore));
                 }
 
-                // Initialize XBET_USERS_STORE if not exists
-                if (!localStorage.getItem('XBET_USERS_STORE')) {
-                    localStorage.setItem('XBET_USERS_STORE', JSON.stringify({}));
+                // Initialize user data storage
+                if (!localStorage.getItem('XBET_USERS_DATA')) {
+                    localStorage.setItem('XBET_USERS_DATA', JSON.stringify({}));
                 }
+
+                // Initialize transactions storage
+                if (!localStorage.getItem('XBET_TRANSACTIONS')) {
+                    localStorage.setItem('XBET_TRANSACTIONS', JSON.stringify([]));
+                }
+
+                // Initialize game history
+                if (!localStorage.getItem('XBET_GAME_HISTORY')) {
+                    localStorage.setItem('XBET_GAME_HISTORY', JSON.stringify([]));
+                }
+            }
+
+            hashPassword(password) {
+                // Simple hash for demonstration (in production, use proper hashing)
+                return btoa(password + 'X-BET-SALT-2024');
+            }
+
+            generateEncryptionKey() {
+                return Array.from(crypto.getRandomValues(new Uint8Array(32)))
+                    .map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            generateTransactionCode(username) {
+                const timestamp = Date.now().toString(36).toUpperCase();
+                const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+                return `XBET-${username.substring(0, 3).toUpperCase()}-${timestamp}-${random}`;
+            }
+
+            generateStrongPassword(length = 12) {
+                const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+                let password = '';
+                for (let i = 0; i < length; i++) {
+                    password += charset.charAt(Math.floor(Math.random() * charset.length));
+                }
+                return password;
+            }
+
+            // USER MANAGEMENT
+            registerUser(username, email, password, initialBalance = 0) {
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+                const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+
+                if (masterStore.users[username]) {
+                    throw new Error('Username already exists');
+                }
+
+                if (Object.values(masterStore.users).some(u => u.email === email)) {
+                    throw new Error('Email already registered');
+                }
+
+                const transactionCode = this.generateTransactionCode(username);
+                const userId = 'USER-' + Date.now();
+
+                // Create user object
+                const userObj = {
+                    id: userId,
+                    username: username,
+                    email: email,
+                    password: this.hashPassword(password),
+                    transactionCode: transactionCode,
+                    balance: parseFloat(initialBalance),
+                    gameBalance: 0,
+                    totalDeposited: 0,
+                    totalWithdrawn: 0,
+                    totalWon: 0,
+                    totalLost: 0,
+                    status: 'active',
+                    isVerified: false,
+                    isAdmin: false,
+                    created: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    lastActivity: new Date().toISOString(),
+                    ipAddresses: [],
+                    security: {
+                        twoFactorEnabled: false,
+                        lastPasswordChange: new Date().toISOString()
+                    }
+                };
+
+                // Update master store
+                masterStore.users[username] = {
+                    id: userId,
+                    email: email,
+                    balance: parseFloat(initialBalance),
+                    status: 'active',
+                    created: new Date().toISOString(),
+                    transactionCode: transactionCode
+                };
+                masterStore.totalUsers++;
+                masterStore.totalPlatformBalance += parseFloat(initialBalance);
+                masterStore.lastUpdated = new Date().toISOString();
+
+                // Save user data
+                usersData[username] = userObj;
+
+                // Record initial transaction if balance > 0
+                if (initialBalance > 0) {
+                    this.recordTransaction({
+                        type: 'deposit',
+                        from: 'system',
+                        to: username,
+                        amount: parseFloat(initialBalance),
+                        description: 'Initial deposit on account creation',
+                        status: 'completed',
+                        category: 'account_creation'
+                    });
+                }
+
+                // Save all data
+                localStorage.setItem('XBET_MASTER_STORE', JSON.stringify(masterStore));
+                localStorage.setItem('XBET_USERS_DATA', JSON.stringify(usersData));
+
+                return {
+                    success: true,
+                    user: userObj,
+                    message: 'User registered successfully'
+                };
+            }
+
+            loginUser(username, password) {
+                const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+
+                if (!usersData[username]) {
+                    throw new Error('User not found');
+                }
+
+                const user = usersData[username];
+
+                if (user.password !== this.hashPassword(password)) {
+                    // Track failed login attempts
+                    const security = JSON.parse(localStorage.getItem('XBET_SECURITY_LOG') || '{}');
+                    security[username] = security[username] || { attempts: 0, lastAttempt: null };
+                    security[username].attempts++;
+                    security[username].lastAttempt = new Date().toISOString();
+                    localStorage.setItem('XBET_SECURITY_LOG', JSON.stringify(security));
+
+                    throw new Error('Invalid password');
+                }
+
+                if (user.status !== 'active') {
+                    throw new Error('Account is ' + user.status);
+                }
+
+                // Update user data
+                user.lastLogin = new Date().toISOString();
+                user.lastActivity = new Date().toISOString();
+                usersData[username] = user;
+                localStorage.setItem('XBET_USERS_DATA', JSON.stringify(usersData));
+
+                // Reset failed attempts
+                const security = JSON.parse(localStorage.getItem('XBET_SECURITY_LOG') || '{}');
+                if (security[username]) {
+                    security[username].attempts = 0;
+                    localStorage.setItem('XBET_SECURITY_LOG', JSON.stringify(security));
+                }
+
+                return {
+                    success: true,
+                    user: {
+                        username: user.username,
+                        email: user.email,
+                        balance: user.balance,
+                        transactionCode: user.transactionCode,
+                        totalWon: user.totalWon,
+                        totalLost: user.totalLost
+                    },
+                    session: this.generateSessionToken(username)
+                };
+            }
+
+            loginAdmin(username, password) {
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+
+                if (!masterStore.admins[username]) {
+                    throw new Error('Admin not found');
+                }
+
+                const admin = masterStore.admins[username];
+
+                if (admin.password !== this.hashPassword(password)) {
+                    throw new Error('Invalid admin password');
+                }
+
+                return {
+                    success: true,
+                    admin: {
+                        username: admin.username,
+                        balance: admin.balance,
+                        permissions: admin.permissions
+                    },
+                    session: this.generateSessionToken(username, 'admin')
+                };
+            }
+
+            generateSessionToken(username, type = 'user') {
+                const token = btoa(`${username}:${type}:${Date.now()}:${Math.random()}`);
+                const session = {
+                    token: token,
+                    username: username,
+                    type: type,
+                    created: new Date().toISOString(),
+                    expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+                };
+
+                const sessions = JSON.parse(localStorage.getItem('XBET_SESSIONS') || '{}');
+                sessions[token] = session;
+                localStorage.setItem('XBET_SESSIONS', JSON.stringify(sessions));
+
+                return token;
+            }
+
+            // TRANSACTION MANAGEMENT
+            recordTransaction(transaction) {
+                const transactions = JSON.parse(localStorage.getItem('XBET_TRANSACTIONS'));
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+                const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+
+                const tx = {
+                    id: 'TXN-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
+                    timestamp: new Date().toISOString(),
+                    ...transaction
+                };
+
+                // Update balances based on transaction type
+                switch(tx.type) {
+                    case 'deposit':
+                        if (tx.to && usersData[tx.to]) {
+                            usersData[tx.to].balance += tx.amount;
+                            usersData[tx.to].totalDeposited += tx.amount;
+                            masterStore.totalPlatformBalance += tx.amount;
+                        }
+                        break;
+
+                    case 'withdrawal':
+                        if (tx.from && usersData[tx.from]) {
+                            usersData[tx.from].balance -= tx.amount;
+                            usersData[tx.from].totalWithdrawn += tx.amount;
+                            masterStore.totalPlatformBalance -= tx.amount;
+                        }
+                        break;
+
+                    case 'transfer':
+                        if (tx.from && usersData[tx.from]) {
+                            usersData[tx.from].balance -= tx.amount;
+                        }
+                        if (tx.to && usersData[tx.to]) {
+                            usersData[tx.to].balance += tx.amount;
+                        }
+                        break;
+
+                    case 'admin_transfer':
+                        if (tx.from && masterStore.admins[tx.from]) {
+                            masterStore.admins[tx.from].balance -= tx.amount;
+                        }
+                        if (tx.to && masterStore.admins[tx.to]) {
+                            masterStore.admins[tx.to].balance += tx.amount;
+                        }
+                        break;
+
+                    case 'win':
+                        if (tx.to && usersData[tx.to]) {
+                            usersData[tx.to].balance += tx.amount;
+                            usersData[tx.to].totalWon += tx.amount;
+                            masterStore.totalWins += tx.amount;
+                            masterStore.totalPlatformBalance += tx.amount;
+                        }
+                        break;
+
+                    case 'loss':
+                        if (tx.from && usersData[tx.from]) {
+                            usersData[tx.from].balance -= tx.amount;
+                            usersData[tx.from].totalLost += tx.amount;
+                            masterStore.totalLosses += tx.amount;
+                            masterStore.totalPlatformBalance -= tx.amount;
+                        }
+                        break;
+                }
+
+                // Save all data
+                transactions.push(tx);
+                masterStore.totalTransactions++;
+                masterStore.lastUpdated = new Date().toISOString();
+
+                localStorage.setItem('XBET_TRANSACTIONS', JSON.stringify(transactions));
+                localStorage.setItem('XBET_MASTER_STORE', JSON.stringify(masterStore));
+                localStorage.setItem('XBET_USERS_DATA', JSON.stringify(usersData));
+
+                return tx;
+            }
+
+            // GAME MANAGEMENT
+            recordGameResult(username, gameType, result, amount, details = '') {
+                const gameHistory = JSON.parse(localStorage.getItem('XBET_GAME_HISTORY'));
+                const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+
+                if (!usersData[username]) {
+                    throw new Error('User not found');
+                }
+
+                const gameRecord = {
+                    id: 'GAME-' + Date.now(),
+                    username: username,
+                    gameType: gameType,
+                    result: result,
+                    amount: parseFloat(amount),
+                    details: details,
+                    timestamp: new Date().toISOString(),
+                    processedBy: 'system'
+                };
+
+                // Update user balance and stats
+                if (result === 'win') {
+                    usersData[username].balance += parseFloat(amount);
+                    usersData[username].totalWon += parseFloat(amount);
+                    masterStore.totalWins += parseFloat(amount);
+                    masterStore.totalPlatformBalance += parseFloat(amount);
+                } else if (result === 'loss') {
+                    usersData[username].balance -= parseFloat(amount);
+                    usersData[username].totalLost += parseFloat(amount);
+                    masterStore.totalLosses += parseFloat(amount);
+                    masterStore.totalPlatformBalance -= parseFloat(amount);
+                }
+
+                // Record transaction
+                this.recordTransaction({
+                    type: result,
+                    from: result === 'loss' ? username : 'system',
+                    to: result === 'win' ? username : 'system',
+                    amount: parseFloat(amount),
+                    description: `${gameType} game: ${details}`,
+                    status: 'completed',
+                    category: 'game_result'
+                });
+
+                // Save game history
+                gameHistory.push(gameRecord);
+                localStorage.setItem('XBET_GAME_HISTORY', JSON.stringify(gameHistory));
+                localStorage.setItem('XBET_USERS_DATA', JSON.stringify(usersData));
+                localStorage.setItem('XBET_MASTER_STORE', JSON.stringify(masterStore));
+
+                return gameRecord;
+            }
+
+            // DATA RETRIEVAL
+            getAllUsers() {
+                const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+                return Object.values(usersData);
+            }
+
+            getAllTransactions(limit = 100) {
+                const transactions = JSON.parse(localStorage.getItem('XBET_TRANSACTIONS'));
+                return transactions.slice(-limit).reverse();
+            }
+
+            getAllGameHistory(limit = 50) {
+                const gameHistory = JSON.parse(localStorage.getItem('XBET_GAME_HISTORY'));
+                return gameHistory.slice(-limit).reverse();
+            }
+
+            getAdminStats() {
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+                const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+
+                let totalUserBalance = 0;
+                let totalWins = 0;
+                let totalLosses = 0;
+
+                Object.values(usersData).forEach(user => {
+                    totalUserBalance += user.balance;
+                    totalWins += user.totalWon;
+                    totalLosses += user.totalLost;
+                });
+
+                return {
+                    totalUsers: masterStore.totalUsers,
+                    totalTransactions: masterStore.totalTransactions,
+                    totalPlatformBalance: masterStore.totalPlatformBalance,
+                    totalUserBalance: totalUserBalance,
+                    totalWins: totalWins,
+                    totalLosses: totalLosses,
+                    adminBalances: Object.keys(masterStore.admins).reduce((acc, admin) => {
+                        acc[admin] = masterStore.admins[admin].balance;
+                        return acc;
+                    }, {})
+                };
+            }
+
+            // UTILITY METHODS
+            getUserByTransactionCode(code) {
+                const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+                return Object.values(usersData).find(user => 
+                    user.transactionCode === code || 
+                    user.transactionCode === code.toUpperCase()
+                );
+            }
+
+            updateUserBalance(username, amount, type = 'deposit') {
+                const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+
+                if (!usersData[username]) {
+                    throw new Error('User not found');
+                }
+
+                if (type === 'deposit') {
+                    usersData[username].balance += parseFloat(amount);
+                    usersData[username].totalDeposited += parseFloat(amount);
+                    masterStore.totalPlatformBalance += parseFloat(amount);
+                } else if (type === 'withdrawal') {
+                    if (usersData[username].balance < parseFloat(amount)) {
+                        throw new Error('Insufficient balance');
+                    }
+                    usersData[username].balance -= parseFloat(amount);
+                    usersData[username].totalWithdrawn += parseFloat(amount);
+                    masterStore.totalPlatformBalance -= parseFloat(amount);
+                }
+
+                localStorage.setItem('XBET_USERS_DATA', JSON.stringify(usersData));
+                localStorage.setItem('XBET_MASTER_STORE', JSON.stringify(masterStore));
+
+                return usersData[username];
+            }
+
+            backupData() {
+                const backup = {
+                    timestamp: new Date().toISOString(),
+                    masterStore: JSON.parse(localStorage.getItem('XBET_MASTER_STORE')),
+                    usersData: JSON.parse(localStorage.getItem('XBET_USERS_DATA')),
+                    transactions: JSON.parse(localStorage.getItem('XBET_TRANSACTIONS')),
+                    gameHistory: JSON.parse(localStorage.getItem('XBET_GAME_HISTORY'))
+                };
+
+                const backups = JSON.parse(localStorage.getItem('XBET_BACKUPS') || '[]');
+                backups.push(backup);
+                if (backups.length > 10) backups.shift(); // Keep only last 10 backups
+                localStorage.setItem('XBET_BACKUPS', JSON.stringify(backups));
+
+                return backup;
+            }
+        }
+
+        // 🔐 ADMIN PANEL CONTROLLER
+        class AdminPanel {
+            constructor() {
+                this.storage = new XBetStorage();
+                this.currentAdmin = null;
+                this.adminData = null;
+                this.allUsers = [];
+                this.allTransactions = [];
+                this.allGames = [];
             }
 
             async init() {
                 this.checkAdminAuth();
                 this.loadAdminData();
-                await this.loadAllUsersFromAllSources();
-                this.calculateWinLossStats();
-                this.loadAllTransactions();
+                await this.loadAllData();
                 this.updateDisplay();
                 this.setupEventListeners();
-                
-                // Initialize sync system status
                 this.updateSyncStatus();
             }
 
@@ -929,13 +1478,14 @@
                 
                 try {
                     this.currentAdmin = adminUser;
-                    document.getElementById('adminUsername').textContent = this.currentAdmin;
+                    const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
                     
-                    // Verify admin exists in hidden admins
-                    const adminExists = this.hiddenAdmins.some(a => a.username === this.currentAdmin);
-                    if (!adminExists) {
+                    if (!masterStore.admins[this.currentAdmin]) {
                         throw new Error('Unauthorized admin access');
                     }
+                    
+                    document.getElementById('adminUsername').textContent = this.currentAdmin;
+                    this.updateAdminBalance();
                     
                 } catch (error) {
                     console.error('Session error:', error);
@@ -944,259 +1494,675 @@
             }
 
             loadAdminData() {
-                // Load from master store
-                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE') || '{}');
-                
-                // Find current admin
-                const adminInfo = masterStore.admins?.find(a => a.username === this.currentAdmin) || 
-                                 this.hiddenAdmins.find(a => a.username === this.currentAdmin);
-                
-                if (adminInfo) {
-                    this.adminData = {
-                        username: adminInfo.username,
-                        balance: adminInfo.balance,
-                        permissions: adminInfo.permissions,
-                        hidden: adminInfo.hidden
-                    };
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+                if (masterStore.admins[this.currentAdmin]) {
+                    this.adminData = masterStore.admins[this.currentAdmin];
                 } else {
-                    // Fallback to old system
-                    this.adminData = JSON.parse(localStorage.getItem('admin_data_' + this.currentAdmin) || '{}');
-                    if (!this.adminData.balance) {
-                        this.adminData.balance = this.currentAdmin === 'admin_master' ? 14050000.00 : 0.00;
-                    }
+                    this.adminData = {
+                        username: this.currentAdmin,
+                        balance: this.currentAdmin === 'admin_master' ? 14050000.00 : 0.00,
+                        permissions: ['all']
+                    };
                 }
+                this.updateAdminBalance();
+            }
+
+            updateAdminBalance() {
+                if (this.adminData) {
+                    document.getElementById('adminBalance').textContent = 
+                        '$' + this.adminData.balance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                }
+            }
+
+            async loadAllData() {
+                try {
+                    // Load users
+                    this.allUsers = this.storage.getAllUsers();
+                    
+                    // Load transactions
+                    this.allTransactions = this.storage.getAllTransactions(200);
+                    
+                    // Load game history
+                    this.allGames = this.storage.getAllGameHistory(100);
+                    
+                    // Calculate statistics
+                    this.calculateStats();
+                    
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    this.showAlert('Error loading data: ' + error.message, 'error');
+                }
+            }
+
+            calculateStats() {
+                const stats = this.storage.getAdminStats();
                 
-                this.saveAdminData();
+                document.getElementById('totalUsers').textContent = stats.totalUsers;
+                document.getElementById('totalBalance').textContent = 
+                    '$' + stats.totalPlatformBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                document.getElementById('totalWins').textContent = 
+                    '$' + stats.totalWins.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                document.getElementById('totalLosses').textContent = 
+                    '$' + stats.totalLosses.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                
+                // Update user codes datalist
+                const datalist = document.getElementById('userCodes');
+                datalist.innerHTML = this.allUsers.map(user => 
+                    `<option value="${user.transactionCode}">${user.username} (${user.transactionCode})</option>`
+                ).join('');
             }
-                value.trim();
-            const status = document.getElementById('withdrawalStatus').value;
-            
-            if (!withdrawalCode) {
-                alert('Please enter withdrawal transaction code');
-                return;
+
+            updateDisplay() {
+                this.updateUsersTable();
+                this.updateTransactionsLog();
             }
-            
-            let found = false;
-            
-            for (const user of admin.allUsers) {
-                const userData = JSON.parse(localStorage.getItem('userData_' + user.username) || '{}');
-                if (userData.activities) {
-                    const transaction = userData.activities.find(t => 
-                        t.code && t.code.toUpperCase() === withdrawalCode.toUpperCase() && 
-                        t.type === 'withdrawal'
-                    );
-                    if (transaction) {
-                        transaction.status = status;
-                        transaction.processedBy = admin.currentAdmin;
-                        transaction.processedAt = new Date().toISOString();
-                        
-                        if (status === 'completed') {
-                            transaction.completedAt = new Date().toISOString();
-                            // Deduct from user balance
-                            userData.balance = (userData.balance || 0) - Math.abs(transaction.amount || 0);
-                            
-                            // Add to admin transactions
-                            admin.adminData.transactions = admin.adminData.transactions || [];
-                            admin.adminData.transactions.push({
-                                id: 'TXN-' + Date.now(),
-                                type: 'withdrawal_processed',
-                                amount: -Math.abs(transaction.amount || 0),
-                                date: new Date().toISOString(),
-                                code: withdrawalCode,
-                                title: `Withdrawal processed for ${user.username}`,
-                                description: 'Withdrawal completed',
-                                status: 'completed',
-                                user: user.username
-                            });
-                            admin.saveAdminData();
-                        } else if (status === 'rejected') {
-                            // Refund to user balance
-                            userData.balance = (userData.balance || 0) + Math.abs(transaction.amount || 0);
-                            
-                            // Add refund activity
-                            userData.activities.push({
-                                id: 'TXN-' + Date.now(),
-                                type: 'refund',
-                                amount: Math.abs(transaction.amount || 0),
-                                date: new Date().toISOString(),
-                                code: 'REFUND-' + withdrawalCode,
-                                title: 'Withdrawal Rejected - Refund',
-                                description: 'Withdrawal request was rejected and funds refunded',
-                                status: 'completed'
-                            });
-                        }
-                        
-                        localStorage.setItem('userData_' + user.username, JSON.stringify(userData));
-                        found = true;
-                        
-                        // Update permanent storage
-                        const usersStore = JSON.parse(localStorage.getItem('XBET_USERS_STORE') || '{}');
-                        if (usersStore[user.username]) {
-                            usersStore[user.username].balance = userData.balance;
-                            usersStore[user.username].lastUpdated = new Date().toISOString();
-                            localStorage.setItem('XBET_USERS_STORE', JSON.stringify(usersStore));
-                        }
-                        
-                        break;
-                    }
+
+            updateUsersTable() {
+                const tbody = document.getElementById('usersTableBody');
+                if (this.allUsers.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 3rem; color: #94a3b8;">
+                                No users found. Users will appear here when they sign up.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = this.allUsers.map(user => `
+                    <tr>
+                        <td><strong>${user.username}</strong></td>
+                        <td>${user.email}</td>
+                        <td><span class="password-display">●●●●●●●●</span></td>
+                        <td>$${user.balance.toFixed(2)}</td>
+                        <td><span class="transaction-code">${user.transactionCode}</span></td>
+                        <td>
+                            <span style="color: ${user.status === 'active' ? '#10b981' : '#ef4444'}; 
+                                  background: ${user.status === 'active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
+                                  padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
+                                ${user.status}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="win-loss-stats">
+                                <div class="win-stat">W: $${user.totalWon.toFixed(2)}</div>
+                                <div class="loss-stat">L: $${user.totalLost.toFixed(2)}</div>
+                            </div>
+                        </td>
+                        <td>${new Date(user.created).toLocaleDateString()}</td>
+                        <td>
+                            <button class="user-action-btn" onclick="viewUserDetails('${user.username}')">View</button>
+                            <button class="user-action-btn" onclick="editUserBalance('${user.username}')">Edit</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            updateTransactionsLog() {
+                const container = document.getElementById('transactionsLog');
+                if (this.allTransactions.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+                            No transactions yet. Transactions will appear here when users deposit, withdraw, or play games.
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.allTransactions.map(tx => `
+                    <div class="transaction-item transaction-${tx.type}">
+                        <div>
+                            <strong>${tx.description || tx.type}</strong><br>
+                            <small>
+                                ${tx.from && tx.to ? `From: ${tx.from} → To: ${tx.to}` : ''}
+                                ${!tx.from && tx.to ? `To: ${tx.to}` : ''}
+                                ${tx.from && !tx.to ? `From: ${tx.from}` : ''}
+                            </small><br>
+                            <small style="color: #94a3b8;">${new Date(tx.timestamp).toLocaleString()}</small>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.25rem; font-weight: bold; 
+                                 color: ${tx.type === 'deposit' || tx.type === 'win' || (tx.type === 'transfer' && tx.to !== 'system') ? '#10b981' : 
+                                         tx.type === 'withdrawal' || tx.type === 'loss' ? '#ef4444' : '#f59e0b'}">
+                                ${(tx.type === 'deposit' || tx.type === 'win' || (tx.type === 'transfer' && tx.to !== 'system')) ? '+' : '-'}$${Math.abs(tx.amount).toFixed(2)}
+                            </div>
+                            <div class="transaction-code">${tx.id}</div>
+                            <small style="color: #94a3b8; text-transform: capitalize;">${tx.type.replace('_', ' ')}</small>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateSyncStatus() {
+                const statusEl = document.getElementById('syncStatus');
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+                
+                if (masterStore) {
+                    statusEl.innerHTML = `
+                        ✅ <strong>Storage System Active</strong> | 
+                        Version: ${masterStore.version} | 
+                        Users: ${masterStore.totalUsers} | 
+                        Last Updated: ${new Date(masterStore.lastUpdated).toLocaleTimeString()}
+                    `;
+                    statusEl.style.borderLeftColor = '#10b981';
                 }
             }
-            
-            if (found) {
-                alert(`✅ Withdrawal ${status} successfully!`);
-                closeWithdrawModal();
-                admin.loadAllUsersFromAllSources();
-                admin.loadAllTransactions();
-                admin.updateDisplay();
-            } else {
-                alert('Withdrawal transaction not found');
+
+            showAlert(message, type = 'success') {
+                const container = document.getElementById('alertContainer');
+                const alertId = 'alert-' + Date.now();
+                
+                const alertEl = document.createElement('div');
+                alertEl.className = `alert alert-${type}`;
+                alertEl.id = alertId;
+                alertEl.innerHTML = `
+                    ${type === 'success' ? '✅' : '❌'} ${message}
+                    <button onclick="document.getElementById('${alertId}').remove()" 
+                            style="float: right; background: none; border: none; color: inherit; cursor: pointer;">✕</button>
+                `;
+                alertEl.style.display = 'block';
+                
+                container.appendChild(alertEl);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (document.getElementById(alertId)) {
+                        document.getElementById(alertId).remove();
+                    }
+                }, 5000);
+            }
+
+            setupEventListeners() {
+                // Auto-generate password and transaction code
+                document.getElementById('newUsername').addEventListener('input', (e) => {
+                    const username = e.target.value;
+                    if (username.length >= 3) {
+                        document.getElementById('newUserPassword').value = 
+                            this.storage.generateStrongPassword(10);
+                        document.getElementById('customTransactionCode').value = 
+                            this.storage.generateTransactionCode(username);
+                    }
+                });
+            }
+
+            async forceSync() {
+                this.showAlert('Syncing all data...', 'success');
+                await this.loadAllData();
+                this.updateDisplay();
+                this.showAlert('Data sync complete!', 'success');
             }
         }
 
-        // Create new user
+        // Initialize admin panel
+        const admin = new AdminPanel();
+
+        // MODAL FUNCTIONS
+        function openDepositModal() {
+            document.getElementById('depositModal').style.display = 'block';
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').style.display = 'none';
+        }
+
+        function openWithdrawModal() {
+            // Load pending withdrawals
+            const transactions = JSON.parse(localStorage.getItem('XBET_TRANSACTIONS') || '[]');
+            const pending = transactions.filter(t => t.type === 'withdrawal' && t.status === 'pending');
+            
+            const list = document.getElementById('pendingWithdrawalsList');
+            if (pending.length === 0) {
+                list.innerHTML = '<div style="color: #94a3b8; padding: 1rem; text-align: center;">No pending withdrawals</div>';
+            } else {
+                list.innerHTML = pending.map(tx => `
+                    <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; margin: 0.5rem 0; border-radius: 8px;">
+                        <strong>${tx.id}</strong><br>
+                        <small>User: ${tx.from} | Amount: $${tx.amount.toFixed(2)}</small><br>
+                        <small>Date: ${new Date(tx.timestamp).toLocaleString()}</small>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('withdrawModal').style.display = 'block';
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').style.display = 'none';
+        }
+
+        function openCreateUserModal() {
+            document.getElementById('createUserModal').style.display = 'block';
+        }
+
+        function closeCreateUserModal() {
+            document.getElementById('createUserModal').style.display = 'none';
+        }
+
+        function openAdminToAdminModal() {
+            document.getElementById('adminToAdminModal').style.display = 'block';
+        }
+
+        function closeAdminToAdminModal() {
+            document.getElementById('adminToAdminModal').style.display = 'none';
+        }
+
+        function openGameResultsModal() {
+            document.getElementById('gameResultsModal').style.display = 'block';
+        }
+
+        function closeGameResultsModal() {
+            document.getElementById('gameResultsModal').style.display = 'none';
+        }
+
+        // PROCESSING FUNCTIONS
+        async function processUserDeposit() {
+            const userCode = document.getElementById('depositUserCode').value.trim();
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+            const description = document.getElementById('depositDescription').value.trim();
+
+            if (!userCode || !amount || amount <= 0) {
+                admin.showAlert('Please enter valid user code and amount', 'error');
+                return;
+            }
+
+            try {
+                const user = admin.storage.getUserByTransactionCode(userCode);
+                if (!user) {
+                    admin.showAlert('User not found with that transaction code', 'error');
+                    return;
+                }
+
+                // Check admin balance
+                if (admin.adminData.balance < amount) {
+                    admin.showAlert('Insufficient admin balance', 'error');
+                    return;
+                }
+
+                // Update admin balance
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+                masterStore.admins[admin.currentAdmin].balance -= amount;
+                localStorage.setItem('XBET_MASTER_STORE', JSON.stringify(masterStore));
+
+                // Record transaction
+                admin.storage.recordTransaction({
+                    type: 'deposit',
+                    from: admin.currentAdmin,
+                    to: user.username,
+                    amount: amount,
+                    description: description || 'Admin deposit',
+                    status: 'completed',
+                    category: 'admin_deposit'
+                });
+
+                // Update user balance
+                admin.storage.updateUserBalance(user.username, amount, 'deposit');
+
+                admin.showAlert(`✅ Deposited $${amount.toFixed(2)} to ${user.username}`, 'success');
+                closeDepositModal();
+                
+                // Refresh data
+                admin.loadAdminData();
+                await admin.loadAllData();
+                admin.updateDisplay();
+
+            } catch (error) {
+                admin.showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function processWithdrawalStatus() {
+            const withdrawalCode = document.getElementById('withdrawalCode').value.trim();
+            const status = document.getElementById('withdrawalStatus').value;
+
+            if (!withdrawalCode) {
+                admin.showAlert('Please enter withdrawal code', 'error');
+                return;
+            }
+
+            try {
+                const transactions = JSON.parse(localStorage.getItem('XBET_TRANSACTIONS'));
+                const txIndex = transactions.findIndex(t => t.id === withdrawalCode && t.type === 'withdrawal');
+                
+                if (txIndex === -1) {
+                    admin.showAlert('Withdrawal transaction not found', 'error');
+                    return;
+                }
+
+                const tx = transactions[txIndex];
+                tx.status = status;
+                tx.processedBy = admin.currentAdmin;
+                tx.processedAt = new Date().toISOString();
+
+                if (status === 'completed') {
+                    tx.completedAt = new Date().toISOString();
+                    // Transfer from admin to system (already deducted from user when requested)
+                    admin.storage.recordTransaction({
+                        type: 'admin_transfer',
+                        from: admin.currentAdmin,
+                        to: 'system',
+                        amount: tx.amount,
+                        description: `Withdrawal processed for ${tx.from}`,
+                        status: 'completed'
+                    });
+                } else if (status === 'rejected') {
+                    // Refund to user
+                    admin.storage.updateUserBalance(tx.from, tx.amount, 'deposit');
+                    admin.storage.recordTransaction({
+                        type: 'refund',
+                        from: 'system',
+                        to: tx.from,
+                        amount: tx.amount,
+                        description: 'Withdrawal rejected - refund',
+                        status: 'completed'
+                    });
+                }
+
+                localStorage.setItem('XBET_TRANSACTIONS', JSON.stringify(transactions));
+                admin.showAlert(`✅ Withdrawal ${status} successfully!`, 'success');
+                closeWithdrawModal();
+                
+                await admin.loadAllData();
+                admin.updateDisplay();
+
+            } catch (error) {
+                admin.showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
         async function createNewUser() {
             const username = document.getElementById('newUsername').value.trim();
             const email = document.getElementById('newUserEmail').value.trim();
             const balance = parseFloat(document.getElementById('initialBalance').value) || 0;
             const password = document.getElementById('newUserPassword').value;
-            const customCode = document.getElementById('customTransactionCode').value.trim();
-            
-            if (!username || !email) {
-                alert('Please fill all required fields');
+
+            if (!username || !email || !password) {
+                admin.showAlert('Please fill all required fields', 'error');
                 return;
             }
-            
+
             if (username.length < 3) {
-                alert('Username must be at least 3 characters long');
+                admin.showAlert('Username must be at least 3 characters', 'error');
                 return;
             }
-            
+
             if (!email.includes('@') || !email.includes('.')) {
-                alert('Please enter a valid email address');
+                admin.showAlert('Please enter valid email', 'error');
                 return;
             }
-            
-            if (balance < 0) {
-                alert('Initial balance cannot be negative');
-                return;
-            }
-            
+
             if (balance > 10000) {
-                alert('Maximum initial balance is $10,000');
+                admin.showAlert('Maximum initial balance is $10,000', 'error');
                 return;
             }
-            
-            // Check if username exists
-            const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-            if (existingUsers[username]) {
-                alert('Username already exists');
-                return;
+
+            try {
+                const result = admin.storage.registerUser(username, email, password, balance);
+                admin.showAlert(`✅ User ${username} created successfully! Transaction Code: ${result.user.transactionCode}`, 'success');
+                closeCreateUserModal();
+                
+                await admin.loadAllData();
+                admin.updateDisplay();
+
+            } catch (error) {
+                admin.showAlert('Error: ' + error.message, 'error');
             }
-            
-            // Generate transaction code
-            const transactionCode = customCode || admin.generateTransactionCode(username);
-            
-            // Prepare user data
-            const userData = {
-                username: username,
-                email: email,
-                password: password,
-                balance: balance,
-                gameBalance: 0,
-                transactionCode: transactionCode,
-                status: 'active',
-                wins: 0,
-                losses: 0,
-                isAdmin: false,
-                registeredAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
-                activities: [],
-                source: 'admin_created'
-            };
-            
-            if (balance > 0) {
-                userData.activities.push({
-                    id: 'TXN-' + Date.now(),
-                    type: 'deposit',
-                    amount: balance,
-                    date: new Date().toISOString(),
-                    code: admin.generateTransactionCode(username),
-                    title: 'Initial Deposit',
-                    description: 'Account creation deposit from admin',
-                    status: 'completed',
-                    category: 'received',
-                    from: admin.currentAdmin,
-                    to: username
-                });
-            }
-            
-            // Save to registeredUsers
-            existingUsers[username] = email;
-            localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
-            
-            // Save detailed data
-            localStorage.setItem('userData_' + username, JSON.stringify(userData));
-            
-            // Update permanent storage
-            const usersStore = JSON.parse(localStorage.getItem('XBET_USERS_STORE') || '{}');
-            usersStore[username] = {
-                email: email,
-                password: password,
-                balance: balance,
-                transactionCode: transactionCode,
-                status: 'active',
-                wins: 0,
-                losses: 0,
-                registeredAt: new Date().toISOString(),
-                lastUpdated: new Date().toISOString()
-            };
-            localStorage.setItem('XBET_USERS_STORE', JSON.stringify(usersStore));
-            
-            // Update master store
-            const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE') || '{}');
-            masterStore.totalUsers = (masterStore.totalUsers || 0) + 1;
-            masterStore.totalBalance = (masterStore.totalBalance || 0) + balance;
-            masterStore.lastUpdated = new Date().toISOString();
-            localStorage.setItem('XBET_MASTER_STORE', JSON.stringify(masterStore));
-            
-            // Register with cross-browser sync if available
-            if (window.crossBrowserSync && window.crossBrowserSync.registerUser) {
-                try {
-                    window.crossBrowserSync.registerUser(userData);
-                    console.log('✅ User registered with cross-browser sync');
-                } catch (error) {
-                    console.error('Error registering with sync system:', error);
-                }
-            }
-            
-            alert(`✅ User created successfully!\n\nUsername: ${username}\nEmail: ${email}\nPassword: ${password}\nTransaction Code: ${transactionCode}\nInitial Balance: $${balance.toFixed(2)}`);
-            
-            closeCreateUserModal();
-            await admin.loadAllUsersFromAllSources();
-            admin.loadAllTransactions();
-            admin.updateDisplay();
         }
 
-        // Admin logout
+        async function processAdminToAdminTransfer() {
+            const fromAdmin = document.getElementById('fromAdmin').value;
+            const toAdmin = document.getElementById('toAdmin').value;
+            const amount = parseFloat(document.getElementById('adminTransferAmount').value);
+            const description = document.getElementById('adminTransferDescription').value.trim();
+
+            if (!amount || amount <= 0) {
+                admin.showAlert('Please enter valid amount', 'error');
+                return;
+            }
+
+            try {
+                const masterStore = JSON.parse(localStorage.getItem('XBET_MASTER_STORE'));
+                
+                if (masterStore.admins[fromAdmin].balance < amount) {
+                    admin.showAlert('Insufficient balance in source admin account', 'error');
+                    return;
+                }
+
+                // Update balances
+                masterStore.admins[fromAdmin].balance -= amount;
+                masterStore.admins[toAdmin].balance += amount;
+                localStorage.setItem('XBET_MASTER_STORE', JSON.stringify(masterStore));
+
+                // Record transaction
+                admin.storage.recordTransaction({
+                    type: 'admin_transfer',
+                    from: fromAdmin,
+                    to: toAdmin,
+                    amount: amount,
+                    description: description || 'Admin transfer',
+                    status: 'completed'
+                });
+
+                admin.showAlert(`✅ Transferred $${amount.toFixed(2)} from ${fromAdmin} to ${toAdmin}`, 'success');
+                closeAdminToAdminModal();
+                
+                admin.loadAdminData();
+                await admin.loadAllData();
+                admin.updateDisplay();
+
+            } catch (error) {
+                admin.showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function processUniversalTransfer() {
+            const fromType = document.getElementById('transferFrom').value;
+            const toType = document.getElementById('transferTo').value;
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+            const code = document.getElementById('transactionCode').value.trim();
+
+            if (!amount || amount <= 0) {
+                admin.showAlert('Please enter valid amount', 'error');
+                return;
+            }
+
+            if (!code) {
+                admin.showAlert('Please enter transaction code', 'error');
+                return;
+            }
+
+            try {
+                const user = admin.storage.getUserByTransactionCode(code);
+                if (!user && (fromType === 'user' || toType === 'user')) {
+                    admin.showAlert('User not found with that transaction code', 'error');
+                    return;
+                }
+
+                let fromUser = fromType === 'user' ? user.username : fromType === 'admin' ? admin.currentAdmin : '';
+                let toUser = toType === 'user' ? user.username : toType === 'admin' ? admin.currentAdmin : '';
+
+                // Admin to User
+                if (fromType === 'admin' && toType === 'user') {
+                    if (admin.adminData.balance < amount) {
+                        admin.showAlert('Insufficient admin balance', 'error');
+                        return;
+                    }
+                    
+                    admin.storage.recordTransaction({
+                        type: 'deposit',
+                        from: admin.currentAdmin,
+                        to: user.username,
+                        amount: amount,
+                        description: 'Admin transfer to user',
+                        status: 'completed'
+                    });
+
+                    admin.showAlert(`✅ Transferred $${amount.toFixed(2)} to ${user.username}`, 'success');
+                }
+                // User to Admin
+                else if (fromType === 'user' && toType === 'admin') {
+                    if (user.balance < amount) {
+                        admin.showAlert('User has insufficient balance', 'error');
+                        return;
+                    }
+
+                    admin.storage.recordTransaction({
+                        type: 'transfer',
+                        from: user.username,
+                        to: admin.currentAdmin,
+                        amount: amount,
+                        description: 'User transfer to admin',
+                        status: 'completed'
+                    });
+
+                    admin.showAlert(`✅ Received $${amount.toFixed(2)} from ${user.username}`, 'success');
+                }
+
+                // Clear form
+                document.getElementById('transferAmount').value = '';
+                document.getElementById('transactionCode').value = '';
+                
+                await admin.loadAllData();
+                admin.updateDisplay();
+
+            } catch (error) {
+                admin.showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function processManualGameResult() {
+            const userCode = document.getElementById('gameUserCode').value.trim();
+            const gameType = document.getElementById('gameType').value;
+            const result = document.getElementById('gameResult').value;
+            const amount = parseFloat(document.getElementById('gameAmount').value);
+            const details = document.getElementById('gameDetails').value.trim();
+
+            if (!userCode || !amount || amount <= 0) {
+                admin.showAlert('Please enter valid user code and amount', 'error');
+                return;
+            }
+
+            try {
+                const user = admin.storage.getUserByTransactionCode(userCode);
+                if (!user) {
+                    admin.showAlert('User not found with that transaction code', 'error');
+                    return;
+                }
+
+                if (result === 'loss' && user.balance < amount) {
+                    admin.showAlert('User has insufficient balance for loss', 'error');
+                    return;
+                }
+
+                const gameRecord = admin.storage.recordGameResult(
+                    user.username,
+                    gameType,
+                    result,
+                    amount,
+                    details
+                );
+
+                admin.showAlert(`✅ Game result recorded: ${user.username} ${result} $${amount.toFixed(2)} in ${gameType}`, 'success');
+                closeGameResultsModal();
+                
+                await admin.loadAllData();
+                admin.updateDisplay();
+
+            } catch (error) {
+                admin.showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // UTILITY FUNCTIONS
+        function searchUsers(query) {
+            const rows = document.querySelectorAll('#usersTableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        function filterTransactions(filter) {
+            const items = document.querySelectorAll('.transaction-item');
+            items.forEach(item => {
+                const type = item.className.includes('transaction-' + filter);
+                item.style.display = filter === 'all' || type ? '' : 'none';
+            });
+        }
+
+        function viewUserDetails(username) {
+            const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+            const user = usersData[username];
+            
+            if (user) {
+                alert(`
+                    👤 User Details: ${username}
+                    
+                    📧 Email: ${user.email}
+                    💰 Balance: $${user.balance.toFixed(2)}
+                    🔑 Transaction Code: ${user.transactionCode}
+                    
+                    📊 Statistics:
+                    • Total Deposited: $${user.totalDeposited.toFixed(2)}
+                    • Total Withdrawn: $${user.totalWithdrawn.toFixed(2)}
+                    • Total Won: $${user.totalWon.toFixed(2)}
+                    • Total Lost: $${user.totalLost.toFixed(2)}
+                    
+                    📅 Account Created: ${new Date(user.created).toLocaleString()}
+                    🔐 Last Login: ${new Date(user.lastLogin).toLocaleString()}
+                    📍 Status: ${user.status}
+                `);
+            }
+        }
+
+        function editUserBalance(username) {
+            const usersData = JSON.parse(localStorage.getItem('XBET_USERS_DATA'));
+            const user = usersData[username];
+            
+            if (user) {
+                const newBalance = prompt(`Edit balance for ${username}\nCurrent: $${user.balance.toFixed(2)}\nEnter new balance:`, user.balance);
+                
+                if (newBalance !== null) {
+                    const balance = parseFloat(newBalance);
+                    if (!isNaN(balance) && balance >= 0) {
+                        user.balance = balance;
+                        localStorage.setItem('XBET_USERS_DATA', JSON.stringify(usersData));
+                        admin.showAlert(`✅ Updated ${username}'s balance to $${balance.toFixed(2)}`, 'success');
+                        admin.updateDisplay();
+                    } else {
+                        admin.showAlert('Invalid balance amount', 'error');
+                    }
+                }
+            }
+        }
+
         function adminLogout() {
             if (confirm('Are you sure you want to logout?')) {
-                // Clear session
                 localStorage.removeItem('admin_session');
                 localStorage.removeItem('admin_user');
-                
-                // Redirect to login
                 window.location.href = 'admin.login.html';
             }
         }
 
-        // Force sync
         async function forceSync() {
             await admin.forceSync();
         }
 
+        // Update transfer options
+        function updateTransferOptions() {
+            const from = document.getElementById('transferFrom').value;
+            const to = document.getElementById('transferTo').value;
+            
+            // Prevent same type transfers
+            if (from === to) {
+                document.getElementById('transferTo').selectedIndex = 
+                    (document.getElementById('transferTo').selectedIndex + 1) % 3;
+            }
+        }
+
         // Close modals on outside click
         window.onclick = function(event) {
-            const modals = ['depositModal', 'withdrawModal', 'createUserModal', 'adminToAdminModal'];
+            const modals = ['depositModal', 'withdrawModal', 'createUserModal', 'adminToAdminModal', 'gameResultsModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -1212,46 +2178,52 @@
                 closeWithdrawModal();
                 closeCreateUserModal();
                 closeAdminToAdminModal();
+                closeGameResultsModal();
             }
             
-            // Ctrl + S for sync
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
                 forceSync();
             }
             
-            // Ctrl + N for new user
             if (e.ctrlKey && e.key === 'n') {
                 e.preventDefault();
                 openCreateUserModal();
             }
             
-            // Ctrl + D for deposit
             if (e.ctrlKey && e.key === 'd') {
                 e.preventDefault();
                 openDepositModal();
+            }
+            
+            if (e.ctrlKey && e.key === 'g') {
+                e.preventDefault();
+                openGameResultsModal();
             }
         });
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            admin.init();
+            
             // Auto-focus search box
-            const searchBox = document.querySelector('.search-box');
-            if (searchBox) {
-                searchBox.focus();
-            }
+            setTimeout(() => {
+                const searchBox = document.querySelector('.search-box');
+                if (searchBox) searchBox.focus();
+            }, 500);
             
             // Show welcome message
             setTimeout(() => {
                 const adminName = document.getElementById('adminUsername').textContent;
-                console.log(`👑 Welcome, ${adminName}! X-BET Admin Panel v4.0 loaded successfully.`);
-                console.log(`🔒 Security: Permanent storage enabled with XBET_MASTER_STORE`);
-                console.log(`📊 Stats: ${admin.allUsers.length} users loaded from all sources`);
+                console.log(`👑 Welcome, ${adminName}! X-BET Admin Panel v5.0 loaded successfully.`);
+                console.log(`🔒 Storage System: Centralized secure storage active`);
+                console.log(`📊 Total Users: ${admin.allUsers.length}`);
             }, 1000);
         });
 
-        // Export admin object globally
+        // Export admin globally
         window.admin = admin;
+        window.XBetStorage = XBetStorage;
     </script>
 </body>
 </html>
