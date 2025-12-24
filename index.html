@@ -3,147 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET | Premium Unified Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>X-BET | Premium Global Gaming Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6; --secondary: #f59e0b; --dark-bg: #070b14;
-            --card-bg: rgba(15, 23, 42, 0.6); --text-main: #ffffff;
-            --text-dim: #94a3b8; --border: rgba(255, 255, 255, 0.08);
+            --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.3);
+            --secondary: #f59e0b; --dark-bg: #05080f; --card-bg: rgba(15, 23, 42, 0.6);
+            --text-main: #ffffff; --text-dim: #94a3b8; --border: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
         }
 
-        body { background: var(--dark-bg); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: var(--dark-bg); color: var(--text-main); 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
 
-        /* --- UNIFIED NAVBAR --- */
+        /* --- 1. FULL-WIDTH CINEMATIC BACKGROUND --- */
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 80% 20%, #1e293b 0%, #05080f 50%);
+            z-index: -1;
+        }
+
+        /* --- 2. MEGA NAVBAR --- */
         .navbar {
-            position: fixed; top: 0; width: 100%; z-index: 1000;
-            background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(20px);
+            position: fixed; top: 0; width: 100%; z-index: 2000;
+            background: rgba(5, 8, 15, 0.7); backdrop-filter: blur(25px);
             border-bottom: 1px solid var(--border);
         }
 
         .nav-container {
-            max-width: 1400px; margin: 0 auto; padding: 15px 25px;
+            max-width: 1800px; margin: 0 auto; padding: 20px 40px;
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        .nav-links { display: flex; gap: 25px; align-items: center; }
-        
+        .logo { font-size: 28px; font-weight: 800; color: white; text-decoration: none; letter-spacing: -1px; }
+        .logo span { color: var(--primary); }
+
+        .nav-links { display: flex; gap: 35px; }
         .nav-item {
-            text-decoration: none; color: var(--text-dim);
-            font-size: 14px; font-weight: 600; transition: 0.3s;
+            text-decoration: none; color: var(--text-dim); font-weight: 600;
+            font-size: 15px; transition: 0.3s; position: relative;
+        }
+        .nav-item:hover { color: white; }
+        .nav-item.active::after {
+            content: ''; position: absolute; bottom: -28px; left: 0;
+            width: 100%; height: 3px; background: var(--primary); box-shadow: 0 0 10px var(--primary);
         }
 
-        .nav-item:hover, .nav-item.active { color: var(--primary); }
+        /* --- 3. LIVE TICKER --- */
+        .ticker-wrap {
+            background: rgba(59, 130, 246, 0.05); border-bottom: 1px solid var(--border);
+            padding: 8px 0; margin-top: 80px; overflow: hidden;
+        }
+        .ticker { display: flex; gap: 50px; animation: scroll 40s linear infinite; white-space: nowrap; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .ticker-item { font-size: 12px; font-weight: 700; color: var(--success); display: flex; gap: 10px; }
 
-        /* Hide specific links by default until auth check */
-        .auth-only { display: none; }
-
-        .btn {
-            padding: 10px 20px; border-radius: 10px; font-weight: 700;
-            text-decoration: none; cursor: pointer; transition: 0.2s;
+        /* --- 4. GIANT HERO SECTION --- */
+        .hero {
+            padding: 120px 40px 100px; max-width: 1400px; margin: 0 auto;
+            display: grid; grid-template-columns: 1.2fr 1fr; align-items: center; gap: 60px;
         }
 
-        .btn-primary { background: var(--primary); color: white; border: none; }
-        .btn-logout { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
-
-        .user-pill {
-            display: flex; align-items: center; gap: 12px;
-            background: var(--border); padding: 5px 15px; border-radius: 50px;
+        .hero-content h1 {
+            font-size: clamp(50px, 6vw, 100px); font-weight: 800; line-height: 0.95;
+            letter-spacing: -4px; margin-bottom: 30px;
         }
 
-        /* --- HERO --- */
-        .hero { padding: 180px 20px 100px; text-align: center; }
-        
-        #adminLink {
-            position: fixed; bottom: 20px; left: 20px;
-            background: #ef4444; color: white; padding: 10px 20px;
-            border-radius: 8px; text-decoration: none; font-weight: bold; display: none;
+        .hero-content p {
+            font-size: 22px; color: var(--text-dim); margin-bottom: 40px; line-height: 1.6;
         }
+
+        .btn-group { display: flex; gap: 20px; }
+        .btn-mega {
+            padding: 22px 45px; border-radius: 15px; font-weight: 800; font-size: 18px;
+            text-decoration: none; transition: 0.3s;
+        }
+        .btn-filled { background: var(--primary); color: white; box-shadow: 0 10px 30px var(--primary-glow); }
+        .btn-filled:hover { transform: translateY(-5px); box-shadow: 0 15px 40px var(--primary-glow); }
+
+        /* --- 5. STATS GRID --- */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+            max-width: 1400px; margin: 0 auto 100px; padding: 0 40px;
+        }
+        .stat-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            padding: 30px; border-radius: 20px; text-align: center;
+        }
+        .stat-card h2 { font-size: 36px; margin-bottom: 5px; }
+        .stat-card p { color: var(--text-dim); text-transform: uppercase; font-size: 12px; font-weight: 700; }
+
+        /* --- 6. AUTH LOADING OVERLAY --- */
+        #loadingOverlay {
+            position: fixed; inset: 0; background: var(--dark-bg);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader { width: 48px; height: 48px; border: 5px solid #FFF; border-bottom-color: var(--primary); border-radius: 50%; animation: rotation 1s linear infinite; }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
     </style>
 </head>
 <body>
 
+    <div id="loadingOverlay"><span class="loader"></span></div>
+    <div class="bg-glow"></div>
+
     <nav class="navbar">
         <div class="nav-container">
-            <div style="display: flex; align-items: center; gap: 40px;">
-                <a href="index.html" style="text-decoration:none; color:var(--primary); font-weight:800; font-size:22px;">X-BET</a>
-                
-                <div class="nav-links">
-                    <a href="index.html" class="nav-item active">Home</a>
-                    <a href="games.html" class="nav-item">Games</a>
-                    <a href="aboutus.html" class="nav-item">About Us</a>
-                    <a href="dashboard.html" class="nav-item auth-only">Dashboard</a>
-                    <a href="bets.html" class="nav-item auth-only">My Bets</a>
-                </div>
+            <a href="index.html" class="logo">X-<span>BET</span></a>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-item active">Home</a>
+                <a href="games.html" class="nav-item">Lobby</a>
+                <a href="dashboard.html" id="dashLink" class="nav-item" style="display:none">Dashboard</a>
+                <a href="bets.html" id="betsLink" class="nav-item" style="display:none">Live Bets</a>
+                <a href="aboutus.html" class="nav-item">About Us</a>
             </div>
 
-            <div id="authSection">
-                <span style="color: var(--text-dim)">Checking session...</span>
-            </div>
+            <div id="authSection" class="auth-group">
+                </div>
         </div>
     </nav>
 
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <div class="ticker-item"><span>WINNER:</span> User442 just won $1,240.00 on Roulette</div>
+            <div class="ticker-item"><span>WINNER:</span> AlphaBet just won $500.00 on Blackjack</div>
+            <div class="ticker-item"><span>WINNER:</span> KingBettor just won $3,100.00 on Slots</div>
+            <div class="ticker-item"><span>WINNER:</span> User442 just won $1,240.00 on Roulette</div>
+        </div>
+    </div>
+
     <main class="hero">
-        <h1>All Systems Operational.</h1>
-        <p>Access your dashboard, browse games, or review your betting history.</p>
+        <div class="hero-content">
+            <h1>NEXT GEN <br>WAGERING.</h1>
+            <p>Experience ultra-low latency gaming with real-time liquid payouts. Secure, fast, and fully transparent logic-based betting.</p>
+            <div class="btn-group" id="heroAction">
+                <a href="signup.html" class="btn-mega btn-filled">Get Started Free</a>
+                <a href="aboutus.html" class="btn-mega" style="color:white; border: 1px solid var(--border)">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div style="width: 100%; height: 500px; background: var(--card-bg); border-radius: 40px; border: 1px solid var(--border); display: grid; place-items: center;">
+                 <span style="color: var(--text-dim)">[ Premium Graphics Container ]</span>
+            </div>
+        </div>
     </main>
 
-    <a href="admin.html" id="adminLink">🛡️ ADMIN PANEL</a>
+    <div class="stats-grid">
+        <div class="stat-card"><h2>24k+</h2><p>Active Players</p></div>
+        <div class="stat-card"><h2>$4.2M</h2><p>Total Payouts</p></div>
+        <div class="stat-card"><h2>< 1m</h2><p>Avg Withdrawal</p></div>
+        <div class="stat-card"><h2>99.9%</h2><p>Uptime Record</p></div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = { /* PASTE YOUR CONFIG HERE */ };
+        const firebaseConfig = { /* PASTE YOUR CONFIG */ };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        const overlay = document.getElementById('loadingOverlay');
         const authSection = document.getElementById('authSection');
-        const authLinks = document.querySelectorAll('.auth-only');
-        const adminLink = document.getElementById('adminLink');
+        const dashLink = document.getElementById('dashLink');
+        const betsLink = document.getElementById('betsLink');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // 1. Show Dashboard & Bets links
-                authLinks.forEach(link => link.style.display = 'block');
-
-                // 2. Listen to User Data (Balance/Role)
+                // User Logged In
                 onSnapshot(doc(db, "users", user.uid), (snap) => {
                     const data = snap.data() || {};
-                    
                     authSection.innerHTML = `
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <div class="user-pill">
-                                <span style="color:var(--secondary); font-weight:800;">$${data.balance || 0}</span>
-                                <span style="font-size:12px;">${data.username || 'User'}</span>
+                        <div style="display:flex; align-items:center; gap:20px;">
+                            <div style="text-align:right">
+                                <div style="color:var(--success); font-weight:800; font-size:18px">$${(data.balance || 0).toLocaleString()}</div>
+                                <div style="color:var(--text-dim); font-size:11px">${data.username}</div>
                             </div>
-                            <button id="logoutBtn" class="btn btn-logout">Logout</button>
+                            <button id="logoutBtn" style="background:none; border: 1px solid #ef4444; color:#ef4444; padding: 8px 15px; border-radius: 8px; cursor:pointer;">Logout</button>
                         </div>
                     `;
-
-                    document.getElementById('logoutBtn').onclick = handleLogout;
-
-                    // 3. Show Admin if applicable
-                    if (data.isAdmin || data.role === 'admin') adminLink.style.display = 'block';
+                    dashLink.style.display = 'block';
+                    betsLink.style.display = 'block';
+                    document.getElementById('logoutBtn').onclick = () => signOut(auth);
                 });
             } else {
-                // User is Guest
-                authLinks.forEach(link => link.style.display = 'none');
+                // User Logged Out
                 authSection.innerHTML = `
-                    <a href="login.html" class="nav-item" style="margin-right:15px">Login</a>
-                    <a href="signup.html" class="btn btn-primary">Join Now</a>
+                    <a href="login.html" style="color:white; text-decoration:none; margin-right:20px; font-weight:600">Login</a>
+                    <a href="signup.html" class="btn-mega btn-filled" style="padding: 12px 25px; font-size: 14px;">Sign Up</a>
                 `;
+                dashLink.style.display = 'none';
+                betsLink.style.display = 'none';
             }
+            // Hide Loader
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 500);
         });
-
-        async function handleLogout() {
-            if (confirm("Sign out of your session?")) {
-                await signOut(auth);
-                window.location.href = "index.html"; 
-            }
-        }
     </script>
 </body>
 </html>
