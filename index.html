@@ -3,642 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Games | X-BET</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>X-BET | Beyond Gaming Logic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Shared styles from index.html */
         :root {
-            --primary: #3b82f6; 
-            --primary-dark: #2563eb;
-            --primary-glow: rgba(59, 130, 246, 0.4);
-            --secondary: #f59e0b; 
-            --secondary-dark: #d97706;
-            --secondary-glow: rgba(245, 158, 11, 0.4);
-            --dark-bg: #05080f;
-            --darker-bg: #020617;
-            --card-bg: rgba(15, 23, 42, 0.8);
-            --text-main: #ffffff; 
-            --text-dim: #94a3b8; 
-            --text-dimmer: #64748b;
-            --border: rgba(255, 255, 255, 0.1);
-            --border-light: rgba(255, 255, 255, 0.05);
-            --success: #10b981; 
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --nav-height: 80px;
-            --transition-fast: 0.2s ease;
-            --transition-base: 0.3s ease;
-            --transition-slow: 0.5s ease;
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-            --glow-primary: 0 0 20px var(--primary-glow);
-            --glow-secondary: 0 0 20px var(--secondary-glow);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
+            --primary: #3b82f6; --secondary: #f59e0b; --dark-bg: #05080f;
+            --text-main: #ffffff; --text-dim: #94a3b8; --border: rgba(255, 255, 255, 0.1);
+            --success: #10b981; --danger: #ef4444; --nav-height: 80px;
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            background: var(--dark-bg); 
-            color: var(--text-main); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-        
-        /* Navigation - same as index */
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(5, 8, 15, 0.95);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--border);
-            height: var(--nav-height);
-        }
-        
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 100%;
-        }
-        
-        .logo {
-            font-size: 32px;
-            font-weight: 800;
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .logo span {
-            color: var(--primary);
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 40px;
-            align-items: center;
-            list-style: none;
-        }
-        
-        .nav-item {
-            color: var(--text-dim);
-            font-weight: 600;
-            font-size: 15px;
-            text-decoration: none;
-            position: relative;
-            padding: 8px 0;
-            transition: color var(--transition-base);
-        }
-        
-        .nav-item::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--secondary);
-            transition: width var(--transition-base);
-        }
-        
-        .nav-item:hover, .nav-item.active {
-            color: white;
-        }
-        
-        .nav-item:hover::after, .nav-item.active::after {
-            width: 100%;
-        }
-        
-        .auth-btn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 12px 28px;
-            border-radius: var(--radius-lg);
-            font-weight: 700;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: all var(--transition-base);
-            box-shadow: var(--shadow-md);
-        }
-        
-        /* Games Page Specific */
-        .games-page {
-            padding-top: calc(var(--nav-height) + 40px);
+            background: var(--dark-bg); color: var(--text-main); 
+            font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; 
+            background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, #05080f 80%);
             min-height: 100vh;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding-left: 30px;
-            padding-right: 30px;
         }
-        
-        .page-header {
-            text-align: center;
-            margin-bottom: 60px;
+
+        /* --- Animations --- */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .fade-in { animation: fadeInUp 0.8s ease forwards; }
+        .floating { animation: float 4s ease-in-out infinite; }
+
+        /* --- Navigation --- */
+        .navbar { 
+            position: fixed; top: 0; width: 100%; z-index: 2000; 
+            background: rgba(5, 8, 15, 0.8); backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--border); height: var(--nav-height); 
         }
-        
-        .page-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 15px;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        .nav-container { max-width: 1400px; margin: 0 auto; padding: 0 30px; display: flex; justify-content: space-between; align-items: center; height: 100%; }
+        .logo { font-size: 24px; font-weight: 800; color: white; text-decoration: none; letter-spacing: -1px; }
+        .logo span { color: var(--primary); }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-item { color: var(--text-dim); font-weight: 600; font-size: 14px; transition: 0.3s; text-decoration: none; }
+        .nav-item:hover, .nav-item.active { color: white; }
+
+        /* --- Hero Section --- */
+        main { padding-top: calc(var(--nav-height) + 60px); max-width: 1400px; margin: 0 auto; padding-bottom: 100px; }
+        .hero-grid { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 30px; align-items: center; padding: 0 20px; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px); border: 1px solid var(--border);
+            border-radius: 24px; padding: 30px; transition: 0.3s;
         }
+
+        .hero-text h1 { font-size: clamp(40px, 5vw, 68px); font-weight: 800; line-height: 1; margin-bottom: 20px; letter-spacing: -3px; text-align: center; }
+        .hero-text p { color: var(--text-dim); font-size: 18px; max-width: 450px; margin: 0 auto 40px; text-align: center; }
+
+        /* --- Auth & User UI --- */
+        .user-pill { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 6px 16px; border-radius: 50px; border: 1px solid var(--border); }
+        .balance-val { color: var(--success); font-weight: 800; }
+        .btn { padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-size: 14px; text-decoration: none; display: inline-block; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: white; }
+        .logout-btn { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 12px; margin-left: 10px; }
+        .logout-btn:hover { color: var(--danger); }
+
+        .sync-spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
+        .hidden { display: none !important; }
+
+        /* --- Stats --- */
+        .stat-group { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        .stat-item span { font-size: 32px; font-weight: 800; display: block; }
         
-        .page-subtitle {
-            font-size: 1.2rem;
-            color: var(--text-dim);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .games-filter {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            padding: 10px 24px;
-            border-radius: var(--radius-lg);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all var(--transition-base);
-        }
-        
-        .filter-btn.active, .filter-btn:hover {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border-color: transparent;
-        }
-        
-        .games-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 80px;
-        }
-        
-        .game-item {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            transition: all var(--transition-base);
-            position: relative;
-        }
-        
-        .game-item:hover {
-            transform: translateY(-10px);
-            border-color: var(--primary);
-            box-shadow: var(--glow-primary);
-        }
-        
-        .game-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--danger);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            z-index: 2;
-        }
-        
-        .game-image {
-            height: 200px;
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-        }
-        
-        .game-details {
-            padding: 25px;
-        }
-        
-        .game-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .game-description {
-            color: var(--text-dim);
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-        
-        .game-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        
-        .stat {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--secondary);
-        }
-        
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--text-dimmer);
-        }
-        
-        .play-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
-            color: white;
-            padding: 12px;
-            border-radius: var(--radius-md);
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all var(--transition-base);
-        }
-        
-        .play-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--glow-secondary);
-        }
-        
-        .featured-section {
-            margin: 80px 0;
-        }
-        
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .jackpot-display {
-            background: linear-gradient(135deg, var(--primary-dark), #7c3aed);
-            border-radius: var(--radius-xl);
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 60px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .jackpot-label {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 10px;
-        }
-        
-        .jackpot-amount {
-            font-size: 4rem;
-            font-weight: 800;
-            color: white;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-        
-        .jackpot-game {
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 10px;
-        }
-        
-        .footer {
-            padding: 60px 30px 30px;
-            border-top: 1px solid var(--border);
-            background: var(--darker-bg);
-            text-align: center;
-            margin-top: 80px;
-        }
-        
-        .footer-logo {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-        }
-        
-        .copyright {
-            color: var(--text-dimmer);
-            font-size: 0.9rem;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-light);
-        }
-        
-        @media (max-width: 768px) {
-            .games-page {
-                padding: calc(var(--nav-height) + 20px) 20px;
+        /* Mobile Hamburger */
+        #menuToggle { display: none; background: none; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 8px; cursor: pointer; }
+
+        @media (max-width: 1100px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            #menuToggle { display: block; }
+            .nav-links { 
+                position: fixed; top: 80px; left: 0; width: 100%; background: #05080f; 
+                flex-direction: column; padding: 20px; transform: translateY(-150%); transition: 0.3s;
             }
-            
-            .page-title {
-                font-size: 2.5rem;
-            }
-            
-            .games-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .jackpot-amount {
-                font-size: 3rem;
-            }
-            
-            .nav-links {
-                display: none;
-                position: fixed;
-                top: var(--nav-height);
-                left: 0;
-                width: 100%;
-                background: var(--dark-bg);
-                flex-direction: column;
-                padding: 30px;
-                gap: 20px;
-                border-bottom: 1px solid var(--border);
-            }
-            
-            .nav-links.active {
-                display: flex;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-                background: none;
-                border: none;
-                color: white;
-                font-size: 1.5rem;
-                cursor: pointer;
-            }
-        }
-        
-        .mobile-menu-btn {
-            display: none;
+            .nav-links.active { transform: translateY(0); }
         }
     </style>
 </head>
-<body>
-    <!-- Navigation -->
+
+<body 
+    data-api-key="YOUR_KEY" 
+    data-auth-domain="YOUR_DOMAIN" 
+    data-project-id="YOUR_ID"
+    data-bucket="YOUR_BUCKET"
+    data-sender-id="YOUR_SENDER"
+    data-app-id="YOUR_APP"
+>
+
     <nav class="navbar">
         <div class="nav-container">
-            <a href="index.html" class="logo">
-                X-<span>BET</span>
-            </a>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <button id="menuToggle">☰</button>
+                <a href="index.html" class="logo">X-<span>BET</span></a>
+            </div>
             
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <ul class="nav-links" id="navLinks">
-                <li><a href="index.html" class="nav-item">Home</a></li>
-                <li><a href="games.html" class="nav-item active">Games</a></li>
-                <li><a href="dashboard.html" class="nav-item">Dashboard</a></li>
-                <li><a href="leaderboard.html" class="nav-item">Leaderboard</a></li>
-                <li><a href="support.html" class="nav-item">Support</a></li>
+            <ul id="navLinks" class="nav-links">
+                <li><a href="index.html" class="nav-item active">Home</a></li>
+                <li><a href="games.html" class="nav-item">Games</a></li>
+                <li><a href="dashboard.html" id="link-dash" class="nav-item hidden">Dashboard</a></li>
             </ul>
-            
-            <a href="login.html" class="auth-btn">Join Now</a>
-        </div>
-    </nav>
-    
-    <!-- Games Page Content -->
-    <main class="games-page">
-        <header class="page-header">
-            <h1 class="page-title">ALL GAMES</h1>
-            <p class="page-subtitle">Choose from over 200+ premium games with the highest payout rates in the industry</p>
-        </header>
-        
-        <!-- Games Filter -->
-        <div class="games-filter">
-            <button class="filter-btn active" data-filter="all">All Games</button>
-            <button class="filter-btn" data-filter="slots">Slots</button>
-            <button class="filter-btn" data-filter="live">Live Casino</button>
-            <button class="filter-btn" data-filter="table">Table Games</button>
-            <button class="filter-btn" data-filter="crypto">Crypto Games</button>
-            <button class="filter-btn" data-filter="jackpot">Jackpot</button>
-        </div>
-        
-        <!-- Featured Jackpot -->
-        <div class="featured-section">
-            <h2 class="section-title">MEGA JACKPOT</h2>
-            <div class="jackpot-display">
-                <div class="jackpot-label">PROGRESSIVE JACKPOT</div>
-                <div class="jackpot-amount">$12,450,320</div>
-                <div class="jackpot-game">Royal Fortune Mega Jackpot</div>
+
+            <div id="authArea">
+                <div class="sync-spinner"></div>
             </div>
         </div>
-        
-        <!-- Games Grid -->
-        <div class="games-container" id="gamesGrid">
-            <!-- Game items will be populated here -->
-        </div>
-    </main>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-logo">X-<span style="color:var(--primary)">BET</span></div>
-        <div class="copyright">
-            © 2024 X-BET Enterprise Gaming. All rights reserved. | Must be 18+ to play | Please gamble responsibly
-        </div>
-    </footer>
-    
-    <script>
-        // Games Data
-        const games = [
-            {
-                id: 1,
-                name: "Royal Fortune",
-                category: "slots",
-                description: "Progressive jackpot slots with royal theme and bonus rounds",
-                icon: "crown",
-                players: "2.4M",
-                rtp: "98.5%",
-                volatility: "High",
-                badge: "HOT"
-            },
-            {
-                id: 2,
-                name: "Dice Dynasty",
-                category: "table",
-                description: "Ancient dice game with modern multipliers",
-                icon: "dice",
-                players: "1.8M",
-                rtp: "99.1%",
-                volatility: "Medium",
-                badge: "TRENDING"
-            },
-            {
-                id: 3,
-                name: "Crypto Crash",
-                category: "crypto",
-                description: "Predict crypto market crashes for massive multipliers",
-                icon: "gem",
-                players: "3.1M",
-                rtp: "97.8%",
-                volatility: "Very High",
-                badge: "NEW"
-            },
-            {
-                id: 4,
-                name: "Blackjack Pro",
-                category: "table",
-                description: "Professional blackjack with live dealers",
-                icon: "spade",
-                players: "890K",
-                rtp: "99.5%",
-                volatility: "Low",
-                badge: null
-            },
-            {
-                id: 5,
-                name: "Roulette Royale",
-                category: "live",
-                description: "Live roulette with immersive 4K streaming",
-                icon: "circle",
-                players: "1.2M",
-                rtp: "97.3%",
-                volatility: "Medium",
-                badge: "POPULAR"
-            },
-            {
-                id: 6,
-                name: "Mega Wheel",
-                category: "jackpot",
-                description: "Spin the wheel for massive progressive jackpots",
-                icon: "sync",
-                players: "2.1M",
-                rtp: "96.9%",
-                volatility: "High",
-                badge: "JACKPOT"
-            },
-            {
-                id: 7,
-                name: "Bitcoin Blast",
-                category: "crypto",
-                description: "Mine bitcoin in this exciting arcade game",
-                icon: "bitcoin",
-                players: "1.5M",
-                rtp: "98.2%",
-                volatility: "Medium",
-                badge: "CRYPTO"
-            },
-            {
-                id: 8,
-                name: "Poker Championship",
-                category: "live",
-                description: "Compete in global poker tournaments",
-                icon: "heart",
-                players: "950K",
-                rtp: "99.0%",
-                volatility: "High",
-                badge: "TOURNAMENT"
-            }
-        ];
-        
-        // Render games
-        function renderGames(filter = 'all') {
-            const grid = document.getElementById('gamesGrid');
-            const filteredGames = filter === 'all' 
-                ? games 
-                : games.filter(game => game.category === filter);
-            
-            grid.innerHTML = filteredGames.map(game => `
-                <div class="game-item" data-category="${game.category}">
-                    ${game.badge ? `<div class="game-badge">${game.badge}</div>` : ''}
-                    <div class="game-image">
-                        <i class="fas fa-${game.icon}"></i>
+    </nav>
+
+    <main>
+        <div class="hero-grid">
+            <div class="glass-card floating fade-in">
+                <h3 style="font-size: 12px; letter-spacing: 2px; margin-bottom: 20px;">GREATNESS OF X-BET</h3>
+                <p style="font-size: 13px; color: var(--text-dim); line-height: 1.6;">X-BET is built on proprietary enterprise-grade logic, ensuring that every millisecond of gameplay is fair, fast, and transparent.</p>
+                <ul style="margin-top: 20px; list-style: none; font-size: 13px;">
+                    <li style="margin-bottom: 10px;">🛡️ Anti-Manipulation Shield</li>
+                    <li style="margin-bottom: 10px;">💎 High-Yield RTP Algorithm</li>
+                    <li style="margin-bottom: 10px;">☁️ Low-Latency Execution</li>
+                </ul>
+            </div>
+
+            <div class="hero-text fade-in" style="animation-delay: 0.2s;">
+                <h1>BEYOND<br><span style="color: var(--primary);">GAMING</span> LOGIC</h1>
+                <p>The first gaming ecosystem to combine high-stakes thrill with institutional-grade security.</p>
+                <div id="heroAction">
                     </div>
-                    <div class="game-details">
-                        <h3 class="game-name">${game.name}</h3>
-                        <p class="game-description">${game.description}</p>
-                        <div class="game-stats">
-                            <div class="stat">
-                                <div class="stat-value">${game.players}</div>
-                                <div class="stat-label">Players</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-value">${game.rtp}</div>
-                                <div class="stat-label">RTP</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-value">${game.volatility}</div>
-                                <div class="stat-label">Volatility</div>
-                            </div>
-                        </div>
-                        <button class="play-btn" onclick="playGame(${game.id})">
-                            <i class="fas fa-play"></i> Play Now
-                        </button>
+            </div>
+
+            <div class="glass-card floating fade-in" style="animation-delay: 0.4s;">
+                <div class="stat-group">
+                    <div class="stat-item">
+                        <h4 style="font-size: 10px; color: var(--text-dim);">WINNER RATE</h4>
+                        <span style="color: var(--success);">92.7%</span>
+                    </div>
+                    <div class="stat-item">
+                        <h4 style="font-size: 10px; color: var(--text-dim);">ACTIVE USERS</h4>
+                        <span>98.1k</span>
                     </div>
                 </div>
-            `).join('');
-        }
-        
-        // Filter games
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                const filter = this.getAttribute('data-filter');
-                renderGames(filter);
-            });
+                <h3 style="font-size: 12px; margin-bottom: 15px;">TOP TRENDING</h3>
+                <div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; border-left: 2px solid var(--primary);">
+                    <h5 style="font-size: 13px;">Quantum Dice</h5>
+                    <p style="font-size: 11px; color: var(--text-dim);">99.2% RTP Certified</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const ds = document.body.dataset;
+        const firebaseConfig = {
+            apiKey: ds.apiKey, authDomain: ds.authDomain, projectId: ds.projectId,
+            storageBucket: ds.bucket, messagingSenderId: ds.senderId, appId: ds.appId
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let unsubscribeFirestore = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (unsubscribeFirestore) unsubscribeFirestore();
+            if (user) {
+                unsubscribeFirestore = onSnapshot(doc(db, "users", user.uid), (snap) => {
+                    if (snap.exists()) renderUserUI(snap.data());
+                });
+            } else {
+                renderGuestUI();
+            }
         });
-        
-        // Play game function
-        function playGame(gameId) {
-            alert(`Starting game ${gameId} - In a real implementation, this would launch the game.`);
-        }
-        
-        // Mobile menu
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.getElementById('navLinks');
-        
-        mobileMenuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-        });
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            renderGames();
+
+        function renderUserUI(data) {
+            document.getElementById('link-dash').classList.remove('hidden');
+            document.getElementById('heroAction').innerHTML = `<a href="games.html" class="btn btn-primary">Go to Lobby</a>`;
             
-            // Set active nav
-            const currentPage = window.location.pathname.split('/').pop();
-            document.querySelectorAll('.nav-item').forEach(item => {
-                if (item.getAttribute('href') === currentPage) {
-                    item.classList.add('active');
-                }
-            });
-        });
+            document.getElementById('authArea').innerHTML = `
+                <div class="user-pill">
+                    <span class="balance-val">$${(Number(data.balance) || 0).toLocaleString()}</span>
+                    <span style="font-size:12px; font-weight:600;">${data.username}</span>
+                    <button id="logoutBtn" class="logout-btn">Logout</button>
+                </div>
+            `;
+            document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.reload());
+        }
+
+        function renderGuestUI() {
+            document.getElementById('link-dash').classList.add('hidden');
+            document.getElementById('heroAction').innerHTML = `<a href="signup.html" class="btn btn-primary">Start Playing Now</a>`;
+            
+            document.getElementById('authArea').innerHTML = `
+                <a href="login.html" class="nav-item" style="margin-right:20px;">Login</a>
+                <a href="signup.html" class="btn btn-primary">Sign Up</a>
+            `;
+        }
+
+        // Mobile Menu
+        document.getElementById('menuToggle').onclick = () => {
+            document.getElementById('navLinks').classList.toggle('active');
+        };
     </script>
 </body>
 </html>
