@@ -3,139 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET | Premium Gaming Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        /* CSS remains largely the same for UI consistency */
+    <title>X-BET | The Gold Standard of Gaming</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@lucide/icons"></script> <style>
         :root {
-            --primary: #3b82f6; --secondary: #f59e0b; --dark-bg: #0f172a;
-            --text-main: #f8fafc; --text-dim: #94a3b8; --success: #10b981;
-            --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --secondary: #f59e0b;
+            --dark-bg: #070b14;
+            --card-bg: rgba(15, 23, 42, 0.6);
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --glass: border-box linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            --border: rgba(255, 255, 255, 0.08);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--dark-bg); color: var(--text-main); line-height: 1.6; }
 
-        .navbar { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border); }
-        .nav-container { max-width: 1300px; margin: 0 auto; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 26px; font-weight: 800; text-decoration: none; color: var(--primary); }
-        .logo span { color: var(--secondary); }
-        .auth-group { display: flex; gap: 12px; }
+        /* Smooth Scroll & Selection */
+        html { scroll-behavior: smooth; }
+        ::selection { background: var(--primary); color: white; }
 
-        .btn { padding: 10px 22px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; text-decoration: none; border: none; }
-        .btn-login { background: var(--glass); color: white; border: 1px solid var(--glass-border); }
-        .btn-signup { background: var(--primary); color: white; }
-        
-        .hero { padding: 180px 20px 100px; text-align: center; max-width: 900px; margin: 0 auto; }
-        .hero h1 { font-size: clamp(40px, 8vw, 72px); font-weight: 800; margin-bottom: 24px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        #adminLink { position: fixed; bottom: 30px; right: 30px; background: #ef4444; color: white; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-weight: 700; display: none; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); }
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        /* --- MODERN NAVIGATION --- */
+        .navbar {
+            position: fixed;
+            top: 0; width: 100%; z-index: 1000;
+            background: rgba(7, 11, 20, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 32px; height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: grid; place-items: center;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        /* --- AUTH SECTION LOADING STATE --- */
+        #authSection { min-width: 200px; display: flex; justify-content: flex-end; align-items: center; gap: 15px; }
+
+        .user-pill {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 6px 16px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .balance { color: var(--success); font-weight: 700; font-family: monospace; }
+
+        /* --- HERO UPGRADE --- */
+        .hero-container {
+            position: relative;
+            padding: 200px 20px 120px;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+        }
+
+        .hero-title {
+            font-size: clamp(48px, 10vw, 84px);
+            font-weight: 800;
+            letter-spacing: -3px;
+            line-height: 1;
+            margin-bottom: 30px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #64748b 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px var(--primary-glow); }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        .btn-outline { background: transparent; color: white; border: 1px solid var(--border); }
+        .btn-outline:hover { background: var(--border); }
+
+        /* Admin Floater Hidden by Default */
+        #adminLink {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--danger); color: white;
+            padding: 15px 25px; border-radius: 15px;
+            text-decoration: none; font-weight: 800;
+            display: none; z-index: 9999;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
         <div class="nav-container">
-            <a href="index.html" class="logo">X-<span>BET</span></a>
-            <div class="auth-group" id="authSection">
-                <div class="loading-dots">...</div>
+            <a href="index.html" class="logo">
+                <div class="logo-icon">X</div> X-BET
+            </a>
+            
+            <div id="authSection">
+                <div class="skeleton" style="width: 150px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 10px;"></div>
             </div>
         </div>
     </nav>
 
-    <main>
-        <section class="hero">
-            <h1>Experience Premium <br>Gaming Logic.</h1>
-            <p>Your secure gateway to instant-payout betting and verified fair play.</p>
-            <div id="heroActions">
-                <a href="signup.html" class="btn btn-signup">Create Free Account</a>
-            </div>
-        </section>
-    </main>
+    <div class="hero-container">
+        <h1 class="hero-title">WAGER ON <br>THE EDGE.</h1>
+        <p style="color: var(--text-dim); font-size: 20px; max-width: 600px; margin: 0 auto 40px;">
+            The world's first decentralized logic-based betting engine. High stakes, instant verification.
+        </p>
+        <div id="heroActions">
+            <a href="signup.html" class="btn btn-primary">Start Winning Now</a>
+        </div>
+    </div>
 
-    <a href="admin.html" id="adminLink">Admin Panel</a>
+    <a href="admin.html" id="adminLink">🛡️ SYSTEM ADMIN</a>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Your Config (Use your actual config here)
+        // CONFIG (Replace with your actual Firebase config)
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIza...",
+            authDomain: "your-app.firebaseapp.com",
+            projectId: "your-app",
+            storageBucket: "your-app.appspot.com",
+            messagingSenderId: "...",
+            appId: "..."
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const authSection = document.getElementById('authSection');
-        const adminLink = document.getElementById('adminLink');
-
-        // 1. THE OBSERVER: This is the "Truth" source
-        onAuthStateChanged(auth, async (user) => {
+        // --- AUTH ENGINE ---
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in with Firebase
-                console.log("Firebase Auth Verified:", user.uid);
-                
-                // Fetch fresh data from Firestore to verify Admin status (Prevents LocalStorage faking)
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                const userData = userDoc.exists() ? userDoc.data() : {};
-                
-                // Sync LocalStorage for non-sensitive UI persistence
-                const sessionData = {
-                    uid: user.uid,
-                    username: userData.username || user.displayName || 'User',
-                    isAdmin: userData.isAdmin || false,
-                    isLoggedIn: true
-                };
-                localStorage.setItem('XBET_SESSION', JSON.stringify(sessionData));
-
-                renderLoggedInUI(sessionData);
+                // Real-time Firestore Listener for Balance & Admin Role
+                // This updates the UI INSTANTLY if the admin changes your balance in the DB
+                onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                    const data = docSnap.exists() ? docSnap.data() : {};
+                    renderUserUI(user, data);
+                    checkAdminStatus(data);
+                });
             } else {
-                // User is signed out
-                localStorage.removeItem('XBET_SESSION');
-                renderLoggedOutUI();
+                renderGuestUI();
             }
         });
 
-        // 2. UI RENDERING FUNCTIONS
-        function renderLoggedInUI(user) {
+        function renderUserUI(user, extraData) {
+            const authSection = document.getElementById('authSection');
+            const balance = extraData.balance || 0;
+            
             authSection.innerHTML = `
-                <span style="color:var(--text-dim); font-size:14px; margin-right:10px">Hi, ${user.username}</span>
-                <a href="dashboard.html" class="btn btn-login">Dashboard</a>
-                <button id="logoutBtn" class="btn btn-signup" style="background:#ef4444">Logout</button>
+                <div class="user-pill">
+                    <span class="balance">$${balance.toLocaleString()}</span>
+                    <span style="color: var(--text-dim)">|</span>
+                    <span style="font-weight: 600">${extraData.username || 'Player'}</span>
+                </div>
+                <a href="dashboard.html" class="btn btn-outline" style="padding: 8px 16px;">Dashboard</a>
+                <button onclick="window.logout()" class="btn" style="color: var(--danger); padding: 0; background: none;">Logout</button>
             `;
 
-            document.getElementById('logoutBtn').onclick = handleLogout;
+            // Update Hero Action if logged in
+            document.getElementById('heroActions').innerHTML = `
+                <a href="games.html" class="btn btn-primary">Enter Game Lobby</a>
+            `;
+        }
 
-            if (user.isAdmin) {
-                adminLink.style.display = 'block';
+        function renderGuestUI() {
+            document.getElementById('authSection').innerHTML = `
+                <a href="login.html" class="btn btn-outline">Login</a>
+                <a href="signup.html" class="btn btn-primary">Sign Up</a>
+            `;
+            document.getElementById('adminLink').style.display = 'none';
+        }
+
+        function checkAdminStatus(data) {
+            if (data.role === 'admin' || data.isAdmin === true) {
+                document.getElementById('adminLink').style.display = 'block';
             }
         }
 
-        function renderLoggedOutUI() {
-            authSection.innerHTML = `
-                <a href="login.html" class="btn btn-login">Login</a>
-                <a href="signup.html" class="btn btn-signup">Sign Up</a>
-            `;
-            adminLink.style.display = 'none';
-        }
-
-        // 3. SECURE LOGOUT
-        async function handleLogout() {
-            try {
-                await signOut(auth); // Destroys the Firebase session
-                localStorage.removeItem('XBET_SESSION'); // Cleans the UI session
+        // Global Logout Function
+        window.logout = async () => {
+            if(confirm("Sign out of X-BET?")) {
+                await signOut(auth);
                 window.location.reload();
-            } catch (error) {
-                console.error("Logout Error:", error);
             }
-        }
+        };
     </script>
 </body>
 </html>
