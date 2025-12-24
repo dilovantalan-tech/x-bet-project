@@ -6,19 +6,42 @@
     <title>X-BET | Authorized Access</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --p-blue: #3b82f6; --p-orange: #f59e0b; --bg: #0f172a; --glass: rgba(255, 255, 255, 0.03); }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-image: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); }
-        .card { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; }
+        :root { --p-blue: #3b82f6; --p-orange: #f59e0b; --bg: #0f172a; --glass: rgba(255, 255, 255, 0.05); }
+        body { 
+            margin: 0; background: var(--bg); color: white; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh;
+            background-image: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+        .card { 
+            background: var(--glass); backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.1); padding: 40px; 
+            border-radius: 24px; width: 100%; max-width: 400px; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; 
+        }
         .logo { font-size: 32px; font-weight: 800; color: var(--p-blue); margin-bottom: 30px; }
         .logo span { color: var(--p-orange); }
         .form-group { margin-bottom: 20px; text-align: left; }
         label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; }
-        input { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        input { 
+            width: 100%; padding: 14px; background: rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; 
+            color: white; box-sizing: border-box; font-size: 16px; transition: 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--p-blue); background: rgba(0,0,0,0.5); }
+        .btn { 
+            width: 100%; padding: 16px; background: linear-gradient(135deg, #3b82f6, #2563eb); 
+            border: none; border-radius: 12px; color: white; font-weight: 700; 
+            cursor: pointer; transition: 0.3s; margin-top: 10px; 
+        }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        #status { margin-top: 20px; padding: 12px; border-radius: 10px; display: none; font-size: 13px; word-break: break-word; }
-        .error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
-        .success { background: rgba(16, 185, 129, 0.1); color: #4ade80; border: 1px solid rgba(16, 185, 129, 0.2); }
+        #status { 
+            margin-top: 20px; padding: 12px; border-radius: 10px; 
+            display: none; font-size: 13px; word-break: break-all; line-height: 1.4;
+        }
+        .error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
+        .success { background: rgba(16, 185, 129, 0.15); color: #4ade80; border: 1px solid #10b981; }
     </style>
 </head>
 <body>
@@ -27,18 +50,20 @@
         <div class="logo">X-<span>BET</span></div>
         <form id="loginForm">
             <div class="form-group">
-                <label>Registered Email</label>
-                <input type="email" id="email" placeholder="email@example.com" required>
+                <label>Email Address</label>
+                <input type="email" id="email" autocomplete="email" required>
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="password" placeholder="••••••••" required>
+                <input type="password" id="password" autocomplete="current-password" required>
             </div>
             <button type="submit" class="btn" id="submitBtn">Authorized Login</button>
         </form>
+        
         <div id="status"></div>
+        
         <div style="margin-top:25px; font-size:14px; color:#64748b;">
-            Need an account? <a href="signup.html" style="color:var(--p-orange); text-decoration:none; font-weight:600;">Signup</a>
+            New Player? <a href="signup.html" style="color:var(--p-orange); text-decoration:none; font-weight:600;">Join Now</a>
         </div>
     </div>
 
@@ -56,58 +81,76 @@
             appId: "1:499334334535:web:bebc1bf817e24d9e3c4962"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // --- Initialization with Error Catching ---
+        let auth, db;
+        try {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Firebase Init Error", e);
+            alert("Critical Error: Check your internet connection or Firebase config.");
+        }
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        const loginForm = document.getElementById('loginForm');
+        const statusBox = document.getElementById('status');
+        const submitBtn = document.getElementById('submitBtn');
+
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const statusBox = document.getElementById('status');
-            const submitBtn = document.getElementById('submitBtn');
             
+            // UI Reset
             statusBox.style.display = 'none';
             submitBtn.disabled = true;
-            submitBtn.innerText = "Authenticating...";
+            submitBtn.innerHTML = "Processing...";
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
             try {
-                // 1. AUTHENTICATION (Checks Firebase Auth Users list)
+                // 1. FIREBASE AUTHENTICATION
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // 2. DATA SYNC (Fetch balance/username from Firestore)
+                // 2. FIRESTORE PROFILE CHECK (The 60-second verify step)
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 
                 if (userDoc.exists()) {
+                    const userData = userDoc.data();
+
+                    // 3. PERSISTENT SESSION
                     localStorage.setItem('XBET_SESSION', JSON.stringify({
                         uid: user.uid,
-                        ...userDoc.data()
+                        username: userData.username,
+                        balance: userData.balance || 0,
+                        transCode: userData.transactionCode,
+                        isLoggedIn: true
                     }));
 
                     statusBox.className = "success";
-                    statusBox.innerText = "Access Verified! Loading Profile...";
+                    statusBox.innerText = "ACCESS GRANTED: Synchronizing Profile...";
                     statusBox.style.display = "block";
 
-                    setTimeout(() => { window.location.href = "index.html"; }, 1500);
+                    // Robust Redirect
+                    setTimeout(() => { 
+                        window.location.replace("index.html"); 
+                    }, 1200);
                 } else {
-                    throw new Error("profile-missing");
+                    // Profile exists in Auth but not in Firestore Database
+                    throw new Error("FIRESTORE_DATA_MISSING: No user document found matching this UID.");
                 }
 
             } catch (error) {
-                console.error("Login Error:", error);
+                console.error("Login Failure:", error);
                 statusBox.className = "error";
                 statusBox.style.display = "block";
                 
-                // DIAGNOSIS LOGIC: Shows real reason for failure
-                if (error.code === 'auth/user-not-found') {
-                    statusBox.innerText = "User not found in Firebase Auth. Did you use createUserWithEmailAndPassword on signup?";
-                } else if (error.code === 'auth/wrong-password') {
-                    statusBox.innerText = "Incorrect password.";
-                } else {
-                    statusBox.innerText = "System Error: " + (error.code || error.message);
-                }
+                // Detailed diagnostic output for you
+                let errorTitle = "LOGIN FAILED";
+                if (error.code === 'auth/user-not-found') errorTitle = "USER NOT FOUND";
+                if (error.code === 'auth/wrong-password') errorTitle = "INCORRECT PASSWORD";
+                
+                statusBox.innerHTML = `<strong>${errorTitle}</strong><br>Code: ${error.code || 'Data Error'}<br>System: ${error.message}`;
                 
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Authorized Login";
