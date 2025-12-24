@@ -3,68 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-BET | Secure Access</title>
+    <title>X-BET | Gateway</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #3b82f6; --bg: #0f172a; }
-        body { 
-            margin: 0; background: var(--bg); color: white; 
-            font-family: 'Inter', system-ui, sans-serif; 
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
+        :root {
+            --accent: #3b82f6;
+            --bg-dark: #020617;
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --border: rgba(255, 255, 255, 0.08);
         }
-        .login-container {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 40px; border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 100%; max-width: 380px; text-align: center;
-            backdrop-filter: blur(10px);
+
+        body {
+            margin: 0;
+            background: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(30, 58, 138, 0.2) 0%, transparent 50%);
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
-        .logo { font-size: 32px; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
-        .status-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .conn-text { font-size: 12px; color: #94a3b8; margin-bottom: 30px; }
+
+        /* Modern Glassmorphism Card */
+        .portal-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 48px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+        }
+
+        .logo-area { margin-bottom: 32px; }
+        .logo-text { 
+            font-size: 38px; 
+            font-weight: 800; 
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-group { position: relative; margin-bottom: 16px; text-align: left; }
+        label { font-size: 12px; font-weight: 600; color: #94a3b8; margin-left: 12px; margin-bottom: 6px; display: block; }
         
         input {
-            width: 100%; padding: 14px; margin: 10px 0;
-            background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px; color: white; font-size: 16px; box-sizing: border-box;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
         }
-        input:focus { outline: 2px solid var(--primary); border-color: transparent; }
-        
-        .btn {
-            width: 100%; padding: 15px; background: var(--primary);
-            border: none; border-radius: 10px; color: white;
-            font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.2s;
-        }
-        .btn:hover { background: #2563eb; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        #error-msg { 
-            background: rgba(248, 113, 113, 0.1); color: #f87171;
-            padding: 10px; border-radius: 8px; margin-top: 20px;
-            font-size: 14px; display: none; 
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 24px;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        }
+
+        .login-btn:hover { transform: translateY(-2px); background: #2563eb; }
+        .login-btn:active { transform: translateY(0); }
+
+        #status-msg {
+            font-size: 13px;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .success { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+
+        /* Navigation Links */
+        .footer-links { margin-top: 32px; font-size: 14px; color: #64748b; }
+        .footer-links a { color: var(--accent); text-decoration: none; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <div class="logo">X-BET</div>
-        <div class="conn-text"><span class="status-dot"></span> Cloud Infrastructure Active</div>
+    <div class="portal-card">
+        <div class="logo-area">
+            <div class="logo-text">X-BET</div>
+            <p style="color: #64748b; font-size: 14px; margin-top: 8px;">Institutional Gaming Portal</p>
+        </div>
 
-        <form id="loginForm">
-            <input type="email" id="email" placeholder="Email Address" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit" class="btn" id="loginBtn">Sign In</button>
+        <form id="authForm">
+            <div class="input-group">
+                <label>IDENTIFICATION</label>
+                <input type="email" id="email" placeholder="email@x-bet.com" required>
+            </div>
+            <div class="input-group" style="margin-bottom: 0;">
+                <label>SECURITY KEY</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="login-btn" id="submitBtn">Unseal Portal</button>
         </form>
 
-        <div id="error-msg"></div>
+        <div id="status-msg"></div>
+
+        <div class="footer-links">
+            New operative? <a href="signup.html">Request Access</a>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 1. Configuration (Exactly the same as Signup)
+        // CONFIG (Ensure this matches your Firebase Project)
         const firebaseConfig = {
             apiKey: "AIzaSyA72Yo_YGqno9PX25p3yQBvyflcaM-NqEM",
             authDomain: "x-bet-prod-jd.firebaseapp.com",
@@ -74,73 +151,75 @@
             appId: "1:499334334535:web:bebc1bf817e24d9e3c4962"
         };
 
-        // 2. Initialize
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const errorDiv = document.getElementById('error-msg');
+        // UI ELEMENTS
+        const authForm = document.getElementById('authForm');
+        const statusMsg = document.getElementById('status-msg');
+        const submitBtn = document.getElementById('submitBtn');
 
-        // 3. Login Logic
-        loginForm.addEventListener('submit', async (e) => {
+        // AUTO-CHECK: If user is already logged in, move to index immediately
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = "index.html";
+            }
+        });
+
+        authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // UI State
-            errorDiv.style.display = 'none';
-            loginBtn.disabled = true;
-            loginBtn.innerText = "Authenticating...";
+            // Start Loading
+            statusMsg.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Authenticating...";
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             try {
-                // A. Sign in with Auth
+                // 1. Firebase Auth
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // B. Get User Profile from Firestore
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-
+                // 2. Fetch Detailed Profile
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                
                 if (userSnap.exists()) {
                     const userData = userSnap.data();
 
-                    // C. Save session to LocalStorage for the Index/Dashboard
-                    localStorage.setItem('XBET_SESSION', JSON.stringify({
-                        uid: user.uid,
+                    // 3. Store Session locally for quick UI access
+                    localStorage.setItem('XBET_ACTIVE_USER', JSON.stringify({
                         username: userData.username,
                         balance: userData.balance || 0,
-                        lastLogin: new Date().toISOString()
+                        role: userData.isAdmin ? 'ADMIN' : 'PLAYER'
                     }));
 
-                    // D. Redirect to Index
-                    loginBtn.innerText = "Access Granted!";
-                    loginBtn.style.background = "#10b981";
-                    
-                    setTimeout(() => {
-                        window.location.href = "index.html"; 
-                    }, 800);
+                    // Success Feedback
+                    statusMsg.className = "success";
+                    statusMsg.innerText = "Identity Confirmed. Redirecting...";
+                    statusMsg.style.display = "block";
+
+                    setTimeout(() => { window.location.href = "index.html"; }, 1000);
                 } else {
-                    throw new Error("Profile not found in database.");
+                    throw new Error("No database profile found for this account.");
                 }
 
             } catch (error) {
-                console.error("Login Error:", error);
-                errorDiv.style.display = 'block';
+                console.error(error);
+                statusMsg.className = "error";
+                statusMsg.style.display = "block";
                 
-                // Clean up error messages
+                // User Friendly Errors
                 if (error.code === 'auth/invalid-credential') {
-                    errorDiv.innerText = "Invalid email or password.";
-                } else if (error.code === 'auth/user-not-found') {
-                    errorDiv.innerText = "Account does not exist.";
+                    statusMsg.innerText = "Invalid credentials. Access denied.";
                 } else {
-                    errorDiv.innerText = "System Error: Unable to login.";
+                    statusMsg.innerText = "System Error: " + error.message;
                 }
                 
-                loginBtn.disabled = false;
-                loginBtn.innerText = "Sign In";
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Unseal Portal";
             }
         });
     </script>
